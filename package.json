@@ -50,6 +50,7 @@
 	},
 	"homepage": "https://github.com/oliverfindl/electron-vue-boilerplate#readme",
 	"dependencies": {
+		"liquor-tree": "^0.2.70",
 		"vue": "^2.6.11"
 	},
 	"devDependencies": {

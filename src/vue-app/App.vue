@@ -1,48 +1,56 @@
 <template lang="html">
 	<div id="app">
-		<img src="@/assets/logo.png" />
+		<Toolbar @setCategories="setCategories" />
+		<div class="content">
+			<Sidebar 
+				:categories="categories"
+				@itemChanged="onItemChanged"
+			/>
+			<Editpane :details="details" />
+		</div>
 	</div>
 </template>
 
 <script>
+import Toolbar from './components/Toolbar'
+import Sidebar from './components/Sidebar'
+import Editpane from './components/Editpane'
 
-	"use strict";
-
-	export default {
-		name: "App",
-		data: () => ({
-			message: "Welcome to Your Vue.js App"
-		})
-	};
+export default {
+	name: "App",
+	components: {
+		Toolbar,
+		Sidebar,
+		Editpane,
+	},
+	data: () => ({
+		categories: {},
+		details: {},
+	}),
+	methods: {
+		setCategories(categories) {
+			this.categories = categories
+		},
+		onItemChanged(item) {
+			this.details = this.categories[item]
+		}
+	}
+};
 </script>
 
 <style lang="scss">
-	@charset "utf-8";
+body {
+	padding: 0;
+	margin: 0;
+}
 
-	#app {
-		font-family: "Avenir", Helvetica, Arial, sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-		text-align: center;
-		color: #2c3e50;
-		margin-top: 60px;
-	}
+ul {
+	margin: 0;
+}
 
-	h1, h2 {
-		font-weight: normal;
-	}
-
-	ul {
-		list-style-type: none;
-		padding: 0;
-	}
-
-	li {
-		display: inline-block;
-		margin: 0 10px;
-	}
-
-	a {
-		color: #42b983;
-	}
+.content {
+	display: flex;
+	height: calc(100vh - 49px);
+	overflow-y: auto;
+}
 </style>
