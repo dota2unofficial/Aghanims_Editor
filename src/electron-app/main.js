@@ -16,7 +16,8 @@ function createWindow () {
 		height: 600,
 		icon: resolve(__dirname, "icon.png"),
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+			webSecurity: false,
 		}
 	});
 

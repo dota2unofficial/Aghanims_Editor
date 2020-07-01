@@ -1,9 +1,13 @@
 <template lang="html">
 	<div id="app">
-		<Toolbar @setCategories="setCategories" />
+		<Toolbar 
+			@setCategories="setCategories" 
+			@folderLoad="setFolder"
+		/>
 		<div class="content">
 			<Sidebar 
 				:categories="categories"
+				:path="folderPath"
 				@itemChanged="onItemChanged"
 			/>
 			<Editpane :details="details" />
@@ -26,6 +30,7 @@ export default {
 	data: () => ({
 		categories: {},
 		details: {},
+		folderPath: ''
 	}),
 	methods: {
 		setCategories(categories) {
@@ -33,10 +38,16 @@ export default {
 		},
 		onItemChanged(item) {
 			this.details = this.categories[item]
+		},
+		setFolder(path) {
+			this.folderPath = path
 		}
 	}
 };
 </script>
+
+<style src="ag-grid-community/dist/styles/ag-grid.css"></style>
+<style src="ag-grid-community/dist/styles/ag-theme-alpine.css"></style>
 
 <style lang="scss">
 body {

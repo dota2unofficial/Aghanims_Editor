@@ -18,7 +18,10 @@ export default {
         readFile(event) {
             const file = event.target.files[0]
             const reader = new FileReader()
+            const path = file.path.split('/')
+            path.pop()
 
+            this.$emit('folderLoad', path.join('/')+'/data/content/panorama/images/custom_game/round_images/')
             reader.onload = e => this.loadFinished(e.target.result)
             reader.readAsText(file)
             event.target.value = null
@@ -33,14 +36,13 @@ export default {
             while (i < lines.length - 1) {
                 const line = lines[i].trim()
                 if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    console.log(line)
                     const lineName = lines[i].split('"')[1]
                     root[lineName] = {}
                     let j = i + 2
                     
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
-                        root[lineName][pair[1]] = pair[3]
+                        if (pair.length > 1) root[lineName][pair[1]] = pair[3]
                         j ++
                     }
                     i = j

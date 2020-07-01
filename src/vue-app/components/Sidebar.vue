@@ -7,7 +7,13 @@
                 class="mod-sidebar-item"
                 :class="{'active': item === activeKey}"
                 @click="onItemChanged(item)"
-            >{{item}}</li>
+            >
+                <img 
+                    :src="`file:///${getFileName(item)}`"
+                    class="menu-icon"
+                />
+                {{item}}
+            </li>
         </ul>
     </aside>
 </template>
@@ -20,22 +26,33 @@ export default {
         categories: {
             type: Object,
             required: true,
+        },
+        path: {
+            type: String,
+            required: true
         }
     },
     data: () => ({
         activeKey: '',
     }),
-    methods: {
-        onItemChanged(item) {
-            this.activeKey = item
-            this.$emit('itemChanged', item)
-        }
-    },
     computed: {
         treeData() {
             return Object.keys(this.categories);
         }
     },
+    methods: {
+        getFileName(file) {
+            const name = file.replace('npc_dota_', '')
+            return this.path + 'Round_' + name[0].toUpperCase() + name.slice(1) + '.png'
+        },
+        onItemChanged(item) {
+            this.activeKey = item
+            this.$emit('itemChanged', item)
+        },
+    },
+    created() {
+        console.log(window.location.href)
+    }
 }
 </script>
 
@@ -55,12 +72,19 @@ export default {
         cursor: pointer;
         transition: color .2s;
         padding: 4px 8px;
+        display: flex;
 
         &:hover, &.active {
             background: #3598dc;
             color: #ffffff;
         }
 
+    }
+
+    .menu-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 4px;
     }
 }
 </style>

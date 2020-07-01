@@ -47,14 +47,8 @@ module.exports = {
 				"vue-style-loader",
 				{
 					loader: "css-loader",
-					options: {
-						importLoaders: 1
-						// 0 => no loaders (default);
-						// 1 => postcss-loader;
-					}
-				},
-				"postcss-loader"
-			]
+				}
+			],
 		}, {
 			test: /\.scss$/i,
 			use: [

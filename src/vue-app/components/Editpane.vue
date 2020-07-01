@@ -1,34 +1,77 @@
 <template>
     <section class="mod-content">
-        <table class="mod-table">
-            <tr>
-                <th>Key</th>
-                <th>Value</th>
-            </tr>
-            <tr
-                v-for="item in items"
-                :key="item.key"
-                class="form-control"
-            >
-                <td>{{item.key}}</td>
-                <td :ref="item.key" @dblclick="editItem(item.key)">{{item.value}}</td>
-            </tr>
-        </table>
+        <div>
+            <ag-grid-vue
+                style="width: 100%; height: calc(100vh - 64px)"
+                class="ag-theme-alpine"
+                :columnDefs="columns"
+                v-model="items"
+                :defaultColDef="{flex: 1}"
+                :components="components"
+            ></ag-grid-vue>
+        </div>
     </section>
 </template>
 
 <script>
-import MetaInput from '../common/MetaInput'
+import { AgGridVue } from 'ag-grid-vue'
+import MetaFile from '../common/MetaFile'
+
+import { getConstData } from '../utils/cellEditor'
 
 export default {
     name: 'EditPane',
-    components: { MetaInput },
+    components: { 
+        MetaFile,
+        AgGridVue,
+    },
     props: {
         details: {
             type: Object,
             required: true,
         }
     },
+    data: () => ({
+        columns: [
+            {
+                headerName: 'Key', 
+                field: 'key', 
+                sortable: true, 
+                filter: true,
+            },
+            {
+                headerName: 'Value',
+                field: 'value',
+                editable: true,
+                cellEditorSelector: (params) => {
+                    const { data: { key } } = params
+                    const options = getConstData(params.data.key)
+                    if (options.length > 0) {
+                        return {
+                            component: 'agSelectCellEditor',
+                            params: {
+                                values: options
+                            }
+                        }
+                    }
+
+                    if ( key === 'vscripts' || key === 'ProjectileModel' || key === 'Model') {
+                        return {
+                            component: MetaFile
+                        }
+                    }
+
+                    return {
+                        component: 'agTextCellEditor'
+                    }
+                }
+            },
+        ],
+        items: [],
+        components: {
+            fileInput: MetaFile,
+        }
+    }),
     methods: {
         editItem(key) {
             console.log(key, this.$refs[key])
@@ -37,12 +80,11 @@ export default {
             `
         }
     },
-    computed: {
-        items() {
-            console.log("details:", this.details)
-            return Object.keys(this.details).map(key => ({
+    watch: {
+        details(details) {
+            this.items = Object.keys(details).map(key => ({
                 key: key,
-                value: this.details[key],
+                value: details[key],
             }))
         }
     }
