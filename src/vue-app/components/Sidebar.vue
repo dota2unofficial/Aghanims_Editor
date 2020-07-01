@@ -50,9 +50,6 @@ export default {
             this.$emit('itemChanged', item)
         },
     },
-    created() {
-        console.log(window.location.href)
-    }
 }
 </script>
 
