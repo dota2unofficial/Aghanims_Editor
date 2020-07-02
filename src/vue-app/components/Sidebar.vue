@@ -1,85 +1,69 @@
 <template>
-    <aside class="mod-sidebar">
-        <ul class="mod-sidebar-list">
-            <li
-                v-for="item in treeData" 
+    <v-navigation-drawer
+        permanent
+    >
+        <v-list
+            dense
+            nav
+        >
+            <v-list-item
+                v-for="item in categories" 
                 :key="item"
-                class="mod-sidebar-item"
                 :class="{'active': item === activeKey}"
                 @click="onItemChanged(item)"
             >
-                <img 
-                    :src="getUnitAvatar(item, path)"
-                    class="menu-icon"
-                />
-                {{item}}
-            </li>
-        </ul>
-    </aside>
+                <v-list-item-icon
+                    class="mr-3"
+                >
+                    <v-img 
+                        :src="getUnitAvatar(item, path)"
+                        :width="24"
+                        :height="24"
+                    ></v-img>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title v-text="item"></v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+        </v-list>
+    </v-navigation-drawer>
 </template>
 
 <script>
 import fileMixin from '../mixin/fileMixin'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
     name: 'Sidebar',
     mixins: [ fileMixin ],
-    props: {
-        categories: {
-            type: Object,
-            required: true,
-        },
-        path: {
-            type: String,
-            required: true
-        }
-    },
     data: () => ({
         activeKey: '',
     }),
     computed: {
-        treeData() {
-            return Object.keys(this.categories);
-        }
+        ...mapGetters([
+            'getPath',
+            'getCategories'
+        ]),
+        path() {
+            return this.getPath
+        },
+        categories() {
+            return Object.keys(this.getCategories)
+        },
     },
     methods: {
+        ...mapMutations([
+            'setDetails',
+            'setSelected'
+        ]),
         onItemChanged(item) {
             this.activeKey = item
-            this.$emit('itemChanged', item)
+            this.setSelected(item)
+            this.setDetails(this.getCategories[item])
         },
     },
 }
 </script>
 
 <style lang="scss" scoped>
-.mod-sidebar {
-    width: 320px;
-    overflow-x: scroll;
-    min-height: calc(100vh - 49px);
-    border-right: 1px solid #ccc;
-
-    &-list {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    &-item {
-        cursor: pointer;
-        transition: color .2s;
-        padding: 4px 8px;
-        display: flex;
-
-        &:hover, &.active {
-            background: #3598dc;
-            color: #ffffff;
-        }
-
-    }
-
-    .menu-icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 4px;
-    }
-}
 </style>

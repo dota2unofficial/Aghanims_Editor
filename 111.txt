@@ -1,0 +1,55 @@
+#base npc_unit_precache.txt
+
+// Units File
+"DOTAUnits"
+{
+	"Version"	"1"
+
+	//-----------------------------------------------------------------
+	//	REGULAR CREEPS
+	//-----------------------------------------------------------------
+
+	"npc_dota_greevil"
+	{
+                "BaseClass" "        npc_dota_creature123123123"
+                "Model" "        models/creeps/mega_greevil/mega_greevil.vmdl"
+                "SoundSet" "        n_creep_Melee"
+                "GameSoundsFile" "        soundevents/game_sounds_creeps.vsndevts"
+                "ModelScale" "        1"
+                "Level" "        1"
+		
+                "Ability1" ""
+
+                "ArmorPhysical" "        0"
+                "StatusHealth" "        65"
+                "AttackDamageMin" "        3"
+                "AttackDamageMax" "        4"
+                "MovementSpeed" "        330"
+
+                "AttackAnimationPoint" "        0.3"
+                "AttackCapabilities" "        DOTA_UNIT_CAP_MELEE_ATTACK"
+                "AttackRange" "        150"
+                "ProjectileModel" ""
+                "ProjectileSpeed" "        1200"
+                "MagicalResistance" "        0"
+                "AttackRate" "        1.5"
+                "AttackAcquisitionRange" "        2000"
+                "RingRadius" "        16"
+                "BoundsHullName" "        DOTA_HULL_SIZE_SMALL"
+                "HealthBarOffset" "        150"
+                "BountyXP" "        0"
+                "BountyGoldMin" "        0"
+                "BountyGoldMax" "        0"
+                "MovementCapabilities" "        DOTA_UNIT_CAP_MOVE_GROUND"
+                "StatusHealthRegen" "        0.0"
+                "StatusMana" "        0"
+                "StatusManaRegen" "        5.0"
+                "VisionDaytimeRange" "        800"
+                "VisionNighttimeRange" "        800"
+                "TeamName" "        DOTA_TEAM_NEUTRALS"
+                "CombatClassAttack" "        DOTA_COMBAT_CLASS_ATTACK_BASIC"
+                "CombatClassDefend" "        DOTA_COMBAT_CLASS_DEFEND_BASIC"
+                "UnitRelationshipClass" "        DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+                "vscripts" "        creatures/ai/general.lua"
+	}
+}

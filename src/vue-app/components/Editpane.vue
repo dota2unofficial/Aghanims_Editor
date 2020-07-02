@@ -1,24 +1,27 @@
 <template>
-    <section class="mod-content">
-        <div 
+    <v-sheet class="mod-content">
+        <v-sheet 
             v-if="getUnitAvatar(selected, path)"
             class="mod-avatar"
         >
-            <img 
-                :src="getUnitAvatar(selected, path)" 
-                :alt="selected"
-                class="mod-unit-avatar"
+            <v-avatar
+                :size="128"
+                :rounded="false"
             >
-        </div>
+                <v-img
+                    :src="getUnitAvatar(selected, path)"
+                ></v-img>
+            </v-avatar>
+        </v-sheet>
         <ag-grid-vue
-            style="width: 100%; height: calc(100vh - 224px)"
+            style="width: 100%; height: calc(100vh - 225px)"
             class="ag-theme-alpine"
             :columnDefs="columns"
             v-model="items"
             :defaultColDef="{flex: 1}"
             :components="components"
         ></ag-grid-vue>
-    </section>
+    </v-sheet>
 </template>
 
 <script>
@@ -28,6 +31,7 @@ import MetaFile from '../common/MetaFile'
 import fileMixin from '../mixin/fileMixin'
 
 import { getConstData } from '../utils/cellEditor'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
     name: 'EditPane',
@@ -35,20 +39,6 @@ export default {
     components: { 
         MetaFile,
         AgGridVue,
-    },
-    props: {
-        details: {
-            type: Object,
-            required: true,
-        },
-        selected: {
-            type: String,
-            required: true,
-        },
-        path: {
-            type: String,
-            required: true,
-        }
     },
     data: () => ({
         columns: [
@@ -91,13 +81,27 @@ export default {
             fileInput: MetaFile,
         }
     }),
+    computed: {
+        ...mapGetters([
+            'getDetails',
+            'getSelected',
+            'getPath',
+            'getCategories'
+        ]),
+        details() {
+            return this.getDetails
+        },
+        selected() {
+            return this.getSelected
+        },
+        path() {
+            return this.getPath
+        },
+    },
     methods: {
-        editItem(key) {
-            console.log(key, this.$refs[key])
-            this.$refs[key][0].innerHTML = `
-                <meta-input />
-            `
-        }
+        ...mapMutations([
+            'setCategories'
+        ]),
     },
     watch: {
         details(details) {
@@ -105,6 +109,14 @@ export default {
                 key: key,
                 value: details[key],
             }))
+        },
+        items(value) {
+            const newData = {}
+            value.forEach(item => newData[item.key] = item.value)
+            this.setCategories({
+                ...this.getCategories,
+                [this.selected]: newData
+            })
         }
     }
 }

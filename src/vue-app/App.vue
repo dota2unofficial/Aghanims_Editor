@@ -1,21 +1,14 @@
 <template lang="html">
 	<div id="app">
-		<Toolbar 
-			@setCategories="setCategories" 
-			@folderLoad="setFolder"
-		/>
-		<div class="content">
-			<Sidebar 
-				:categories="categories"
-				:path="folderPath"
-				@itemChanged="onItemChanged"
-			/>
-			<Editpane 
-				:details="details" 
-				:path="folderPath"
-				:selected="selectedMeta"
-			/>
-		</div>
+		<v-app>
+			<Toolbar />
+			<v-content>
+				<div class="content">
+					<Sidebar />
+					<Editpane />
+				</div>
+			</v-content>
+		</v-app>
 	</div>
 </template>
 
@@ -31,24 +24,6 @@ export default {
 		Sidebar,
 		Editpane,
 	},
-	data: () => ({
-		categories: {},
-		details: {},
-		folderPath: '',
-		selectedMeta: ''
-	}),
-	methods: {
-		setCategories(categories) {
-			this.categories = categories
-		},
-		onItemChanged(item) {
-			this.details = this.categories[item]
-			this.selectedMeta = item
-		},
-		setFolder(path) {
-			this.folderPath = path
-		}
-	}
 };
 </script>
 
@@ -67,7 +42,7 @@ ul {
 
 .content {
 	display: flex;
-	height: calc(100vh - 49px);
+	height: calc(100vh - 48px);
 	overflow-y: auto;
 }
 </style>
