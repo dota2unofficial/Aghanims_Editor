@@ -1,8 +1,12 @@
 <template>
     <header class="mod-toolbar">
-        <div class="mdi-toolbar-item">
+        <div class="mod-toolbar-item">
             <input type="file" ref="openFile" style="display: none" @change="readFile">
             <button @click="openFile">Open</button>
+        </div>
+
+        <div class="mod-toolbar-item">
+            <button @click="saveFile">Save</button>
         </div>
     </header>
 </template>
@@ -14,6 +18,9 @@ export default {
         openFile() {
             const node = this.$refs.openFile
             node.click()
+        },
+        saveFile() {
+            console.log('save file')
         },
         readFile(event) {
             const file = event.target.files[0]
