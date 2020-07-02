@@ -4,7 +4,7 @@
 
 <script>
 export default {
-    name: 'MetaFile'
+    name: 'MetaFile',
 }
 </script>
 

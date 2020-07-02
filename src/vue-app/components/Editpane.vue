@@ -1,15 +1,23 @@
 <template>
     <section class="mod-content">
-        <div>
-            <ag-grid-vue
-                style="width: 100%; height: calc(100vh - 64px)"
-                class="ag-theme-alpine"
-                :columnDefs="columns"
-                v-model="items"
-                :defaultColDef="{flex: 1}"
-                :components="components"
-            ></ag-grid-vue>
+        <div 
+            v-if="getUnitAvatar(selected, path)"
+            class="mod-avatar"
+        >
+            <img 
+                :src="getUnitAvatar(selected, path)" 
+                :alt="selected"
+                class="mod-unit-avatar"
+            >
         </div>
+        <ag-grid-vue
+            style="width: 100%; height: calc(100vh - 224px)"
+            class="ag-theme-alpine"
+            :columnDefs="columns"
+            v-model="items"
+            :defaultColDef="{flex: 1}"
+            :components="components"
+        ></ag-grid-vue>
     </section>
 </template>
 
@@ -17,10 +25,13 @@
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
 
+import fileMixin from '../mixin/fileMixin'
+
 import { getConstData } from '../utils/cellEditor'
 
 export default {
     name: 'EditPane',
+    mixins: [ fileMixin ],
     components: { 
         MetaFile,
         AgGridVue,
@@ -28,6 +39,14 @@ export default {
     props: {
         details: {
             type: Object,
+            required: true,
+        },
+        selected: {
+            type: String,
+            required: true,
+        },
+        path: {
+            type: String,
             required: true,
         }
     },
@@ -57,7 +76,7 @@ export default {
 
                     if ( key === 'vscripts' || key === 'ProjectileModel' || key === 'Model') {
                         return {
-                            component: MetaFile
+                            component: 'fileInput'
                         }
                     }
 
@@ -95,6 +114,18 @@ export default {
 .mod-content {
     flex: 1;
     overflow-x: scroll;
+
+    .mod-avatar {
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .mod-unit-avatar {
+        width: 128px;
+        height: 128px;
+        object-fit: cover;
+    }
 }
 
 .form-control {

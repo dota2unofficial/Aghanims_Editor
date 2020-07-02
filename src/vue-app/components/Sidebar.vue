@@ -9,7 +9,7 @@
                 @click="onItemChanged(item)"
             >
                 <img 
-                    :src="`file:///${getFileName(item)}`"
+                    :src="getUnitAvatar(item, path)"
                     class="menu-icon"
                 />
                 {{item}}
@@ -19,9 +19,11 @@
 </template>
 
 <script>
+import fileMixin from '../mixin/fileMixin'
 
 export default {
     name: 'Sidebar',
+    mixins: [ fileMixin ],
     props: {
         categories: {
             type: Object,
@@ -41,10 +43,6 @@ export default {
         }
     },
     methods: {
-        getFileName(file) {
-            const name = file.replace('npc_dota_', '')
-            return this.path + 'Round_' + name[0].toUpperCase() + name.slice(1) + '.png'
-        },
         onItemChanged(item) {
             this.activeKey = item
             this.$emit('itemChanged', item)

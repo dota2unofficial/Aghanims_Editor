@@ -10,7 +10,11 @@
 				:path="folderPath"
 				@itemChanged="onItemChanged"
 			/>
-			<Editpane :details="details" />
+			<Editpane 
+				:details="details" 
+				:path="folderPath"
+				:selected="selectedMeta"
+			/>
 		</div>
 	</div>
 </template>
@@ -30,7 +34,8 @@ export default {
 	data: () => ({
 		categories: {},
 		details: {},
-		folderPath: ''
+		folderPath: '',
+		selectedMeta: ''
 	}),
 	methods: {
 		setCategories(categories) {
@@ -38,6 +43,7 @@ export default {
 		},
 		onItemChanged(item) {
 			this.details = this.categories[item]
+			this.selectedMeta = item
 		},
 		setFolder(path) {
 			this.folderPath = path
