@@ -9,12 +9,14 @@ const store = new Vuex.Store({
         categories: {},
         details: {},
         selected: null,
+        fileLoading: false,
     },
     getters: {
         getPath: state => state.path,
         getCategories: state => state.categories,
         getDetails: state => state.details,
         getSelected: state => state.selected,
+        getFileLoading: state => state.fileLoading,
     },
     mutations: {
         setPath(state, path) {
@@ -28,6 +30,9 @@ const store = new Vuex.Store({
         },
         setSelected(state, selected) {
             state.selected = selected
+        },
+        setFileLoading(state, loading) {
+            state.fileLoading = loading
         },
     },
 })

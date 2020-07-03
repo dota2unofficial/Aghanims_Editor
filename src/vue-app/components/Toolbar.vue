@@ -12,18 +12,34 @@
             small
             outlined
             class="mr-3"
+            :disabled="getFileLoading"
         >
             Open
         </v-btn>
         <v-btn 
             dark
-            @click="saveFile"
+            @click="saveConfirm"
             small
             outlined
+            :disabled="fileName === null"
             class="mr-3"
         >
             Save
         </v-btn>
+        <v-dialog
+            v-model="confirmSave"
+            persistent
+        >
+            <v-card>
+                <v-card-title>Confirm Save</v-card-title>
+                <v-card-text>Are you reall sure to save it?</v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" outlined @click="confirmSave = false">Cancel</v-btn>
+                    <v-btn color="primary" outlined @click="saveFile" :loading="loading">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app-bar>
 </template>
 
@@ -37,17 +53,24 @@ export default {
     computed: {
         ...mapGetters([
             'getCategories',
+            'getFileLoading',
         ]),
     },
     data: () => ({
         fileName: null,
         fileContent: null,
+        confirmSave: false,
+        loading: false,
     }),
     methods: {
         ...mapMutations([
+            'setFileLoading',
             'setCategories',
             'setPath',
         ]),
+        saveConfirm() {
+            this.confirmSave = true
+        },
         openFile() {
             const node = this.$refs.openFile
             node.click()
@@ -66,7 +89,7 @@ export default {
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
                         let text = ''
-                        if (pair.length > 1) {
+                        if (pair.length > 1 && this.getCategories[lineName][pair[1]]) {
                             text = indent(`"${pair[1]}" "${indent(this.getCategories[lineName][pair[1]], 1, 8)}"`, 2, 8)
                             lines[j] = text;
                         }
@@ -82,8 +105,12 @@ export default {
             fs.writeFile(this.fileName, result, err => {
                 if (err) throw err
             })
+
+            this.loading = false
+            this.confirmSave = false
         },
         readFile(event) {
+            this.setFileLoading(true)
             const file = event.target.files[0]
             const reader = new FileReader()
             const path = file.path.split('\\')
@@ -113,7 +140,7 @@ export default {
                     
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
-                        if (pair.length > 1) root[lineName][pair[1]] = pair[3]
+                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
                         j ++
                     }
                     i = j
@@ -122,6 +149,7 @@ export default {
                 }
             }
             this.setCategories(root)
+            this.setFileLoading(false)
         }
     }
 }

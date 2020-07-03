@@ -1,5 +1,5 @@
 {
-	"name": "electron-vue-boilerplate",
+	"name": "mod-explorer",
 	"version": "1.4.1",
 	"description": "Simple boilerplate for building Vue app with Electron and Webpack.",
 	"main": "dist/electron-app/main.js",
@@ -53,7 +53,6 @@
 		"ag-grid": "^18.1.2",
 		"ag-grid-community": "^23.2.1",
 		"ag-grid-vue": "^23.2.1",
-		"liquor-tree": "^0.2.70",
 		"style-loader": "^1.2.1",
 		"vue": "^2.6.11",
 		"vue-class-component": "^7.2.3",

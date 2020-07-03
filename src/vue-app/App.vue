@@ -8,6 +8,17 @@
 					<Editpane />
 				</div>
 			</v-content>
+			
+			<v-overlay
+				:value="getFileLoading"
+			>
+				<v-progress-linear
+					indeterminate 
+					color="pink"
+					style="width: 40vw"
+					striped
+				></v-progress-linear>
+			</v-overlay>
 		</v-app>
 	</div>
 </template>
@@ -16,6 +27,7 @@
 import Toolbar from './components/Toolbar'
 import Sidebar from './components/Sidebar'
 import Editpane from './components/Editpane'
+import { mapGetters } from 'vuex';
 
 export default {
 	name: "App",
@@ -24,6 +36,11 @@ export default {
 		Sidebar,
 		Editpane,
 	},
+	computed: {
+		...mapGetters([
+			'getFileLoading'
+		]),
+	}
 };
 </script>
 
