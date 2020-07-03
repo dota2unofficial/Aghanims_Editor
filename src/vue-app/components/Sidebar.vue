@@ -1,31 +1,41 @@
 <template>
     <v-navigation-drawer
         permanent
+        ref="drawer"
+        :width="navigationWidth"
     >
-        <v-list
-            dense
-            nav
+        <v-sheet
+            class="pa-2"
         >
-            <v-list-item
-                v-for="item in categories" 
-                :key="item"
-                :class="{'active': item === activeKey}"
-                @click="onItemChanged(item)"
-            >
-                <v-list-item-icon
-                    class="mr-3"
-                >
-                    <v-img 
-                        :src="getUnitAvatar(item, path)"
-                        :width="24"
-                        :height="24"
-                    ></v-img>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-list-item-title v-text="item"></v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-        </v-list>
+            <v-text-field 
+                dense 
+                hide-details
+                outlined
+                v-model="filterString"
+            ></v-text-field>
+        </v-sheet>
+        <v-treeview 
+            :items="treeNodes"
+            dense
+            open-on-click
+            selected-color="primary"
+            hoverable
+            activatable
+            item-key="name"
+        >
+            <template v-slot:label="{ item }">
+                <span @click="onItemChanged(item.name)">{{ item.name }}</span>
+            </template>
+            <template v-slot:prepend="{ item, leaf }">
+                <v-img
+                    v-if="leaf"
+                    :src="getUnitAvatar(item.name, path)"
+                    :width="24"
+                    :height="24"
+                ></v-img>
+                <v-icon v-else>{{mdiParent}}</v-icon>
+            </template>
+        </v-treeview>
     </v-navigation-drawer>
 </template>
 
@@ -33,11 +43,16 @@
 import fileMixin from '../mixin/fileMixin'
 import { mapGetters, mapMutations } from 'vuex'
 
+import { mdiAlienOutline  } from '@mdi/js'
+
 export default {
     name: 'Sidebar',
     mixins: [ fileMixin ],
     data: () => ({
         activeKey: '',
+        navigationWidth: 300,
+        filterString: '',
+        mdiParent: mdiAlienOutline ,
     }),
     computed: {
         ...mapGetters([
@@ -48,8 +63,17 @@ export default {
             return this.getPath
         },
         categories() {
-            return Object.keys(this.getCategories)
+            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString))
         },
+        treeNodes() {
+            return [
+                {
+                    id: "CUSTOM_UNITS",
+                    name: 'Units :',
+                    children: this.categories.map(item => ({ id: item, name: item }))
+                }
+            ]
+        }
     },
     methods: {
         ...mapMutations([
@@ -57,10 +81,54 @@ export default {
             'setSelected'
         ]),
         onItemChanged(item) {
+            if (item === 'Units :') return
             this.activeKey = item
             this.setSelected(item)
             this.setDetails(this.getCategories[item])
         },
+        setBorderWidth() {
+            const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
+            node.style.width = `3px`
+            node.style.cursor = 'ew-resize'
+            node.style.backgroundColor = 'primary'
+        },
+        setDragEvents() {
+            const minSize = 3
+            const el = this.$refs.drawer.$el
+            const drawerBorder = el.querySelector('.v-navigation-drawer__border')
+            const vm = this
+            const direction = 'left'
+
+            const resize = (e) => {
+                document.body.style.cursor = 'ew-resize'
+                el.style.width = `${e.clientX}px`
+            }
+
+            drawerBorder.addEventListener(
+                'mousedown',
+                (e) => {
+                    if (e.offsetX < 3) {
+                        el.style.transition = 'initial'
+                        document.addEventListener('mousemove', resize, false)
+                    }
+                },
+                false
+            )
+
+            document.addEventListener(
+                'mouseup',
+                () => {
+                    el.style.transition = ''
+                    document.body.style.cursor = ''
+                    this.navigationWidth = el.style.width
+                    document.removeEventListener('mousemove', resize, false)
+                }
+            )
+        },
+    },
+    mounted() {
+        this.setBorderWidth()
+        this.setDragEvents()
     },
 }
 </script>

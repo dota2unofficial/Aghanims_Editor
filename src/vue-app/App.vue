@@ -2,12 +2,12 @@
 	<div id="app">
 		<v-app>
 			<Toolbar />
-			<v-content>
+			<v-main>
 				<div class="content">
 					<Sidebar />
 					<Editpane />
 				</div>
-			</v-content>
+			</v-main>
 			
 			<v-overlay
 				:value="getFileLoading"

@@ -50,6 +50,7 @@
 	},
 	"homepage": "https://github.com/oliverfindl/electron-vue-boilerplate#readme",
 	"dependencies": {
+		"@mdi/js": "^5.3.45",
 		"ag-grid": "^18.1.2",
 		"ag-grid-community": "^23.2.1",
 		"ag-grid-vue": "^23.2.1",

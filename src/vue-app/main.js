@@ -14,5 +14,9 @@ new Vue({
 	template: "<app />",
 	components: { App },
 	store: store,
-	vuetify: new Vuetify({})
+	vuetify: new Vuetify({
+		icons: {
+			iconfont: 'mdiSvg'
+		}
+	})
 }).$mount("#app")
