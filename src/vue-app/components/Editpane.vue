@@ -105,6 +105,7 @@ export default {
     },
     watch: {
         details(details) {
+            if (!details) return []
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],

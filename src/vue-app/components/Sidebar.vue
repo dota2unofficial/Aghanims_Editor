@@ -22,6 +22,7 @@
             hoverable
             activatable
             item-key="name"
+            @update:active="onItemChanged"
         >
             <template v-slot:label="{ item }">
                 <span @click="onItemChanged(item.name)">{{ item.name }}</span>
@@ -81,10 +82,10 @@ export default {
             'setSelected'
         ]),
         onItemChanged(item) {
-            if (item === 'Units :') return
-            this.activeKey = item
-            this.setSelected(item)
-            this.setDetails(this.getCategories[item])
+            if (item[0] === 'Units :') return
+            this.activeKey = item[0]
+            this.setSelected(item[0])
+            this.setDetails(this.getCategories[item[0]])
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
