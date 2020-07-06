@@ -64,12 +64,6 @@ export default {
                         }
                     }
 
-                    if ( key === 'vscripts' || key === 'ProjectileModel' || key === 'Model') {
-                        return {
-                            component: 'agTextCellEditor'
-                        }
-                    }
-
                     return {
                         component: 'agTextCellEditor'
                     }

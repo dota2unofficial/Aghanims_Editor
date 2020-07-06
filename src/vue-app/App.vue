@@ -19,6 +19,19 @@
 					striped
 				></v-progress-linear>
 			</v-overlay>
+
+			<v-overlay
+				:value="getLocalizationLoading"
+			>
+				<v-progress-linear
+					indeterminate 
+					color="pink"
+					style="width: 40vw"
+					striped
+				></v-progress-linear>
+			</v-overlay>
+
+			<Alert />
 		</v-app>
 	</div>
 </template>
@@ -27,7 +40,8 @@
 import Toolbar from './components/Toolbar'
 import Sidebar from './components/Sidebar'
 import Editpane from './components/Editpane'
-import { mapGetters } from 'vuex';
+import Alert from './common/Alert'
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
 	name: "App",
@@ -35,11 +49,28 @@ export default {
 		Toolbar,
 		Sidebar,
 		Editpane,
+		Alert,
 	},
 	computed: {
 		...mapGetters([
-			'getFileLoading'
+			'getFileLoading',
+			'getLocalizationLoading',
+			'getD2Found',
 		]),
+	},
+	methods: {
+		...mapActions([
+			'findD2Path',
+			'loadLocalization',
+		]),
+	},
+	created() {
+		this.findD2Path()
+	},
+	watch: {
+		getD2Found(found) {
+			if (found) this.loadLocalization()
+		}
 	}
 };
 </script>

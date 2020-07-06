@@ -30,7 +30,7 @@
             <template v-slot:prepend="{ item, leaf }">
                 <v-img
                     v-if="leaf"
-                    :src="getUnitAvatar(item.name, path)"
+                    src="/images/units/electron.png"
                     :width="24"
                     :height="24"
                 ></v-img>
@@ -53,7 +53,7 @@ export default {
         activeKey: '',
         navigationWidth: 300,
         filterString: '',
-        mdiParent: mdiAlienOutline ,
+        mdiParent: mdiAlienOutline,
     }),
     computed: {
         ...mapGetters([

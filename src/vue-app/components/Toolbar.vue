@@ -2,24 +2,22 @@
     <v-app-bar
         app
         color="primary"
-        dense
         dark
     >
         <input type="file" ref="openFile" style="display: none" @change="readFile">
-        <v-btn 
-            dark
-            @click="openFile"
-            small
+        <v-combobox
+            v-model="selectedMod"
+            :items="addonList"
+            placeholder="Select your custom mod"
+            dense
+            hide-details
             outlined
-            class="mr-3"
-            :disabled="getFileLoading"
+            class="mr-5"
         >
-            Open
-        </v-btn>
+        </v-combobox>
         <v-btn 
             dark
             @click="saveConfirm"
-            small
             outlined
             :disabled="fileName === null"
             class="mr-3"
@@ -45,6 +43,7 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
+import { findSteamAppById } from 'find-steam-app'
 import { indent } from '../utils/text'
 import fs from 'fs'
 
@@ -54,6 +53,8 @@ export default {
         ...mapGetters([
             'getCategories',
             'getFileLoading',
+            'getD2Found',
+            'getD2Path',
         ]),
     },
     data: () => ({
@@ -61,12 +62,16 @@ export default {
         fileContent: null,
         confirmSave: false,
         loading: false,
+        dota2mods: [],
+        addonList: [],
+        selectedMod: null,
     }),
     methods: {
         ...mapMutations([
             'setFileLoading',
             'setCategories',
             'setPath',
+            'setD2Found',
         ]),
         saveConfirm() {
             this.confirmSave = true
@@ -109,19 +114,12 @@ export default {
             this.loading = false
             this.confirmSave = false
         },
-        readFile(event) {
+        readFile(unitpath) {
             this.setFileLoading(true)
-            const file = event.target.files[0]
-            const reader = new FileReader()
-            const path = file.path.split('\\')
-            path.pop()
-
-            this.fileName = file.path
-            this.setPath(path.join('/')+'/data/content/panorama/images/custom_game/round_images/')
-
-            reader.onload = e => this.loadFinished(e.target.result)
-            reader.readAsText(file)
-            event.target.value = null
+            fs.readFile(unitpath, 'utf8', (err, data) => {
+                if (err) throw err;
+                this.loadFinished(data)
+            })
         },
         loadFinished(result) {
             this.fileContent = result
@@ -150,6 +148,23 @@ export default {
             }
             this.setCategories(root)
             this.setFileLoading(false)
+        }
+    },
+    watch: {
+        getD2Found(found) {
+            const d2path = this.getD2Path
+            fs.readdir(`${d2path}/dota_addons/`, (err, files) => {
+                if (err) {
+                    this.setD2Found(false)
+                }
+                this.addonList = files
+            })
+        },
+        selectedMod(folder) {
+            const path = this.getD2Path + '/dota_addons/' + folder
+            const unitPath = `${path}/scripts/npc/npc_units_custom.txt`
+            console.log(this.getD2Path + folder)
+            this.readFile(unitPath)
         }
     }
 }
