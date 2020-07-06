@@ -43,7 +43,6 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-import { findSteamAppById } from 'find-steam-app'
 import { indent } from '../utils/text'
 import fs from 'fs'
 

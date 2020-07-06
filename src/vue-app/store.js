@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { findSteamAppById } from 'find-steam-app'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -56,12 +58,12 @@ const store = new Vuex.Store({
         },
     },
     actions: {
-        findD2Path({ commit }) {
+        async findD2Path({ commit }) {
             commit('setD2Found', true)
             let dota2Path = ''
             try {
-                dota2Path = findSteamAppById(570)
-            } catch {
+                dota2Path = await findSteamAppById(570)
+            } catch (err) {
                 commit('setD2Found', false)
             }
             commit('setD2Path', `${dota2Path}/game/`)
