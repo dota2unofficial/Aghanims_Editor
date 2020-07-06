@@ -14,7 +14,7 @@
             </v-avatar>
         </v-sheet>
         <ag-grid-vue
-            style="width: 100%; height: calc(100vh - 225px)"
+            style="width: 100%; height: calc(100vh - 241px)"
             class="ag-theme-alpine"
             :columnDefs="columns"
             v-model="items"
@@ -31,7 +31,7 @@ import MetaFile from '../common/MetaFile'
 import fileMixin from '../mixin/fileMixin'
 
 import { getConstData } from '../utils/cellEditor'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
     name: 'EditPane',
@@ -95,6 +95,9 @@ export default {
     methods: {
         ...mapMutations([
             'setCategories'
+        ]),
+        ...mapActions([
+            'addDebugLogs'
         ]),
     },
     watch: {

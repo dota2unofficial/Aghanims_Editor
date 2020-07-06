@@ -24,6 +24,15 @@
         >
             Save
         </v-btn>
+
+        <v-btn 
+            dark
+            @click="showDebugger"
+            outlined
+        >
+            Show Debugger
+        </v-btn>
+
         <v-dialog
             v-model="confirmSave"
             persistent
@@ -42,7 +51,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex'
+import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs from 'fs'
 
@@ -64,6 +73,7 @@ export default {
         dota2mods: [],
         addonList: [],
         selectedMod: null,
+        isDebugger: false,
     }),
     methods: {
         ...mapMutations([
@@ -71,6 +81,9 @@ export default {
             'setCategories',
             'setPath',
             'setD2Found',
+        ]),
+        ...mapActions([
+            'addDebugLogs'
         ]),
         saveConfirm() {
             this.confirmSave = true
@@ -112,6 +125,7 @@ export default {
 
             this.loading = false
             this.confirmSave = false
+            this.addDebugLogs(`Custom Units Saved.`)
         },
         readFile(unitpath) {
             this.setFileLoading(true)
@@ -147,6 +161,9 @@ export default {
             }
             this.setCategories(root)
             this.setFileLoading(false)
+        },
+        showDebugger() {
+            this.$emit('toggleDebugger')
         }
     },
     watch: {
@@ -155,14 +172,17 @@ export default {
             fs.readdir(`${d2path}/dota_addons/`, (err, files) => {
                 if (err) {
                     this.setD2Found(false)
+                    this.addDebugLogs('D2 installation is not found on your pc.')
+                } else {
+                    this.addonList = files
+                    this.addDebugLogs(`Dota2 is found on your pc.`)
                 }
-                this.addonList = files
             })
         },
         selectedMod(folder) {
             const path = this.getD2Path + '/dota_addons/' + folder
             const unitPath = `${path}/scripts/npc/npc_units_custom.txt`
-            console.log(this.getD2Path + folder)
+            this.addDebugLogs(`${folder} mod is loaded.`)
             this.readFile(unitPath)
         }
     }

@@ -42,7 +42,7 @@
 
 <script>
 import fileMixin from '../mixin/fileMixin'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import { mdiAlienOutline  } from '@mdi/js'
 
@@ -81,11 +81,15 @@ export default {
             'setDetails',
             'setSelected'
         ]),
+        ...mapActions([
+            'addDebugLogs'
+        ]),
         onItemChanged(item) {
             if (item[0] === 'Units :') return
             this.activeKey = item[0]
             this.setSelected(item[0])
             this.setDetails(this.getCategories[item[0]])
+            this.addDebugLogs(`Custom Unit ${item} is loaded.`)
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
@@ -111,6 +115,7 @@ export default {
                     if (e.offsetX < 3) {
                         el.style.transition = 'initial'
                         document.addEventListener('mousemove', resize, false)
+                        this.addDebugLogs(`Sidebar is resized.`)
                     }
                 },
                 false

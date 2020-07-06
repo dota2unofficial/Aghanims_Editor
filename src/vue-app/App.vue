@@ -1,7 +1,9 @@
 <template lang="html">
 	<div id="app">
 		<v-app>
-			<Toolbar />
+			<Toolbar 
+				@toggleDebugger="toggleDebugger"
+			/>
 			<v-main>
 				<div class="content">
 					<Sidebar />
@@ -31,6 +33,11 @@
 				></v-progress-linear>
 			</v-overlay>
 
+			<Debugger
+				:isVisible="isDebugger"
+				@toggleDebugger="toggleDebugger"
+			/>
+
 			<Alert />
 		</v-app>
 	</div>
@@ -41,6 +48,7 @@ import Toolbar from './components/Toolbar'
 import Sidebar from './components/Sidebar'
 import Editpane from './components/Editpane'
 import Alert from './common/Alert'
+import Debugger from './common/Debugger'
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -50,6 +58,7 @@ export default {
 		Sidebar,
 		Editpane,
 		Alert,
+		Debugger,
 	},
 	computed: {
 		...mapGetters([
@@ -63,6 +72,9 @@ export default {
 			'findD2Path',
 			'loadLocalization',
 		]),
+		toggleDebugger() {
+			this.isDebugger = !this.isDebugger
+		}
 	},
 	created() {
 		this.findD2Path()
@@ -70,8 +82,11 @@ export default {
 	watch: {
 		getD2Found(found) {
 			if (found) this.loadLocalization()
-		}
-	}
+		},
+	},
+	data: () => ({
+		isDebugger: false,
+	}),
 };
 </script>
 
@@ -90,7 +105,7 @@ ul {
 
 .content {
 	display: flex;
-	height: calc(100vh - 48px);
+	height: calc(100vh - 64px);
 	overflow-y: auto;
 }
 </style>
