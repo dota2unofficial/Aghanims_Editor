@@ -16,6 +16,7 @@ const store = new Vuex.Store({
         d2Path: null,
         localization: {},
         localizationLoading: false,
+        debugLogs: [],
     },
     getters: {
         getPath: state => state.path,
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
         getD2Path: state => state.d2Path,
         getLocalization: state => state.localization,
         getLocalizationLoading: state => state.localizationLoading,
+        getDebugLogs: state => state.debugLogs,
     },
     mutations: {
         setPath(state, path) {
@@ -56,6 +58,9 @@ const store = new Vuex.Store({
         setLocalizationLoading(state, loading) {
             state.localizationLoading = loading
         },
+        setDebugLogs(state, logs) {
+            state.debugLogs = logs
+        },
     },
     actions: {
         async findD2Path({ commit }) {
@@ -72,7 +77,10 @@ const store = new Vuex.Store({
             commit('setLocalizationLoading', true)
             console.log(getters.getD2Path)
             commit('setLocalizationLoading', false)
-        }
+        },
+        addDebugLogs({ commit, getters }, log) {
+            commit('setDebugLogs', [...getters.getDebugLogs, log])
+        },
     }
 })
 
