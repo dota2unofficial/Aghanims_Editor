@@ -9,7 +9,7 @@
                 :rounded="false"
             >
                 <v-img
-                    :src="getUnitAvatar(selected, path)"
+                    src="/images/units/electron.png"
                 ></v-img>
             </v-avatar>
         </v-sheet>
