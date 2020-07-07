@@ -176,7 +176,8 @@ export default {
                 const files = readdirSync(`${d2path}\\dota_addons\\`, { withFileTypes: true })
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name)
-                this.addDebugLogs(`Dota2 mods List: `, files.toString())
+                this.addDebugLogs(`Dota2 mods List`)
+                this.addDebugLogs(files.toString())
                 this.addDebugLogs(`Dota2 is found on your pc.`)
                 this.addonList = files
             } catch (err) {

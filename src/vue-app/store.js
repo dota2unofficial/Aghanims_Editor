@@ -68,10 +68,12 @@ const store = new Vuex.Store({
             let dota2Path = ''
             try {
                 dota2Path = await findSteamAppById(570)
+                if (dota2Path === undefined) commit('setD2Found', false)
             } catch (err) {
                 commit('setD2Found', false)
+                throw err
             }
-            commit('setD2Path', `${dota2Path}\\game\\`)
+            commit('setD2Path', `${dota2Path}\\game`)
         },
         loadLocalization({ getters, commit }) {
             commit('setLocalizationLoading', true)
