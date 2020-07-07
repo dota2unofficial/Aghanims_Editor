@@ -73,8 +73,8 @@ export default {
         setFolderPath(evt) {
             if (evt.target.files.length < 1) return
             const file = evt.target.files[0]
-            const path = file.path.split('\\').splice(0, file.path.split('\\').findIndex(item => item === 'game')).join('/')
-            this.setD2Path(`${path}/game/`)
+            const path = file.path.split('\\').splice(0, file.path.split('\\').findIndex(item => item === 'game')).join('\\')
+            this.setD2Path(`${path}\\game`)
             this.setD2Found(true)
         }
     },
