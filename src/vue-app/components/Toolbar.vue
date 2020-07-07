@@ -130,7 +130,10 @@ export default {
         readFile(unitpath) {
             this.setFileLoading(true)
             fs.readFile(unitpath, 'utf8', (err, data) => {
-                if (err) throw err;
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
                 this.loadFinished(data)
             })
         },
