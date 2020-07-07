@@ -53,7 +53,7 @@
 <script>
 import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
-import fs from 'fs'
+import fs, { lstatSync, readdirSync } from 'fs'
 
 export default {
     name: 'Toolbar',
@@ -130,7 +130,10 @@ export default {
         readFile(unitpath) {
             this.setFileLoading(true)
             fs.readFile(unitpath, 'utf8', (err, data) => {
-                if (err) throw err;
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
                 this.loadFinished(data)
             })
         },
@@ -169,15 +172,16 @@ export default {
     watch: {
         getD2Found(found) {
             const d2path = this.getD2Path
-            fs.readdir(`${d2path}\\dota_addons\\`, (err, files) => {
-                if (err) {
-                    this.setD2Found(false)
-                    this.addDebugLogs('D2 installation is not found on your pc.')
-                } else {
-                    this.addonList = files
-                    this.addDebugLogs(`Dota2 is found on your pc.`)
-                }
-            })
+            try {
+                const files = readdirSync(`${d2path}\\dota_addons\\`, { withFileTypes: true })
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name)
+                this.addDebugLogs(`Dota2 mods List: `, files.toString())
+                this.addDebugLogs(`Dota2 is found on your pc.`)
+                this.addonList = files
+            } catch (err) {
+                this.addDebugLogs(`Dota2 : `, err)
+            }
         },
         selectedMod(folder) {
             const path = this.getD2Path + '\\dota_addons\\' + folder
