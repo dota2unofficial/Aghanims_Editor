@@ -5,7 +5,7 @@
         dark
     >
         <input type="file" ref="openFile" style="display: none" @change="readFile">
-        <v-combobox
+        <v-select
             v-model="selectedMod"
             :items="addonList"
             placeholder="Select your custom mod"
@@ -13,8 +13,7 @@
             hide-details
             outlined
             class="mr-5"
-        >
-        </v-combobox>
+        ></v-select>
         <v-btn 
             dark
             @click="saveConfirm"
