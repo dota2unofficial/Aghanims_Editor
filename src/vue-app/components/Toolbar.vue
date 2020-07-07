@@ -169,7 +169,7 @@ export default {
     watch: {
         getD2Found(found) {
             const d2path = this.getD2Path
-            fs.readdir(`${d2path}/dota_addons/`, (err, files) => {
+            fs.readdir(`${d2path}\\dota_addons\\`, (err, files) => {
                 if (err) {
                     this.setD2Found(false)
                     this.addDebugLogs('D2 installation is not found on your pc.')
@@ -180,8 +180,8 @@ export default {
             })
         },
         selectedMod(folder) {
-            const path = this.getD2Path + '/dota_addons/' + folder
-            const unitPath = `${path}/scripts/npc/npc_units_custom.txt`
+            const path = this.getD2Path + '\\dota_addons\\' + folder
+            const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.readFile(unitPath)
         }
