@@ -20,6 +20,7 @@
             v-model="items"
             :defaultColDef="{flex: 1}"
             :components="components"
+            :tooltipShowDelay="0"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -27,11 +28,14 @@
 <script>
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
+import KeyCell from '../common/KeyCell'
 
 import fileMixin from '../mixin/fileMixin'
 
 import { getConstData } from '../utils/cellEditor'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+
+import { schemas } from 'dota-data/lib/schemas'
 
 export default {
     name: 'EditPane',
@@ -39,6 +43,7 @@ export default {
     components: { 
         MetaFile,
         AgGridVue,
+        KeyCell,
     },
     data: () => ({
         columns: [
@@ -47,6 +52,8 @@ export default {
                 field: 'key', 
                 sortable: true, 
                 filter: true,
+                tooltip: (params) => `${params.data.description ? params.data.description : 'No Description'}`,
+                cellRendererFramework: KeyCell,
             },
             {
                 headerName: 'Value',
@@ -73,7 +80,7 @@ export default {
         items: [],
         components: {
             fileInput: MetaFile,
-        }
+        },
     }),
     computed: {
         ...mapGetters([
@@ -103,9 +110,13 @@ export default {
     watch: {
         details(details) {
             if (!details) return []
+            const { npc_units_custom } = schemas;
+            const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
+            const baseClassDescription = getKeyInformation('BaseClass').description;
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
+                description: getKeyInformation(key) ? getKeyInformation(key).description : 'No description'
             }))
         },
         items(value) {
