@@ -71,7 +71,7 @@ const store = new Vuex.Store({
             } catch (err) {
                 commit('setD2Found', false)
             }
-            commit('setD2Path', `${dota2Path}/game/`)
+            commit('setD2Path', `${dota2Path}\\game\\`)
         },
         loadLocalization({ getters, commit }) {
             commit('setLocalizationLoading', true)
