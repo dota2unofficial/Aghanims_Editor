@@ -3,7 +3,7 @@
     class="cell"
   >
     <img
-      :src="`assets/icons/${params.value}.png`"
+      :src="require(`../assets/icons/${params.value}.png`)"
       alt="skill"
       v-if="hasIconInsideAssets(params.value)"
     />
@@ -13,6 +13,15 @@
 
 <script>
 import Vue from 'vue'
+import '../assets/icons/ArmorPhysical.png'
+import '../assets/icons/AttackDamageMax.png'
+import '../assets/icons/AttackDamageMin.png'
+import '../assets/icons/BaseClass.png'
+import '../assets/icons/gamesoundsfile.png'
+import '../assets/icons/SoundSet.png'
+import '../assets/icons/StatusHealth.png'
+import '../assets/icons/StatusHealthRegen.png'
+
 export default Vue.extend({
   name: 'KeyCell',
   data: () => ({
