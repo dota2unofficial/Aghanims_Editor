@@ -3,7 +3,7 @@
     class="cell"
   >
     <img
-      :src="require(`../assets/icons/${params.value}.png`)"
+      :src="getIcon(params.value)"
       alt="skill"
       v-if="hasIconInsideAssets(params.value)"
     />
@@ -13,14 +13,7 @@
 
 <script>
 import Vue from 'vue'
-import '../assets/icons/ArmorPhysical.png'
-import '../assets/icons/AttackDamageMax.png'
-import '../assets/icons/AttackDamageMin.png'
-import '../assets/icons/BaseClass.png'
-import '../assets/icons/gamesoundsfile.png'
-import '../assets/icons/SoundSet.png'
-import '../assets/icons/StatusHealth.png'
-import '../assets/icons/StatusHealthRegen.png'
+import path from 'path'
 
 export default Vue.extend({
   name: 'KeyCell',
@@ -39,6 +32,9 @@ export default Vue.extend({
   methods: {
     hasIconInsideAssets(key) {
       return this.iconArray.includes(key)
+    },
+    getIcon(item) {
+      return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item}.png`
     }
   }
 })
