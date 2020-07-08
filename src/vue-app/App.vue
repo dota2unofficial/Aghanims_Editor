@@ -3,6 +3,7 @@
 		<v-app>
 			<Toolbar 
 				@toggleDebugger="toggleDebugger"
+				:localization="localizationData"
 			/>
 			<v-main>
 				<div class="content">
