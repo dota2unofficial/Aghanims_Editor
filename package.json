@@ -24,7 +24,10 @@
 		"appId": "app.id",
 		"directories": {
 			"output": "build/"
-		}
+		},
+		"extraResources": [
+			"./assets/**"
+		]
 	},
 	"repository": {
 		"type": "git",
