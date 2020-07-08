@@ -64,6 +64,12 @@ export default {
             'getD2Path',
         ]),
     },
+    props: {
+        localization: {
+            type: Object,
+            required: true,
+        }
+    },
     data: () => ({
         fileName: null,
         fileContent: null,

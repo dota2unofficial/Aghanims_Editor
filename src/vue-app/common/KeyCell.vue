@@ -14,21 +14,18 @@
 <script>
 import Vue from 'vue'
 import path from 'path'
+import fs, { readdirSync } from 'fs'
 
 export default Vue.extend({
   name: 'KeyCell',
   data: () => ({
-    iconArray: [
-      'ArmorPhysical',
-      'AttackDamageMax',
-      'AttackDamageMin',
-      'BaseClass',
-      'gamesoundsfile',
-      'SoundSet',
-      'StatusHealth',
-      'StatusHealthRegen',
-    ]
+    iconArray: []
   }),
+  created() {
+    const path = `${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\`
+    const result = fs.readdirSync(path)
+    this.iconArray = result.map(file => file.split('.')[0])
+  },
   methods: {
     hasIconInsideAssets(key) {
       return this.iconArray.includes(key)
