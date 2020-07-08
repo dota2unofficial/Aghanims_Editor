@@ -158,5 +158,8 @@ module.exports = {
 			"vue$": "vue/dist/vue.esm.js",
 			"@": resolve(__dirname, "src/vue-app/")
 		}
+	},
+	externals: {
+		keyv: "commonjs keyv"
 	}
 };

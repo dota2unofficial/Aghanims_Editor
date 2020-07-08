@@ -25,7 +25,9 @@
             @update:active="onItemChanged"
         >
             <template v-slot:label="{ item }">
-                <span @click="onItemChanged(item.name)">{{ item.name }}</span>
+                <span @click="onItemChanged(item.name)">
+                    {{ customLocalization(item.name) }}
+                </span>
             </template>
             <template v-slot:prepend="{ item, leaf }">
                 <v-img
@@ -42,23 +44,35 @@
 
 <script>
 import fileMixin from '../mixin/fileMixin'
+import localizationMixin from '../mixin/localizationMixin'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import { mdiAlienOutline  } from '@mdi/js'
 
 export default {
     name: 'Sidebar',
-    mixins: [ fileMixin ],
+    mixins: [
+        fileMixin,
+        localizationMixin,
+    ],
     data: () => ({
         activeKey: '',
         navigationWidth: 300,
         filterString: '',
         mdiParent: mdiAlienOutline,
     }),
+    props: {
+        localization: {
+            type: Object,
+            required: true,
+        }
+    },
     computed: {
         ...mapGetters([
             'getPath',
-            'getCategories'
+            'getCategories',
+            'getTokens',
+            'getCustomLocalization',
         ]),
         path() {
             return this.getPath
@@ -71,10 +85,10 @@ export default {
                 {
                     id: "CUSTOM_UNITS",
                     name: 'Units :',
-                    children: this.categories.map(item => ({ id: item, name: item }))
+                    children: this.categories.map(item => ({id: item, name: item}))
                 }
             ]
-        }
+        },
     },
     methods: {
         ...mapMutations([
@@ -131,6 +145,11 @@ export default {
                 }
             )
         },
+        customLocalization(key) {
+            if (this.localization[key]) return this.localization[key]
+            if (this.getCustomLocalization[key]) return this.getCustomLocalization[key]
+            return key
+        }
     },
     mounted() {
         this.setBorderWidth()

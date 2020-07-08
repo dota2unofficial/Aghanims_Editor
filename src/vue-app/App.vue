@@ -6,7 +6,9 @@
 			/>
 			<v-main>
 				<div class="content">
-					<Sidebar />
+					<Sidebar 
+						:localization="localizationData"
+					/>
 					<Editpane />
 				</div>
 			</v-main>
@@ -49,10 +51,12 @@ import Sidebar from './components/Sidebar'
 import Editpane from './components/Editpane'
 import Alert from './common/Alert'
 import Debugger from './common/Debugger'
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
+import localizationMixin from './mixin/localizationMixin'
 
 export default {
 	name: "App",
+	mixins: [ localizationMixin ],
 	components: {
 		Toolbar,
 		Sidebar,
@@ -70,7 +74,6 @@ export default {
 	methods: {
 		...mapActions([
 			'findD2Path',
-			'loadLocalization',
 		]),
 		toggleDebugger() {
 			this.isDebugger = !this.isDebugger
@@ -79,13 +82,12 @@ export default {
 	created() {
 		this.findD2Path()
 	},
-	watch: {
-		getD2Found(found) {
-			if (found) this.loadLocalization()
-		},
+	async mounted() {
+		this.localizationData = await this.getLocalization()
 	},
 	data: () => ({
 		isDebugger: false,
+		localizationData: {}
 	}),
 };
 </script>
