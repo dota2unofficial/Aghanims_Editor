@@ -82,7 +82,8 @@ export default {
             'setD2Found',
         ]),
         ...mapActions([
-            'addDebugLogs'
+            'addDebugLogs',
+            'loadCustomLocalization'
         ]),
         saveConfirm() {
             this.confirmSave = true
@@ -187,6 +188,7 @@ export default {
             const path = this.getD2Path + '\\dota_addons\\' + folder
             const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
+            this.loadCustomLocalization(folder)
             this.readFile(unitPath)
         }
     }

@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import { findSteamAppById } from 'find-steam-app'
+import fs from 'fs'
+import chardet from 'chardet'
 
 Vue.use(Vuex)
 
@@ -16,6 +18,7 @@ const store = new Vuex.Store({
         d2Path: null,
         localization: {},
         localizationLoading: false,
+        customLocalization: {},
         debugLogs: [],
     },
     getters: {
@@ -29,6 +32,7 @@ const store = new Vuex.Store({
         getLocalization: state => state.localization,
         getLocalizationLoading: state => state.localizationLoading,
         getDebugLogs: state => state.debugLogs,
+        getCustomLocalization: state => state.customLocalization,
     },
     mutations: {
         setPath(state, path) {
@@ -61,6 +65,9 @@ const store = new Vuex.Store({
         setDebugLogs(state, logs) {
             state.debugLogs = logs
         },
+        setCustomLocalization(state, localization) {
+            state.customLocalization = localization
+        },
     },
     actions: {
         async findD2Path({ commit }) {
@@ -78,13 +85,36 @@ const store = new Vuex.Store({
             }
             commit('setD2Path', `${dota2Path}\\game`)
         },
-        loadLocalization({ getters, commit }) {
-            commit('setLocalizationLoading', true)
-            console.log(getters.getD2Path)
-            commit('setLocalizationLoading', false)
-        },
         addDebugLogs({ commit, getters }, log) {
             commit('setDebugLogs', [...getters.getDebugLogs, log])
+        },
+        loadCustomLocalization({ commit, getters }, mod) {
+            const filePath = `${getters.getD2Path}\\dota_addons\\${mod}\\resource\\addon_english.txt`
+            const encoding = chardet.detectFileSync(filePath)
+            const result = fs.readFileSync(filePath, encoding)
+            const lines = result.split('\n')
+
+            let root = {}
+            let i = 3
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+
+            commit('setCustomLocalization', root.Tokens)
         },
     }
 })
