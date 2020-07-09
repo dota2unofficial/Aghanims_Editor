@@ -22,6 +22,7 @@
             :components="components"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
+            v-if="getSelected"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -53,6 +54,7 @@ export default {
         KeyCell,
     },
     data: () => ({
+        isFirst: false,
         columns: [
             {
                 headerName: 'Key', 
@@ -80,6 +82,19 @@ export default {
                         }
                     }
 
+                    if (Number.isInteger(params.data.value)) {
+                        return 'agTextCellEditor'
+                    } else {
+                        if (params.data.value[params.data.value.length - 1] === 's') {
+                            return {
+                                component: 'agTextCellEditor',
+                                params: {
+                                    value: params.data.value.splice(0, 1)
+                                }
+                            }
+                        }
+                    }
+
                     return {
                         component: 'agTextCellEditor'
                     }
@@ -99,6 +114,7 @@ export default {
             'getCategories',
             'getAbility',
             'getCurrentAvatar',
+            'getCustomLocalization'
         ]),
         details() {
             return this.getDetails
@@ -118,7 +134,13 @@ export default {
             'addDebugLogs'
         ]),
         getRowHeight(params) {
-            return params.data.key.includes('Ability') && this.getAbility ? 80 : 40
+            const { data: { key }} = params
+            if (key.includes('Ability')) {
+                const keyArr = Object.keys(this.getDetails)
+                const index = keyArr.findIndex(value => value === key)
+                return keyArr.splice(0, index).findIndex(value => value.includes('Ability')) > -1 ? 40 : 80
+            }
+            return 40
         }
     },
     watch: {
@@ -144,7 +166,6 @@ export default {
         getAbility(ability) {
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            console.log(this.localization[this.details['ability_hide_healthbar']])
             this.items = Object.keys(this.details).map(key => ({
                 key: key,
                 value: key.includes('Ability') ? this.localization[this.details[key]] ? this.localization[this.details[key]] : this.details[key] : this.details[key],
