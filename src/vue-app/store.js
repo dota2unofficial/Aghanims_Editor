@@ -20,6 +20,7 @@ const store = new Vuex.Store({
         localizationLoading: false,
         customLocalization: {},
         debugLogs: [],
+        availability: true,
     },
     getters: {
         getPath: state => state.path,
@@ -33,6 +34,7 @@ const store = new Vuex.Store({
         getLocalizationLoading: state => state.localizationLoading,
         getDebugLogs: state => state.debugLogs,
         getCustomLocalization: state => state.customLocalization,
+        getAbility: state => state.availability,
     },
     mutations: {
         setPath(state, path) {
@@ -68,6 +70,9 @@ const store = new Vuex.Store({
         setCustomLocalization(state, localization) {
             state.customLocalization = localization
         },
+        setAbility(state, availability) {
+            state.availability = availability
+        }
     },
     actions: {
         async findD2Path({ commit }) {

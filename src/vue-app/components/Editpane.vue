@@ -21,6 +21,7 @@
             :defaultColDef="{flex: 1}"
             :components="components"
             :tooltipShowDelay="0"
+            :getRowHeight="getRowHeight"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -40,6 +41,12 @@ import { schemas } from 'dota-data/lib/schemas'
 export default {
     name: 'EditPane',
     mixins: [ fileMixin ],
+    props: {
+        localization: {
+            type: Object,
+            required: true
+        }
+    },
     components: { 
         MetaFile,
         AgGridVue,
@@ -52,6 +59,7 @@ export default {
                 field: 'key', 
                 sortable: true, 
                 filter: true,
+                resizable: true,
                 tooltip: (params) => `${params.data.description ? params.data.description : 'No Description'}`,
                 cellRendererFramework: KeyCell,
             },
@@ -59,6 +67,7 @@ export default {
                 headerName: 'Value',
                 field: 'value',
                 editable: true,
+                resizable: true,
                 cellEditorSelector: (params) => {
                     const { data: { key } } = params
                     const options = getConstData(params.data.key)
@@ -87,7 +96,8 @@ export default {
             'getDetails',
             'getSelected',
             'getPath',
-            'getCategories'
+            'getCategories',
+            'getAbility',
         ]),
         details() {
             return this.getDetails
@@ -106,13 +116,15 @@ export default {
         ...mapActions([
             'addDebugLogs'
         ]),
+        getRowHeight(params) {
+            return params.data.key.includes('Ability') && this.getAbility ? 80 : 40
+        }
     },
     watch: {
         details(details) {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            const baseClassDescription = getKeyInformation('BaseClass').description;
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
@@ -126,6 +138,16 @@ export default {
                 ...this.getCategories,
                 [this.selected]: newData
             })
+        },
+        getAbility(ability) {
+            const { npc_units_custom } = schemas;
+            const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
+            console.log(this.localization[this.details['ability_hide_healthbar']])
+            this.items = Object.keys(this.details).map(key => ({
+                key: key,
+                value: key.includes('Ability') ? this.localization[this.details[key]] ? this.localization[this.details[key]] : this.details[key] : this.details[key],
+                description: getKeyInformation(key) ? getKeyInformation(key).description : 'No description'
+            }))
         }
     }
 }

@@ -10,7 +10,9 @@
 					<Sidebar 
 						:localization="localizationData"
 					/>
-					<Editpane />
+					<Editpane
+						:localization="localizationData"
+					/>
 				</div>
 			</v-main>
 			
