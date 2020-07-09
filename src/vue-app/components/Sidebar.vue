@@ -71,9 +71,11 @@ export default {
             'getPath',
             'getCategories',
             'getHeros',
+            'getAbilitiesOverride',
             'getTokens',
             'getCustomLocalization',
-            'getDetails'
+            'getDetails',
+            'getPrecache',
         ]),
         path() {
             return this.getPath
@@ -90,6 +92,18 @@ export default {
                 return 1
             })
         },
+        overrideAbilities() {
+            return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        precache() {
+            return Object.keys(this.getPrecache).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
         treeNodes() {
             return [
                 {
@@ -101,6 +115,16 @@ export default {
                     id: "CUSTOM_HEROS",
                     name: 'Heros :',
                     children: this.heros.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_ABILITIES",
+                    name: 'Override Abilities :',
+                    children: this.overrideAbilities.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_PRECACHE",
+                    name: 'Precache :',
+                    children: this.precache.map(item => ({id: item, name: item}))
                 }
             ]
         },
@@ -119,12 +143,16 @@ export default {
                 this.setSelected("")
                 return
             }
-            if (item[0] === 'Units :' || item[0] === 'Heros: ') return
+            if (item[0] === 'Units :' || item[0] === 'Heros: ' || item[0] === 'Override Abilities :' || item[0] === 'Precache :') return
             this.setSelected(item[0])
             if (this.categories.findIndex(category => category === item[0]) > -1)
                 this.setDetails(this.getCategories[item[0]])
-            else
+            else if (this.heros.findIndex(hero => hero === item[0]) > -1)
                 this.setDetails(this.getHeros[item[0]])
+            else if (this.overrideAbilities.findIndex(hero => hero === item[0]) > -1)
+                this.setDetails(this.getAbilitiesOverride[item[0]])
+            else
+                this.setDetails(this.getPrecache[item[0]])
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
             if (this.getDetails && this.getDetails.override_hero)
                 this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getDetails.override_hero}_png.png`)
