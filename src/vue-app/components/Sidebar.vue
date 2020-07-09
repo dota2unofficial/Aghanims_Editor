@@ -25,14 +25,14 @@
             @update:active="onItemChanged"
         >
             <template v-slot:label="{ item }">
-                <span @click="onItemChanged(item.name)">
+                <span>
                     {{ customLocalization(item.name) }}
                 </span>
             </template>
             <template v-slot:prepend="{ item, leaf }">
                 <v-img
                     v-if="leaf"
-                    src="/images/units/electron.png"
+                    :src="getHeroAvatar(item.name)"
                     :width="24"
                     :height="24"
                 ></v-img>
@@ -56,7 +56,6 @@ export default {
         localizationMixin,
     ],
     data: () => ({
-        activeKey: '',
         navigationWidth: 300,
         filterString: '',
         mdiParent: mdiAlienOutline,
@@ -74,6 +73,7 @@ export default {
             'getHeros',
             'getTokens',
             'getCustomLocalization',
+            'getDetails'
         ]),
         path() {
             return this.getPath
@@ -108,20 +108,24 @@ export default {
     methods: {
         ...mapMutations([
             'setDetails',
-            'setSelected'
+            'setSelected',
+            'setCurrentAvatar'
         ]),
         ...mapActions([
             'addDebugLogs'
         ]),
         onItemChanged(item) {
             if (item[0] === 'Units :' || item[0] === 'Heros: ') return
-            this.activeKey = item[0]
             this.setSelected(item[0])
-            if (this.getCategories[item[0]])
+            if (this.categories.findIndex(category => category === item[0]) > -1)
                 this.setDetails(this.getCategories[item[0]])
             else
                 this.setDetails(this.getHeros[item[0]])
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
+            if (this.getDetails && this.getDetails.override_hero)
+                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getDetails.override_hero}_png.png`)
+            else
+                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0]}_png.png`)
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
@@ -164,10 +168,23 @@ export default {
             )
         },
         customLocalization(key) {
+            if (this.getHeros[key] && this.getHeros[key].override_hero) {
+                const filteredKey = key.replace('custom_', '')
+                if (this.localization[filteredKey]) return this.localization[filteredKey]
+                if (this.getCustomLocalization[filteredKey]) return this.getCustomLocalization[filteredKey]    
+            }
             if (this.localization[key]) return this.localization[key]
             if (this.getCustomLocalization[key]) return this.getCustomLocalization[key]
             return key
-        }
+        },
+        getHeroAvatar(hero) {
+            if (this.heros.findIndex(heroName => heroName === hero) < 0) 
+                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
+            if (!this.getHeros[hero].override_hero)
+                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
+            else
+                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+        },
     },
     mounted() {
         this.setBorderWidth()
