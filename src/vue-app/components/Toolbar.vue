@@ -53,6 +53,7 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
+import path from 'path'
 import chardet from 'chardet'
 
 export default {
@@ -223,12 +224,17 @@ export default {
                 const files = readdirSync(`${d2path}\\dota_addons\\`, { withFileTypes: true })
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name)
+                .filter(dirent => {
+                    const filePath = `${d2path}\\dota_addons\\${dirent}\\resource\\addon_english.txt`
+                    if (fs.existsSync(filePath)) return true
+                    return false
+                })
                 this.addDebugLogs(`Dota2 mods List`)
                 this.addDebugLogs(files.toString())
                 this.addDebugLogs(`Dota2 is found on your pc.`)
                 this.addonList = files
                 this.addonList = files.map(file => {
-                    const filePath = `${this.getD2Path}\\dota_addons\\${file}\\resource\\addon_english.txt`
+                    const filePath = `${d2path}\\dota_addons\\${file}\\resource\\addon_english.txt`
                     const encoding = chardet.detectFileSync(filePath)
                     const result = fs.readFileSync(filePath, encoding)
                     const lines = result.split('\n')
