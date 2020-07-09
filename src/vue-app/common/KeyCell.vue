@@ -43,10 +43,13 @@ export default Vue.extend({
       'setAbility'
     ]),
     hasIconInsideAssets(key) {
-      return this.iconArray.includes(key)
+      return this.iconArray.includes(key) || this.iconArray.includes(key.toLowerCase())
     },
     getIcon(item) {
-      return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item}.png`
+      const path = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item}.png`
+      if (fs.existsSync(path))
+        return path
+      return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item.toLowerCase()}.png`
     },
   },
   computed: {
