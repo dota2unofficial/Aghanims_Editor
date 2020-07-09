@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import { findSteamAppById } from 'find-steam-app'
 import fs from 'fs'
 import chardet from 'chardet'
+import { flatten } from './utils/file'
 
 Vue.use(Vuex)
 
@@ -12,7 +13,9 @@ const store = new Vuex.Store({
         path: null,
         categories: {},
         heros: {},
+        abilities: {},
         details: {},
+        items: {},
         selected: null,
         fileLoading: false,
         d2Found: false,
@@ -28,6 +31,8 @@ const store = new Vuex.Store({
         getPath: state => state.path,
         getCategories: state => state.categories,
         getHeros: state => state.heros,
+        getAbilities: state => state.abilities,
+        getItems: state => state.items,
         getDetails: state => state.details,
         getSelected: state => state.selected,
         getFileLoading: state => state.fileLoading,
@@ -50,8 +55,14 @@ const store = new Vuex.Store({
         setHeros(state, heros) {
             state.heros = heros
         },
+        setAbilities(state, abilities) {
+            state.abilities = abilities
+        },
+        setItems(state, items) {
+            state.items = items
+        },
         setDetails(state, details) {
-            state.details = details
+            state.details = flatten(details)
         },
         setSelected(state, selected) {
             state.selected = selected

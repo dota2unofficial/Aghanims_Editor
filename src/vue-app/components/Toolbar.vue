@@ -54,6 +54,7 @@ import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
 import chardet from 'chardet'
+import parseKV from 'parse-kv'
 
 export default {
     name: 'Toolbar',
@@ -89,6 +90,8 @@ export default {
             'setPath',
             'setD2Found',
             'setHeros',
+            'setAbilities',
+            'setItems',
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -156,6 +159,26 @@ export default {
                 this.loadHeroFinished(data)
             })
         },
+        readAbilities(abilitiesPath) {
+            this.setFileLoading(true)
+            fs.readFile(abilitiesPath, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadAbilitiesFinished(data)
+            })
+        },
+        readItems(itemsPath) {
+            this.setFileLoading(true)
+            fs.readFile(itemsPath, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadItemsFinished(data)
+            })
+        },
         loadFinished(result) {
             this.fileContent = result
             const lines = result.split('\n')
@@ -213,6 +236,19 @@ export default {
             this.setHeros(root)
             this.setFileLoading(false)
         },
+        loadAbilitiesFinished(result) {
+            const parsed = parseKV(result)
+            this.setAbilities(parsed.DOTAAbilities)
+            this.setFileLoading(false)
+        },
+        loadItemsFinished(result) {
+            try {
+                const parsed = parseKV(result)
+                this.setItems(parsed.DOTAAbilities)
+            } catch (err) {
+                console.log(err)
+            }
+        },
         showDebugger() {
             this.$emit('toggleDebugger')
         }
@@ -256,10 +292,14 @@ export default {
             const path = this.getD2Path + '\\dota_addons\\' + folder
             const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
             const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
+            const abilitiesPath = `${path}\\scripts\\npc\\npc_abilities_custom.txt`
+            const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)
             this.readHeros(heroPath)
+            this.readAbilities(abilitiesPath)
+            this.readItems(itemsPath)
         }
     }
 }

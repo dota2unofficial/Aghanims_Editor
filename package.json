@@ -61,6 +61,7 @@
 		"dota-data": "^0.9.5",
 		"find-steam-app": "^1.0.2",
 		"keyv": "^4.0.1",
+		"parse-kv": "^0.3.1",
 		"style-loader": "^1.2.1",
 		"vue": "^2.6.11",
 		"vue-class-component": "^7.2.3",
