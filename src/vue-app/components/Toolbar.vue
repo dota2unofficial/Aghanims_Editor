@@ -201,7 +201,8 @@ export default {
                     
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
-                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
+                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
                         j ++
                     }
                     i = j
