@@ -90,6 +90,8 @@ export default {
             'setPath',
             'setD2Found',
             'setHeros',
+            'setAbilitiesOverride',
+            'setPrecache'
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -157,6 +159,26 @@ export default {
                 this.loadHeroFinished(data)
             })
         },
+        readAbilitiesOverride(override) {
+            this.setFileLoading(true)
+            fs.readFile(override, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadAbilitiesOverrideFinished(data)
+            })
+        },
+        readPrecache(precache) {
+            this.setFileLoading(true)
+            fs.readFile(precache, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadPrecacheFinished(data)
+            })
+        },
         loadFinished(result) {
             this.fileContent = result
             const lines = result.split('\n')
@@ -214,6 +236,63 @@ export default {
             this.setHeros(root)
             this.setFileLoading(false)
         },
+        loadAbilitiesOverrideFinished(result) {
+            this.fileContent = result
+            const lines = result.split('\n')
+            const items = []
+            items[lines[3].substring(1, lines[3].length - 1)] = {}
+
+            let root = items[lines[3].substring(1, lines[3].length - 1)]
+            let i = 1
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
+                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+            this.setAbilitiesOverride(root)
+            this.setFileLoading(false)
+        },
+        loadPrecacheFinished(result) {
+            this.fileContent = result
+            const lines = result.split('\n')
+            const items = []
+            items[lines[3].substring(1, lines[3].length - 1)] = {}
+
+            let root = items[lines[3].substring(1, lines[3].length - 1)]
+            let i = 0
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+            this.setPrecache(root)
+            this.setFileLoading(false)
+        },
         showDebugger() {
             this.$emit('toggleDebugger')
         }
@@ -262,10 +341,14 @@ export default {
             const path = this.getD2Path + '\\dota_addons\\' + folder
             const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
             const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
+            const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`
+            const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)
             this.readHeros(heroPath)
+            this.readAbilitiesOverride(abilitiesOverridePath)
+            this.readPrecache(precachePath)
         }
     }
 }
