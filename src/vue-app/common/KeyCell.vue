@@ -10,7 +10,7 @@
       />
       {{params.value}}
     </div>
-    <p class="mb-0" v-if="isAbility">
+    <p class="mb-0">
       <input
         type="checkbox"
         placeholder="Hello"

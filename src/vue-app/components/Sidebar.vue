@@ -115,6 +115,10 @@ export default {
             'addDebugLogs'
         ]),
         onItemChanged(item) {
+            if (item.length === 0) {
+                this.setSelected("")
+                return
+            }
             if (item[0] === 'Units :' || item[0] === 'Heros: ') return
             this.setSelected(item[0])
             if (this.categories.findIndex(category => category === item[0]) > -1)
