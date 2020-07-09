@@ -53,6 +53,7 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
+import chardet from 'chardet'
 
 export default {
     name: 'Toolbar',
@@ -186,6 +187,26 @@ export default {
                 this.addDebugLogs(files.toString())
                 this.addDebugLogs(`Dota2 is found on your pc.`)
                 this.addonList = files
+                this.addonList = files.map(file => {
+                    const filePath = `${this.getD2Path}\\dota_addons\\${file}\\resource\\addon_english.txt`
+                    const encoding = chardet.detectFileSync(filePath)
+                    const result = fs.readFileSync(filePath, encoding)
+                    const lines = result.split('\n')
+
+                    let root = {}
+                    let i = 3
+                    while (i < lines.length - 1) {
+                        const line = lines[i].trim()
+                        const arr = line.split(`"`)
+                        if (arr[1] === "addon_game_name") {
+                            return {
+                                value: file,
+                                text: arr[3]
+                            }
+                        }
+                        i ++
+                    }
+                })
             } catch (err) {
                 this.addDebugLogs(`Dota2 : `, err)
             }
