@@ -11,6 +11,7 @@ const store = new Vuex.Store({
     state: {
         path: null,
         categories: {},
+        heros: {},
         details: {},
         selected: null,
         fileLoading: false,
@@ -25,6 +26,7 @@ const store = new Vuex.Store({
     getters: {
         getPath: state => state.path,
         getCategories: state => state.categories,
+        getHeros: state => state.heros,
         getDetails: state => state.details,
         getSelected: state => state.selected,
         getFileLoading: state => state.fileLoading,
@@ -42,6 +44,9 @@ const store = new Vuex.Store({
         },
         setCategories(state, categories) {
             state.categories = categories
+        },
+        setHeros(state, heros) {
+            state.heros = heros
         },
         setDetails(state, details) {
             state.details = details
