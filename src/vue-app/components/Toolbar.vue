@@ -63,6 +63,7 @@ export default {
             'getFileLoading',
             'getD2Found',
             'getD2Path',
+            'getHeros'
         ]),
     },
     props: {
@@ -87,6 +88,7 @@ export default {
             'setCategories',
             'setPath',
             'setD2Found',
+            'setHeros',
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -144,6 +146,16 @@ export default {
                 this.loadFinished(data)
             })
         },
+        readHeros(heropath) {
+            this.setFileLoading(true)
+            fs.readFile(heropath, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadHeroFinished(data)
+            })
+        },
         loadFinished(result) {
             this.fileContent = result
             const lines = result.split('\n')
@@ -170,6 +182,34 @@ export default {
                 }
             }
             this.setCategories(root)
+            this.setFileLoading(false)
+        },
+        loadHeroFinished(result) {
+            this.fileContent = result
+            const lines = result.split('\n')
+            const items = []
+            items[lines[3].substring(1, lines[3].length - 1)] = {}
+
+            let root = items[lines[3].substring(1, lines[3].length - 1)]
+            let i = 1
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+            this.setHeros(root)
             this.setFileLoading(false)
         },
         showDebugger() {
@@ -214,9 +254,11 @@ export default {
         selectedMod(folder) {
             const path = this.getD2Path + '\\dota_addons\\' + folder
             const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
+            const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)
+            this.readHeros(heroPath)
         }
     }
 }

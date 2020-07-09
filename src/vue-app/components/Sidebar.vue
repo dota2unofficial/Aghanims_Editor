@@ -71,6 +71,7 @@ export default {
         ...mapGetters([
             'getPath',
             'getCategories',
+            'getHeros',
             'getTokens',
             'getCustomLocalization',
         ]),
@@ -78,7 +79,16 @@ export default {
             return this.getPath
         },
         categories() {
-            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString))
+            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        heros() {
+            return Object.keys(this.getHeros).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
         },
         treeNodes() {
             return [
@@ -86,6 +96,11 @@ export default {
                     id: "CUSTOM_UNITS",
                     name: 'Units :',
                     children: this.categories.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_HEROS",
+                    name: 'Heros :',
+                    children: this.heros.map(item => ({id: item, name: item}))
                 }
             ]
         },
@@ -99,10 +114,13 @@ export default {
             'addDebugLogs'
         ]),
         onItemChanged(item) {
-            if (item[0] === 'Units :') return
+            if (item[0] === 'Units :' || item[0] === 'Heros: ') return
             this.activeKey = item[0]
             this.setSelected(item[0])
-            this.setDetails(this.getCategories[item[0]])
+            if (this.getCategories[item[0]])
+                this.setDetails(this.getCategories[item[0]])
+            else
+                this.setDetails(this.getHeros[item[0]])
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
         },
         setBorderWidth() {
