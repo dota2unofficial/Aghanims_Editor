@@ -134,6 +134,7 @@ export default {
         },
         items(value) {
             const newData = {}
+            if (!Object.keys(this.getCategories).includes(this.selected)) return
             value.forEach(item => newData[item.key] = item.value)
             this.setCategories({
                 ...this.getCategories,

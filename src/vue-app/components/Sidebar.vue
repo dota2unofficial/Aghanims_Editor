@@ -25,7 +25,7 @@
             @update:active="onItemChanged"
         >
             <template v-slot:label="{ item }">
-                <span @click="onItemChanged(item.name)">
+                <span>
                     {{ customLocalization(item.name) }}
                 </span>
             </template>
@@ -56,7 +56,6 @@ export default {
         localizationMixin,
     ],
     data: () => ({
-        activeKey: '',
         navigationWidth: 300,
         filterString: '',
         mdiParent: mdiAlienOutline,
@@ -117,9 +116,8 @@ export default {
         ]),
         onItemChanged(item) {
             if (item[0] === 'Units :' || item[0] === 'Heros: ') return
-            this.activeKey = item[0]
             this.setSelected(item[0])
-            if (this.getCategories[item[0]])
+            if (this.categories.findIndex(category => category === item[0]) > -1)
                 this.setDetails(this.getCategories[item[0]])
             else
                 this.setDetails(this.getHeros[item[0]])
@@ -180,6 +178,8 @@ export default {
             return key
         },
         getHeroAvatar(hero) {
+            if (this.heros.findIndex(heroName => heroName === hero) < 0) 
+                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
             if (!this.getHeros[hero].override_hero)
                 return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
             else
