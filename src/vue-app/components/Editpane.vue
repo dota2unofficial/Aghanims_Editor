@@ -22,6 +22,7 @@
             :components="components"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
+            v-if="getSelected"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -76,6 +77,19 @@ export default {
                             component: 'agSelectCellEditor',
                             params: {
                                 values: options
+                            }
+                        }
+                    }
+
+                    if (Number.isInteger(params.data.value)) {
+                        return 'agTextCellEditor'
+                    } else {
+                        if (params.data.value[params.data.value.length - 1] === 's') {
+                            return {
+                                component: 'agTextCellEditor',
+                                params: {
+                                    value: params.data.value.splice(0, 1)
+                                }
                             }
                         }
                     }
