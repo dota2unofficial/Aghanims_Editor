@@ -63,6 +63,7 @@
 		"keyv": "^4.0.1",
 		"parse-kv": "^0.3.1",
 		"style-loader": "^1.2.1",
+		"vdfplus": "^1.0.0",
 		"vue": "^2.6.11",
 		"vue-class-component": "^7.2.3",
 		"vue-property-decorator": "^9.0.0",
