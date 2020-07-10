@@ -14,6 +14,8 @@ const store = new Vuex.Store({
         categories: {},
         heros: {},
         abilities: {},
+        ablitiesOverride: {},
+        precache: {},
         details: {},
         items: {},
         selected: null,
@@ -33,6 +35,8 @@ const store = new Vuex.Store({
         getHeros: state => state.heros,
         getAbilities: state => state.abilities,
         getItems: state => state.items,
+        getAbilitiesOverride: state => state.ablitiesOverride,
+        getPrecache: state => state.precache,
         getDetails: state => state.details,
         getSelected: state => state.selected,
         getFileLoading: state => state.fileLoading,
@@ -60,6 +64,12 @@ const store = new Vuex.Store({
         },
         setItems(state, items) {
             state.items = items
+        },
+        setAbilitiesOverride(state, abilities) {
+            state.ablitiesOverride = abilities
+        },
+        setPrecache(state, precache) {
+            state.precache = precache
         },
         setDetails(state, details) {
             state.details = flatten(details)

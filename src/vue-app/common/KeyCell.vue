@@ -10,17 +10,13 @@
       />
       {{params.value}}
     </div>
-    <p class="mb-0" v-if="isAbility">
-      <input
-        type="checkbox"
-        placeholder="Hello"
-        :id="`checkbox${params.value}`"
-        @change="onChange"
-      >
-      <label
-        :for="`checkbox${params.value}`"
-      >Always show ingame names for abilities</label>
-    </p>
+    <v-checkbox
+      v-model="ability"
+      label="Always show ingame names for abilities"
+      dense
+      hide-details
+      class="pt-0 mt-0"
+    ></v-checkbox>
   </div>
 </template>
 
@@ -33,26 +29,28 @@ import { mapGetters, mapMutations } from 'vuex'
 export default Vue.extend({
   name: 'KeyCell',
   data: () => ({
-    iconArray: []
+    iconArray: [],
+    ability: false,
   }),
   created() {
     const path = `${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\`
     const result = fs.readdirSync(path)
     this.iconArray = result.map(file => file.split('.')[0])
+    this.ability = this.getAbility
   },
   methods: {
     ...mapMutations([
       'setAbility'
     ]),
     hasIconInsideAssets(key) {
-      return this.iconArray.includes(key)
+      return this.iconArray.includes(key) || this.iconArray.includes(key.toLowerCase())
     },
     getIcon(item) {
-      return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item}.png`
+      const path = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item}.png`
+      if (fs.existsSync(path))
+        return path
+      return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item.toLowerCase()}.png`
     },
-    onChange() {
-      this.setAbility(false)
-    }
   },
   computed: {
     ...mapGetters([
@@ -60,6 +58,15 @@ export default Vue.extend({
     ]),
     isAbility() {
       return this.params.value.includes('Ability') && this.getAbility
+    },
+  },
+  watch: {
+    getAbility(able) {
+      this.ability = able
+    },
+    ability(able) {
+      if (able !== this.getAbility)
+        this.setAbility(able)
     },
   }
 })

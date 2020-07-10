@@ -53,6 +53,7 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
+import path from 'path'
 import chardet from 'chardet'
 import parseKV from 'parse-kv'
 
@@ -92,6 +93,8 @@ export default {
             'setHeros',
             'setAbilities',
             'setItems',
+            'setAbilitiesOverride',
+            'setPrecache'
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -169,14 +172,31 @@ export default {
                 this.loadAbilitiesFinished(data)
             })
         },
+        readAbilitiesOverride(override) {
+            this.setFileLoading(true)
+            fs.readFile(override, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadAbilitiesFinished(data)
+            })
+        },
         readItems(itemsPath) {
             this.setFileLoading(true)
             fs.readFile(itemsPath, 'utf8', (err, data) => {
+                this.loadAbilitiesOverrideFinished(data)
+            })
+        },
+        readPrecache(precache) {
+            this.setFileLoading(true)
+            fs.readFile(precache, 'utf8', (err, data) => {
                 if (err) {
                     this.setFileLoading(false)
                     throw err
                 }
                 this.loadItemsFinished(data)
+                this.loadPrecacheFinished(data)
             })
         },
         loadFinished(result) {
@@ -249,6 +269,63 @@ export default {
                 console.log(err)
             }
         },
+        loadAbilitiesOverrideFinished(result) {
+            this.fileContent = result
+            const lines = result.split('\n')
+            const items = []
+            items[lines[3].substring(1, lines[3].length - 1)] = {}
+
+            let root = items[lines[3].substring(1, lines[3].length - 1)]
+            let i = 1
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
+                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+            this.setAbilitiesOverride(root)
+            this.setFileLoading(false)
+        },
+        loadPrecacheFinished(result) {
+            this.fileContent = result
+            const lines = result.split('\n')
+            const items = []
+            items[lines[3].substring(1, lines[3].length - 1)] = {}
+
+            let root = items[lines[3].substring(1, lines[3].length - 1)]
+            let i = 0
+            while (i < lines.length - 1) {
+                const line = lines[i].trim()
+                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
+                    const lineName = lines[i].split('"')[1]
+                    root[lineName] = {}
+                    let j = i + 2
+                    
+                    while (lines[j].trim()[0] !== '}') {
+                        const pair = lines[j].trim().split('"')
+                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
+                        j ++
+                    }
+                    i = j
+                } else {
+                    i ++
+                }
+            }
+            this.setPrecache(root)
+            this.setFileLoading(false)
+        },
         showDebugger() {
             this.$emit('toggleDebugger')
         }
@@ -260,12 +337,17 @@ export default {
                 const files = readdirSync(`${d2path}\\dota_addons\\`, { withFileTypes: true })
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name)
+                .filter(dirent => {
+                    const filePath = `${d2path}\\dota_addons\\${dirent}\\resource\\addon_english.txt`
+                    if (fs.existsSync(filePath)) return true
+                    return false
+                })
                 this.addDebugLogs(`Dota2 mods List`)
                 this.addDebugLogs(files.toString())
                 this.addDebugLogs(`Dota2 is found on your pc.`)
                 this.addonList = files
                 this.addonList = files.map(file => {
-                    const filePath = `${this.getD2Path}\\dota_addons\\${file}\\resource\\addon_english.txt`
+                    const filePath = `${d2path}\\dota_addons\\${file}\\resource\\addon_english.txt`
                     const encoding = chardet.detectFileSync(filePath)
                     const result = fs.readFileSync(filePath, encoding)
                     const lines = result.split('\n')
@@ -294,12 +376,16 @@ export default {
             const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
             const abilitiesPath = `${path}\\scripts\\npc\\npc_abilities_custom.txt`
             const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`
+            const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`
+            const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)
             this.readHeros(heroPath)
             this.readAbilities(abilitiesPath)
             this.readItems(itemsPath)
+            this.readAbilitiesOverride(abilitiesOverridePath)
+            this.readPrecache(precachePath)
         }
     }
 }
