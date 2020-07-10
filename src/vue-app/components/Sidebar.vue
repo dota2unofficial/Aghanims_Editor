@@ -71,6 +71,8 @@ export default {
             'getPath',
             'getCategories',
             'getHeros',
+            'getAbilities',
+            'getItems',
             'getAbilitiesOverride',
             'getTokens',
             'getCustomLocalization',
@@ -92,8 +94,20 @@ export default {
                 return 1
             })
         },
+        abilities() {
+            return Object.keys(this.getAbilities).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
         overrideAbilities() {
             return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString)).sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        items() {
+            return Object.keys(this.getItems).filter(key => key.includes(this.filterString)).sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
@@ -115,6 +129,16 @@ export default {
                     id: "CUSTOM_HEROS",
                     name: 'Heros :',
                     children: this.heros.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_Abilities",
+                    name: 'Abilities :',
+                    children: this.abilities.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM ITEMS",
+                    name: 'Items :',
+                    children: this.items.map(item => ({id: item, name: item}))
                 },
                 {
                     id: "CUSTOM_ABILITIES",
@@ -149,6 +173,10 @@ export default {
                 this.setDetails(this.getCategories[item[0]])
             else if (this.heros.findIndex(hero => hero === item[0]) > -1)
                 this.setDetails(this.getHeros[item[0]])
+            if (this.abilities.findIndex(category => category === item[0]) > -1)
+                this.setDetails(this.getAbilities[item[0]])
+            if (this.items.findIndex(category => category === item[0]) > -1)
+                this.setDetails(this.getItems[item[0]])
             else if (this.overrideAbilities.findIndex(hero => hero === item[0]) > -1)
                 this.setDetails(this.getAbilitiesOverride[item[0]])
             else
