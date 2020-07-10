@@ -56,6 +56,7 @@ import fs, { lstatSync, readdirSync } from 'fs'
 import path from 'path'
 import chardet from 'chardet'
 import parseKV from 'parse-kv'
+const vdfplus = require('vdfplus')
 
 export default {
     name: 'Toolbar',
@@ -203,109 +204,33 @@ export default {
             })
         },
         loadFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 5
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
-                }
-            }
-            this.setCategories(root)
+            const root = vdfplus.parse(result)
+            this.setCategories(root.DOTAUnits)
             this.setFileLoading(false)
         },
         loadHeroFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 1
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
-                }
-            }
-            this.setHeros(root)
+            const root = vdfplus.parse(result)
+            this.setHeros(root.DOTAHeroes)
             this.setFileLoading(false)
         },
         loadAbilitiesFinished(result) {
-            const parsed = parseKV(result)
-            this.setAbilities(parsed.DOTAAbilities)
+            const root = vdfplus.parse(result)
+            this.setAbilities(root.DOTAAbilities)
             this.setFileLoading(false)
         },
         loadItemsFinished(result) {
-            try {
-                const parsed = parseKV(result)
-                this.setItems(parsed.DOTAAbilities)
-            } catch (err) {
-                console.log(err)
-            }
+            const root = vdfplus.parse(result)
+            this.setItems(root.DOTAAbilities)
+            this.setFileLoading(false)
         },
         loadAbilitiesOverrideFinished(result) {
-            try {
-                const parsed = parseKV(result)
-                this.setAbilitiesOverride(parsed.DOTAAbilities)
-                this.setFileLoading(false)
-            } catch (err) {
-                console.log(err)
-            }
+            const root = vdfplus.parse(result)
+            this.setAbilitiesOverride(root.DOTAAbilities)
+            this.setFileLoading(false)
         },
         loadPrecacheFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 0
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
-                }
-            }
-            this.setPrecache(root)
+            const root = vdfplus.parse(result)
+            this.setPrecache(root.DOTAUnits)
             this.setFileLoading(false)
         },
         showDebugger() {

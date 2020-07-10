@@ -83,37 +83,37 @@ export default {
             return this.getPath
         },
         categories() {
-            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         heros() {
-            return Object.keys(this.getHeros).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getHeros).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         abilities() {
-            return Object.keys(this.getAbilities).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getAbilities).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         overrideAbilities() {
-            return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         items() {
-            return Object.keys(this.getItems).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getItems).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         precache() {
-            return Object.keys(this.getPrecache).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getPrecache).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
