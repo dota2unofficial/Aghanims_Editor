@@ -179,13 +179,17 @@ export default {
                     this.setFileLoading(false)
                     throw err
                 }
-                this.loadAbilitiesFinished(data)
+                this.loadAbilitiesOverrideFinished(data)
             })
         },
         readItems(itemsPath) {
             this.setFileLoading(true)
             fs.readFile(itemsPath, 'utf8', (err, data) => {
-                this.loadAbilitiesOverrideFinished(data)
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadItemsFinished(data)
             })
         },
         readPrecache(precache) {
@@ -195,7 +199,6 @@ export default {
                     this.setFileLoading(false)
                     throw err
                 }
-                this.loadItemsFinished(data)
                 this.loadPrecacheFinished(data)
             })
         },
@@ -244,7 +247,6 @@ export default {
                     
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
-                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
                         if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
                         j ++
                     }
@@ -270,33 +272,13 @@ export default {
             }
         },
         loadAbilitiesOverrideFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 1
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
-                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
-                }
+            try {
+                const parsed = parseKV(result)
+                this.setAbilitiesOverride(parsed.DOTAAbilities)
+                this.setFileLoading(false)
+            } catch (err) {
+                console.log(err)
             }
-            this.setAbilitiesOverride(root)
-            this.setFileLoading(false)
         },
         loadPrecacheFinished(result) {
             this.fileContent = result
