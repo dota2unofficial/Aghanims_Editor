@@ -19,10 +19,11 @@
             :columnDefs="columns"
             v-model="items"
             :defaultColDef="{flex: 1}"
-            :components="components"
+            :components="frameworkComponents"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
             v-if="getSelected"
+            :frameworkComponents="frameworkComponents"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -31,6 +32,7 @@
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
+import AbilityCell from '../common/AbilityCell'
 
 import fileMixin from '../mixin/fileMixin'
 
@@ -52,6 +54,7 @@ export default {
         MetaFile,
         AgGridVue,
         KeyCell,
+        AbilityCell
     },
     data: () => ({
         isFirst: false,
@@ -72,6 +75,13 @@ export default {
                 resizable: true,
                 cellEditorSelector: (params) => {
                     const { data: { key } } = params
+                    if (params.data.key.includes('Ability')) {
+                        console.log(params.data.key)
+                        return {
+                            component: AbilityCell,
+                        }
+                    }
+
                     const options = getConstData(params.data.key)
                     if (options.length > 0) {
                         return {
@@ -102,8 +112,8 @@ export default {
             },
         ],
         items: [],
-        components: {
-            fileInput: MetaFile,
+        frameworkComponents: {
+            fileInput: AbilityCell,
         },
     }),
     computed: {

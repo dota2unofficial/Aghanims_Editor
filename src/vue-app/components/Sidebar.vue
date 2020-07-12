@@ -179,11 +179,14 @@ export default {
                 this.setDetails(this.getItems[item[0]])
             else if (this.overrideAbilities.findIndex(hero => hero === item[0]) > -1)
                 this.setDetails(this.getAbilitiesOverride[item[0]])
-            else
+            else {
                 this.setDetails(this.getPrecache[item[0]])
+            }
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
             if (this.getDetails && this.getDetails.override_hero)
                 this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getDetails.override_hero}_png.png`)
+            else if (this.precache.findIndex(hero => hero === item[0]) > -1)
+                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0].replace('npc_precache_', '')}_png.png`)
             else
                 this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0]}_png.png`)
         },
@@ -233,14 +236,21 @@ export default {
                 if (this.localization[filteredKey]) return this.localization[filteredKey]
                 if (this.getCustomLocalization[filteredKey]) return this.getCustomLocalization[filteredKey]    
             }
+            if (this.getPrecache[key]) {
+                const filteredKey = key.replace('npc_precache_', '')
+                if (this.localization[filteredKey]) return this.localization[filteredKey]
+                if (this.getCustomLocalization[filteredKey]) return this.getCustomLocalization[filteredKey]    
+            }
             if (this.localization[key]) return this.localization[key]
             if (this.getCustomLocalization[key]) return this.getCustomLocalization[key]
             return key
         },
         getHeroAvatar(hero) {
+            if (this.precache.findIndex(precache => precache === hero) >= 0)
+                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
             if (this.heros.findIndex(heroName => heroName === hero) < 0) 
                 return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
-            if (!this.getHeros[hero].override_hero)
+            else if (!this.getHeros[hero].override_hero)
                 return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
             else
                 return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getHeros[hero].override_hero}_png.png`
