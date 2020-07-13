@@ -18,7 +18,6 @@
             dark
             @click="saveConfirm"
             outlined
-            :disabled="fileName === null"
             class="mr-3"
         >
             Save
@@ -38,7 +37,7 @@
         >
             <v-card>
                 <v-card-title>Confirm Save</v-card-title>
-                <v-card-text>Are you reall sure to save it?</v-card-text>
+                <v-card-text>Are you really sure to save it?</v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" outlined @click="confirmSave = false">Cancel</v-btn>
@@ -109,6 +108,7 @@ export default {
             node.click()
         },
         saveFile() {
+            console.log(vdfplus.stringify(this.getCategories))
             const lines = this.fileContent.split('\n')
 
             let i = 5
