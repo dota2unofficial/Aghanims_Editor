@@ -139,6 +139,7 @@ export default {
             'setItems',
             'setAbilitiesOverride',
             'setPrecache',
+            'setHeros'
         ]),
         ...mapActions([
             'addDebugLogs'
