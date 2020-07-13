@@ -6,10 +6,11 @@
         >
             <v-avatar
                 :size="128"
-                :rounded="false"
+                tile
             >
                 <v-img
                     :src="getCurrentAvatar"
+                    contain
                 ></v-img>
             </v-avatar>
         </v-sheet>

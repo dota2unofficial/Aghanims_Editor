@@ -35,6 +35,8 @@
                     :src="getHeroAvatar(item.name)"
                     :width="24"
                     :height="24"
+                    tile
+                    contain
                 ></v-img>
                 <v-icon v-else>{{mdiParent}}</v-icon>
             </template>
@@ -183,12 +185,23 @@ export default {
                 this.setDetails(this.getPrecache[item[0]])
             }
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
-            if (this.getDetails && this.getDetails.override_hero)
-                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getDetails.override_hero}_png.png`)
-            else if (this.precache.findIndex(hero => hero === item[0]) > -1)
-                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0].replace('npc_precache_', '')}_png.png`)
-            else
-                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0]}_png.png`)
+
+            const hero = item[0]
+            const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+
+            if (this.categories.findIndex(category => category === hero) >= 0) {
+                this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+            } else if (this.precache.findIndex(precache => precache === hero) >= 0) {
+                this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`)
+            } else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
+                if (!this.getHeros[hero.override_hero]) {
+                    this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero}_png.png`)
+                } else {
+                    this.setCurrentAvatar(`${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`)
+                }
+            } else {
+                this.setCurrentAvatar('')
+            }
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
@@ -246,14 +259,18 @@ export default {
             return key
         },
         getHeroAvatar(hero) {
-            if (this.precache.findIndex(precache => precache === hero) >= 0)
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
-            if (this.heros.findIndex(heroName => heroName === hero) < 0) 
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
-            else if (!this.getHeros[hero].override_hero)
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
-            else
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+            const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+            if (this.categories.findIndex(category => category === hero) >= 0) {
+                return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
+            } else if (this.precache.findIndex(precache => precache === hero) >= 0) {
+                return `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
+            } else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
+                if (!this.getHeros[hero.override_hero]) {
+                    return `${defaultPath}\\heroes\\${hero}_png.png`
+                } else {
+                    return `${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+                }
+            }
         },
     },
     mounted() {
