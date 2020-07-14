@@ -72,7 +72,7 @@ const store = new Vuex.Store({
             state.precache = precache
         },
         setDetails(state, details) {
-            state.details = flatten(details)
+            state.details = details
         },
         setSelected(state, selected) {
             state.selected = selected
