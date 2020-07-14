@@ -6,10 +6,11 @@
         >
             <v-avatar
                 :size="128"
-                :rounded="false"
+                tile
             >
                 <v-img
                     :src="getCurrentAvatar"
+                    contain
                 ></v-img>
             </v-avatar>
         </v-sheet>
@@ -19,10 +20,11 @@
             :columnDefs="columns"
             v-model="items"
             :defaultColDef="{flex: 1}"
-            :components="components"
+            :components="frameworkComponents"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
             v-if="getSelected"
+            :frameworkComponents="frameworkComponents"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -31,6 +33,7 @@
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
+import AbilityCell from '../common/AbilityCell'
 
 import fileMixin from '../mixin/fileMixin'
 
@@ -52,6 +55,7 @@ export default {
         MetaFile,
         AgGridVue,
         KeyCell,
+        AbilityCell
     },
     data: () => ({
         isFirst: false,
@@ -72,6 +76,13 @@ export default {
                 resizable: true,
                 cellEditorSelector: (params) => {
                     const { data: { key } } = params
+                    if (params.data.key.includes('Ability')) {
+                        console.log(params.data.key)
+                        return {
+                            component: AbilityCell,
+                        }
+                    }
+
                     const options = getConstData(params.data.key)
                     if (options.length > 0) {
                         return {
@@ -102,8 +113,8 @@ export default {
             },
         ],
         items: [],
-        components: {
-            fileInput: MetaFile,
+        frameworkComponents: {
+            fileInput: AbilityCell,
         },
     }),
     computed: {
@@ -113,8 +124,14 @@ export default {
             'getPath',
             'getCategories',
             'getAbility',
+            'getHeros',
             'getCurrentAvatar',
-            'getCustomLocalization'
+            'getCustomLocalization',
+            'getAbilities',
+            'getItems',
+            'getAbilitiesOverride',
+            'getPrecache',
+            'getSelected',
         ]),
         details() {
             return this.getDetails
@@ -128,7 +145,12 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'setCategories'
+            'setCategories',
+            'setAbilities',
+            'setItems',
+            'setAbilitiesOverride',
+            'setPrecache',
+            'setHeros'
         ]),
         ...mapActions([
             'addDebugLogs'
@@ -148,6 +170,7 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
+            
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
@@ -156,12 +179,38 @@ export default {
         },
         items(value) {
             const newData = {}
-            if (!Object.keys(this.getCategories).includes(this.selected)) return
-            value.forEach(item => newData[item.key] = item.value)
-            this.setCategories({
-                ...this.getCategories,
-                [this.selected]: newData
-            })
+            const selected = this.getSelected
+            if (Object.keys(this.getCategories).includes(this.selected)) {
+                value.forEach(item => newData[item.key] = item.value)
+                this.setCategories({
+                    ...this.getCategories,
+                    [this.selected]: newData
+                })
+            } else if (Object.keys(this.getHeros).includes(this.selected)) {
+                value.forEach(item => newData[item.key] = item.value)
+                this.setHeros({
+                    ...this.getHeros,
+                    [this.selected]: newData
+                })
+            } else if (Object.keys(this.getAbilities).includes(this.selected)) {
+                value.forEach(item => newData[item.key] = item.value)
+                this.setHeros({
+                    ...this.getAbilities,
+                    [this.selected]: newData
+                })
+            } else if (Object.keys(this.getAbilitiesOverride).includes(this.selected)) {
+                value.forEach(item => newData[item.key] = item.value)
+                this.setHeros({
+                    ...this.getAbilitiesOverride,
+                    [this.selected]: newData
+                })
+            } else if (Object.keys(this.getPrecache).includes(this.selected)) {
+                value.forEach(item => newData[item.key] = item.value)
+                this.setHeros({
+                    ...this.getPrecache,
+                    [this.selected]: newData
+                })
+            }
         },
         getAbility(ability) {
             const { npc_units_custom } = schemas;

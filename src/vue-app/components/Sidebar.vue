@@ -35,6 +35,7 @@
                     :src="getHeroAvatar(item.name)"
                     :width="24"
                     :height="24"
+                    tile
                 ></v-img>
                 <v-icon v-else>{{mdiParent}}</v-icon>
             </template>
@@ -71,21 +72,49 @@ export default {
             'getPath',
             'getCategories',
             'getHeros',
+            'getAbilities',
+            'getItems',
+            'getAbilitiesOverride',
             'getTokens',
             'getCustomLocalization',
-            'getDetails'
+            'getDetails',
+            'getPrecache',
         ]),
         path() {
             return this.getPath
         },
         categories() {
-            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getCategories).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
         },
         heros() {
-            return Object.keys(this.getHeros).filter(key => key.includes(this.filterString)).sort((first, next) => {
+            return Object.keys(this.getHeros).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        abilities() {
+            return Object.keys(this.getAbilities).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        overrideAbilities() {
+            return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        items() {
+            return Object.keys(this.getItems).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
+                if (this.customLocalization(first) < this.customLocalization(next)) return -1
+                return 1
+            })
+        },
+        precache() {
+            return Object.keys(this.getPrecache).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
             })
@@ -101,6 +130,26 @@ export default {
                     id: "CUSTOM_HEROS",
                     name: 'Heros :',
                     children: this.heros.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_Abilities",
+                    name: 'Abilities :',
+                    children: this.abilities.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM ITEMS",
+                    name: 'Items :',
+                    children: this.items.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_ABILITIES",
+                    name: 'Override Abilities :',
+                    children: this.overrideAbilities.map(item => ({id: item, name: item}))
+                },
+                {
+                    id: "CUSTOM_PRECACHE",
+                    name: 'Precache :',
+                    children: this.precache.map(item => ({id: item, name: item}))
                 }
             ]
         },
@@ -119,17 +168,43 @@ export default {
                 this.setSelected("")
                 return
             }
-            if (item[0] === 'Units :' || item[0] === 'Heros: ') return
+            if (item[0] === 'Units :' || item[0] === 'Heros: ' || item[0] === 'Override Abilities :' || item[0] === 'Precache :') return
             this.setSelected(item[0])
             if (this.categories.findIndex(category => category === item[0]) > -1)
                 this.setDetails(this.getCategories[item[0]])
-            else
+            else if (this.heros.findIndex(hero => hero === item[0]) > -1)
                 this.setDetails(this.getHeros[item[0]])
+            else if (this.abilities.findIndex(category => category === item[0]) > -1)
+                this.setDetails(this.getAbilities[item[0]])
+            else if (this.items.findIndex(category => category === item[0]) > -1)
+                this.setDetails(this.getItems[item[0]])
+            else if (this.overrideAbilities.findIndex(hero => hero === item[0]) > -1)
+                this.setDetails(this.getAbilitiesOverride[item[0]])
+            else {
+                this.setDetails(this.getPrecache[item[0]])
+            }
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
-            if (this.getDetails && this.getDetails.override_hero)
-                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getDetails.override_hero}_png.png`)
-            else
-                this.setCurrentAvatar(`file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${item[0]}_png.png`)
+
+            const hero = item[0]
+            const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+
+            if (this.categories.findIndex(category => category === hero) >= 0) {
+                this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+            }
+            if (this.precache.findIndex(precache => precache === hero) >= 0) {
+                this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`)
+            }
+            if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
+                if (!this.getHeros[hero.override_hero]) this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero}_png.png`)
+                else this.setCurrentAvatar(`${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`)
+            }
+            if (this.items.findIndex(item => item === hero) >= 0) {
+                this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
+            }
+            if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
+                if (hero.includes('item_')) this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
+                else this.setCurrentAvatar(`${defaultPath}\\spells\\${hero}_png.png`)
+            }
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
@@ -177,17 +252,41 @@ export default {
                 if (this.localization[filteredKey]) return this.localization[filteredKey]
                 if (this.getCustomLocalization[filteredKey]) return this.getCustomLocalization[filteredKey]    
             }
+            if (this.getPrecache[key]) {
+                const filteredKey = key.replace('npc_precache_', '')
+                if (this.localization[filteredKey]) return this.localization[filteredKey]
+                if (this.getCustomLocalization[filteredKey]) return this.getCustomLocalization[filteredKey]    
+            }
+            if (this.getAbilitiesOverride[key]) {
+                if (this.localization[`DOTA_Tooltip_ability_${key}`]) return this.localization[`DOTA_Tooltip_ability_${key}`]
+                else if (key.includes('item_') && this.localization[`DOTA_Tooltip_Ability_${key}`]) return this.localization[`DOTA_Tooltip_Ability_${key}`]
+                else return key
+            }
+            if (this.getItems[key]) {
+                return this.localization[`DOTA_Tooltip_Ability_${key}`] ? this.localization[`DOTA_Tooltip_Ability_${key}`] : key
+            }
             if (this.localization[key]) return this.localization[key]
             if (this.getCustomLocalization[key]) return this.getCustomLocalization[key]
             return key
         },
         getHeroAvatar(hero) {
-            if (this.heros.findIndex(heroName => heroName === hero) < 0) 
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
-            if (!this.getHeros[hero].override_hero)
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${hero}_png.png`
-            else
-                return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+            const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+            if (this.categories.findIndex(category => category === hero) >= 0) {
+                return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
+            } else if (this.precache.findIndex(precache => precache === hero) >= 0) {
+                return `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
+            } else if (this.items.findIndex(item => item === hero) >= 0) {
+                return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+            } else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
+                if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                return `${defaultPath}\\spells\\${hero}_png.png`
+            } else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
+                if (!this.getHeros[hero.override_hero]) {
+                    return `${defaultPath}\\heroes\\${hero}_png.png`
+                } else {
+                    return `${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+                }
+            }
         },
     },
     mounted() {
