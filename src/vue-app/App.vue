@@ -113,4 +113,8 @@ ul {
 	height: calc(100vh - 64px);
 	overflow-y: auto;
 }
+
+.ag-cell-inline-editing {
+	overflow: visible !important;
+}
 </style>

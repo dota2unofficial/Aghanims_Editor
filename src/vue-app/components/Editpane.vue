@@ -1,7 +1,6 @@
 <template>
     <v-sheet class="mod-content">
-        <v-sheet 
-            v-if="getUnitAvatar(selected, path)"
+        <v-sheet
             class="mod-avatar"
         >
             <v-avatar
@@ -20,11 +19,10 @@
             :columnDefs="columns"
             v-model="items"
             :defaultColDef="{flex: 1}"
-            :components="frameworkComponents"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
-            v-if="getSelected"
             :frameworkComponents="frameworkComponents"
+            v-if="getSelected"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -33,7 +31,9 @@
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
+import ValueCell from '../common/ValueCell'
 import AbilityCell from '../common/AbilityCell'
+import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
 
@@ -55,7 +55,7 @@ export default {
         MetaFile,
         AgGridVue,
         KeyCell,
-        AbilityCell
+        ValueCell,
     },
     data: () => ({
         isFirst: false,
@@ -74,34 +74,23 @@ export default {
                 field: 'value',
                 editable: true,
                 resizable: true,
+                cellRendererFramework: ValueCell,
                 cellEditorSelector: (params) => {
-                    const { data: { key } } = params
-                    if (params.data.key.includes('Ability')) {
-                        console.log(params.data.key)
+                    const { data: { key, value } } = params
+                    
+                    if (typeof(value) === 'object') {
                         return {
-                            component: AbilityCell,
+                            component: 'abilityEditor',
+                            params: { value: value }
                         }
                     }
 
-                    const options = getConstData(params.data.key)
+                    const options = getConstData(key)
                     if (options.length > 0) {
                         return {
                             component: 'agSelectCellEditor',
                             params: {
                                 values: options
-                            }
-                        }
-                    }
-
-                    if (Number.isInteger(params.data.value)) {
-                        return 'agTextCellEditor'
-                    } else {
-                        if (params.data.value[params.data.value.length - 1] === 's') {
-                            return {
-                                component: 'agTextCellEditor',
-                                params: {
-                                    value: params.data.value.splice(0, 1)
-                                }
                             }
                         }
                     }
@@ -114,8 +103,8 @@ export default {
         ],
         items: [],
         frameworkComponents: {
-            fileInput: AbilityCell,
-        },
+            abilityEditor: AbilityCell
+        }
     }),
     computed: {
         ...mapGetters([
@@ -156,7 +145,10 @@ export default {
             'addDebugLogs'
         ]),
         getRowHeight(params) {
-            const { data: { key }} = params
+            const { data: { key, value }} = params
+            if (typeof(value) === 'object') {
+                return Object.keys(flatten(value)).length * 40
+            }
             if (key.includes('Ability')) {
                 const keyArr = Object.keys(this.getDetails)
                 const index = keyArr.findIndex(value => value === key)

@@ -257,20 +257,10 @@ export default {
                     const filePath = `${d2path}\\dota_addons\\${file}\\resource\\addon_english.txt`
                     const encoding = chardet.detectFileSync(filePath)
                     const result = fs.readFileSync(filePath, encoding)
-                    const lines = result.split('\n')
-
-                    let root = {}
-                    let i = 3
-                    while (i < lines.length - 1) {
-                        const line = lines[i].trim()
-                        const arr = line.split(`"`)
-                        if (arr[1] === "addon_game_name") {
-                            return {
-                                value: file,
-                                text: arr[3]
-                            }
-                        }
-                        i ++
+                    const root = vdfplus.parse(result)
+                    return {
+                        value: file,
+                        text: root.lang.Tokens['addon_game_name']
                     }
                 })
             } catch (err) {
