@@ -116,5 +116,10 @@ ul {
 
 .ag-cell-inline-editing {
 	overflow: visible !important;
+	height: 100% !important;
+}
+
+.ag-popup-child {
+	width: 49%;
 }
 </style>

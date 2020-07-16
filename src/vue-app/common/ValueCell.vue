@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div
+    :style="{height: getHeight}"
+  >
     <span v-if="!isObject">{{params.value}}</span>
     <div v-else>
       <div

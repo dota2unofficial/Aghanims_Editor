@@ -260,11 +260,12 @@ export default {
                     const root = vdfplus.parse(result)
                     return {
                         value: file,
-                        text: root.lang.Tokens['addon_game_name']
+                        text: root.lang.Tokens['addon_game_name'] ? root.lang.Tokens['addon_game_name'] : file
                     }
                 })
             } catch (err) {
                 this.addDebugLogs(`Dota2 : `, err)
+                throw err
             }
         },
         selectedMod(folder) {
@@ -275,6 +276,7 @@ export default {
             const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`
             const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`
             const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`
+            this.setPath(folder)
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)

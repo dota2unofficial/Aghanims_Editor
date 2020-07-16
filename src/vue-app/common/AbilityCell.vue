@@ -7,13 +7,22 @@
         :key="item"
         class="table"
       >
-        <span>{{getKey(item)}}</span>
+        <span class="pl-2">{{getKey(item)}}</span>
         <span>
+          <v-select
+            v-if="getType(item) === 1"
+            v-model="models[item]"
+            dense
+            hide-details
+            outlined
+            :items="getFields('FieldType')"
+          ></v-select>
           <v-text-field
             hide-details
             dense
             outlined
             v-model="models[item]"
+            v-else
           ></v-text-field>
         </span>
       </div>
@@ -25,6 +34,7 @@
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { flatten } from '../utils/file'
+import { getConstData } from '../utils/cellEditor'
 
 export default Vue.extend({
   name: 'ValueCell',
@@ -33,7 +43,7 @@ export default Vue.extend({
   }),
   created() {
     this.getKeys.forEach((key => {
-      this.models[key] = this.getValue(key)
+      this.models[key] = this.getVal(key)
     }))
   },
   computed: {
@@ -43,13 +53,10 @@ export default Vue.extend({
     },
     getKeys() {
       return Object.keys(flatten(this.params.value))
-    },
-    getHeight() {
-      return `${Object.keys(flatten(this.params.value)).length * 40}px`
     }
   },
   methods: {
-    getValue(key) {
+    getVal(key) {
       const depth = key.split('.')
       let value = this.params.value
       depth.forEach(nest => value = value[nest])
@@ -58,6 +65,26 @@ export default Vue.extend({
     getKey(key) {
       const depth = key.split('.').pop()
       return depth
+    },
+    getValue() {
+      const res = {}
+      Object.keys(this.models).forEach(key => {
+        const list = key.split('.')
+        res[list[0]] = {...res[list[0]]}
+        res[list[0]][list[1]] = this.models[key]
+      })
+      return res
+    },
+    getFields(key) {
+      return getConstData(key)
+    },
+    getType(item) {
+      if (this.getKey(item) === 'var_type') return 1
+      return 2
+    },
+    getArray(item) {
+      
+      return this.models[item].split(' ')
     }
   }
 })
@@ -70,6 +97,8 @@ export default Vue.extend({
   span {
     flex: 50%;
     position: relative;
+    display: flex;
+    align-items: center;
 
     &:first-child {
       &:after {

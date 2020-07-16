@@ -2,6 +2,7 @@
     <v-sheet class="mod-content">
         <v-sheet
             class="mod-avatar"
+            v-show="getSelected"
         >
             <v-avatar
                 :size="128"
@@ -22,6 +23,7 @@
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
             :frameworkComponents="frameworkComponents"
+            stopEditingWhenGridLosesFocus
             v-if="getSelected"
         ></ag-grid-vue>
     </v-sheet>
@@ -33,11 +35,12 @@ import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
 import ValueCell from '../common/ValueCell'
 import AbilityCell from '../common/AbilityCell'
+import FileSelectCell from '../common/FileSelectCell'
 import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
 
-import { getConstData } from '../utils/cellEditor'
+import { getConstData, getDescription } from '../utils/cellEditor'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import { schemas } from 'dota-data/lib/schemas'
@@ -56,6 +59,7 @@ export default {
         AgGridVue,
         KeyCell,
         ValueCell,
+        FileSelectCell,
     },
     data: () => ({
         isFirst: false,
@@ -78,10 +82,17 @@ export default {
                 cellEditorSelector: (params) => {
                     const { data: { key, value } } = params
                     
-                    if (typeof(value) === 'object') {
+                    if (typeof(value) === 'object' && value) {
                         return {
                             component: 'abilityEditor',
-                            params: { value: value }
+                            params
+                        }
+                    }
+
+                    if (key === 'Model') {
+                        return {
+                            component: 'fileEditor',
+                            params
                         }
                     }
 
@@ -103,7 +114,8 @@ export default {
         ],
         items: [],
         frameworkComponents: {
-            abilityEditor: AbilityCell
+            abilityEditor: AbilityCell,
+            fileEditor: FileSelectCell,
         }
     }),
     computed: {
@@ -149,7 +161,8 @@ export default {
             if (typeof(value) === 'object') {
                 return Object.keys(flatten(value)).length * 40
             }
-            if (key.includes('Ability')) {
+            const char = key.charAt(7)
+            if (key.includes('Ability') && char >= '0' && char <= '9') {
                 const keyArr = Object.keys(this.getDetails)
                 const index = keyArr.findIndex(value => value === key)
                 return keyArr.splice(0, index).findIndex(value => value.includes('Ability')) > -1 ? 40 : 80
@@ -162,45 +175,46 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            
+            console.log(getDescription('ArmorPhysical'), getKeyInformation('ArmorPhysical') ? getKeyInformation('ArmorPhysical').description : getDescription('ArmorPhysical') ? getDescription('ArmorPhysical') : 'No description')
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
-                description: getKeyInformation(key) ? getKeyInformation(key).description : 'No description'
+                description: getKeyInformation(key) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
             }))
         },
         items(value) {
             const newData = {}
+            value.forEach(item => newData[item.key] = item.value)
             const selected = this.getSelected
-            if (Object.keys(this.getCategories).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
+            if (Object.keys(this.getCategories).includes(selected)) {
                 this.setCategories({
                     ...this.getCategories,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getHeros).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
+            } else if (Object.keys(this.getHeros).includes(selected)) {
                 this.setHeros({
                     ...this.getHeros,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getAbilities).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getAbilities).includes(selected)) {
+                this.setAbilities({
                     ...this.getAbilities,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getAbilitiesOverride).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getAbilitiesOverride).includes(selected)) {
+                this.setAbilitiesOverride({
                     ...this.getAbilitiesOverride,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getPrecache).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getPrecache).includes(selected)) {
+                this.setPrecache({
                     ...this.getPrecache,
-                    [this.selected]: newData
+                    [selected]: newData
+                })
+            } else if (Object.keys(this.getItems).includes(selected)) {
+                this.setItems({
+                    ...this.getItems,
+                    [selected]: newData
                 })
             }
         },
