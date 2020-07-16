@@ -2,6 +2,7 @@
     <v-sheet class="mod-content">
         <v-sheet
             class="mod-avatar"
+            v-show="getSelected"
         >
             <v-avatar
                 :size="128"
@@ -34,6 +35,7 @@ import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
 import ValueCell from '../common/ValueCell'
 import AbilityCell from '../common/AbilityCell'
+import FileSelectCell from '../common/FileSelectCell'
 import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
@@ -57,6 +59,7 @@ export default {
         AgGridVue,
         KeyCell,
         ValueCell,
+        FileSelectCell,
     },
     data: () => ({
         isFirst: false,
@@ -86,6 +89,13 @@ export default {
                         }
                     }
 
+                    if (key === 'Model') {
+                        return {
+                            component: 'fileEditor',
+                            params
+                        }
+                    }
+
                     const options = getConstData(key)
                     if (options.length > 0) {
                         return {
@@ -104,7 +114,8 @@ export default {
         ],
         items: [],
         frameworkComponents: {
-            abilityEditor: AbilityCell
+            abilityEditor: AbilityCell,
+            fileEditor: FileSelectCell,
         }
     }),
     computed: {
