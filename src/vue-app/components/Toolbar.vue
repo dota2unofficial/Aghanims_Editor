@@ -260,7 +260,7 @@ export default {
                     const root = vdfplus.parse(result)
                     return {
                         value: file,
-                        text: root.lang.Tokens['addon_game_name']
+                        text: root.lang.Tokens['addon_game_name'] ? root.lang.Tokens['addon_game_name'] : file
                     }
                 })
             } catch (err) {

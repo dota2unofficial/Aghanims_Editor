@@ -263,7 +263,7 @@ export default {
                 else return key
             }
             if (this.getItems[key]) {
-                return this.localization[`DOTA_Tooltip_Ability_${key}`] ? this.localization[`DOTA_Tooltip_Ability_${key}`] : key
+                return this.localization[`DOTA_Tooltip_Ability_${key}`] ? this.localization[`DOTA_Tooltip_Ability_${key}`] : this.getCustomLocalization[`DOTA_Tooltip_ability_${key}`] ? this.getCustomLocalization[`DOTA_Tooltip_ability_${key}`] : key
             }
             if (this.localization[key]) return this.localization[key]
             if (this.getCustomLocalization[key]) return this.getCustomLocalization[key]
