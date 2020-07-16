@@ -1,4 +1,5 @@
 import enums from '../assets/enums'
+import descriptions from '../assets/description'
 
 export const getConstData = (key) => {
     let options = [];
@@ -39,4 +40,8 @@ export const getConstData = (key) => {
             break
     }
     return options.members ? options.members.map(item => item.name) : []
+}
+
+export const getDescription = (key) => {
+    return descriptions[key]
 }
