@@ -19,7 +19,7 @@
 <script>
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { flatten } from '../utils/file'
+import { flatten } from '../../utils/file'
 
 export default Vue.extend({
   name: 'ValueCell',

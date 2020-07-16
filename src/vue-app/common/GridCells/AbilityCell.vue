@@ -33,8 +33,8 @@
 <script>
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { flatten } from '../utils/file'
-import { getConstData } from '../utils/cellEditor'
+import { flatten } from '../../utils/file'
+import { getConstData } from '../../utils/cellEditor'
 
 export default Vue.extend({
   name: 'ValueCell',

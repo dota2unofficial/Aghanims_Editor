@@ -5,7 +5,6 @@
       dense
       hide-details
       v-model="file"
-      accept=".vmdl"
     ></v-file-input>
   </div>
 </template>
@@ -15,7 +14,7 @@ import Vue from 'vue'
 import { mapGetters } from 'vuex'
 
 export default Vue.extend({
-  name: 'FileSelectCell',
+  name: 'AbilitySelectCell',
   data: () => ({
     file: null,
   }),
@@ -28,8 +27,7 @@ export default Vue.extend({
   methods: {
     getValue() {
       if (!this.file) return this.params.value
-      const res = this.file.path.replace(`${this.getD2Path}\\dota_addons\\${this.getPath}\\`, '').replace(/\\/g, '/')
-      return res
+      return this.file.name.split('.')[0]
     },
     isPopup() {
       return true

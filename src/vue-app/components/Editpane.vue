@@ -31,11 +31,13 @@
 
 <script>
 import { AgGridVue } from 'ag-grid-vue'
-import MetaFile from '../common/MetaFile'
-import KeyCell from '../common/KeyCell'
-import ValueCell from '../common/ValueCell'
-import AbilityCell from '../common/AbilityCell'
-import FileSelectCell from '../common/FileSelectCell'
+import KeyCell from '../common/GridCells/KeyCell'
+import ValueCell from '../common/GridCells/ValueCell'
+import AbilityCell from '../common/GridCells/AbilityCell'
+import AbilitySelectCell from '../common/GridCells/AbilitySelectCell'
+import VScriptCell from '../common/GridCells/VScriptCell'
+import ScriptFile from '../common/GridCells/ScriptFile'
+import FileSelectCell from '../common/GridCells/FileSelectCell'
 import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
@@ -55,7 +57,6 @@ export default {
         }
     },
     components: { 
-        MetaFile,
         AgGridVue,
         KeyCell,
         ValueCell,
@@ -89,9 +90,30 @@ export default {
                         }
                     }
 
-                    if (key === 'Model') {
+                    if (key === 'Model' || key === 'ProjectileModel') {
                         return {
                             component: 'fileEditor',
+                            params
+                        }
+                    }
+
+                    if (key === 'vscripts') {
+                        return {
+                            component: 'vscriptSelector',
+                            params
+                        }
+                    }
+
+                    if (key === 'ScriptFile') {
+                        return {
+                            component: 'scriptSelector',
+                            params
+                        }
+                    }
+
+                    if (key.includes('Ability')) {
+                        return {
+                            component: 'abilitySelector',
                             params
                         }
                     }
@@ -116,6 +138,9 @@ export default {
         frameworkComponents: {
             abilityEditor: AbilityCell,
             fileEditor: FileSelectCell,
+            abilitySelector: AbilitySelectCell,
+            vscriptSelector: VScriptCell,
+            scriptSelector: ScriptFile,
         }
     }),
     computed: {
@@ -175,7 +200,6 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            console.log(getDescription('ArmorPhysical'), getKeyInformation('ArmorPhysical') ? getKeyInformation('ArmorPhysical').description : getDescription('ArmorPhysical') ? getDescription('ArmorPhysical') : 'No description')
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
