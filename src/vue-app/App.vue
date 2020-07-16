@@ -116,5 +116,6 @@ ul {
 
 .ag-cell-inline-editing {
 	overflow: visible !important;
+	height: 100% !important;
 }
 </style>

@@ -16,6 +16,7 @@
       dense
       hide-details
       class="pt-0 mt-0"
+      v-if="isAbilitySet"
     ></v-checkbox>
   </div>
 </template>
@@ -56,8 +57,9 @@ export default Vue.extend({
     ...mapGetters([
       'getAbility'
     ]),
-    isAbility() {
-      return this.params.value.includes('Ability') && this.getAbility
+    isAbilitySet() {
+      const char = this.params.value.charAt(7)
+      return this.params.value.includes('Ability') && char >= '0' && char <= '9'
     },
   },
   watch: {
