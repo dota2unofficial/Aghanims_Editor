@@ -1,4 +1,5 @@
 import enums from '../assets/enums'
+import descriptions from '../assets/description'
 
 export const getConstData = (key) => {
     let options = [];
@@ -25,8 +26,22 @@ export const getConstData = (key) => {
         case 'UnitRelationshipClass':
             options = arrayEnums.find(item => item.name === "NpcUnitRelationshipType")
             break
+        case 'AbilityType':
+            options = arrayEnums.find(item => item.name === "AbilityType")
+            break
+        case 'AbilityUnitDamageType':
+            options = arrayEnums.find(item => item.name === "DamageType")
+            break
+        case 'AbilityCastAnimation':
+            options = arrayEnums.find(item => item.name === "Activity")
+            break
         default:
+            options = arrayEnums.find(item => item.name === key) ? arrayEnums.find(item => item.name === key) : {}
             break
     }
     return options.members ? options.members.map(item => item.name) : []
+}
+
+export const getDescription = (key) => {
+    return descriptions[key]
 }

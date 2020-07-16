@@ -4,7 +4,6 @@ import Vuex from 'vuex'
 import { findSteamAppById } from 'find-steam-app'
 import fs from 'fs'
 import chardet from 'chardet'
-import { flatten } from './utils/file'
 
 Vue.use(Vuex)
 
@@ -27,7 +26,7 @@ const store = new Vuex.Store({
         customLocalization: {},
         debugLogs: [],
         availability: true,
-        currentAvatar: null,
+        currentAvatar: '',
     },
     getters: {
         getPath: state => state.path,

@@ -1,8 +1,8 @@
 <template>
     <v-sheet class="mod-content">
-        <v-sheet 
-            v-if="getUnitAvatar(selected, path)"
+        <v-sheet
             class="mod-avatar"
+            v-show="getSelected"
         >
             <v-avatar
                 :size="128"
@@ -20,11 +20,11 @@
             :columnDefs="columns"
             v-model="items"
             :defaultColDef="{flex: 1}"
-            :components="frameworkComponents"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
-            v-if="getSelected"
             :frameworkComponents="frameworkComponents"
+            stopEditingWhenGridLosesFocus
+            v-if="getSelected"
         ></ag-grid-vue>
     </v-sheet>
 </template>
@@ -33,11 +33,14 @@
 import { AgGridVue } from 'ag-grid-vue'
 import MetaFile from '../common/MetaFile'
 import KeyCell from '../common/KeyCell'
+import ValueCell from '../common/ValueCell'
 import AbilityCell from '../common/AbilityCell'
+import FileSelectCell from '../common/FileSelectCell'
+import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
 
-import { getConstData } from '../utils/cellEditor'
+import { getConstData, getDescription } from '../utils/cellEditor'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import { schemas } from 'dota-data/lib/schemas'
@@ -55,7 +58,8 @@ export default {
         MetaFile,
         AgGridVue,
         KeyCell,
-        AbilityCell
+        ValueCell,
+        FileSelectCell,
     },
     data: () => ({
         isFirst: false,
@@ -74,34 +78,30 @@ export default {
                 field: 'value',
                 editable: true,
                 resizable: true,
+                cellRendererFramework: ValueCell,
                 cellEditorSelector: (params) => {
-                    const { data: { key } } = params
-                    if (params.data.key.includes('Ability')) {
-                        console.log(params.data.key)
+                    const { data: { key, value } } = params
+                    
+                    if (typeof(value) === 'object' && value) {
                         return {
-                            component: AbilityCell,
+                            component: 'abilityEditor',
+                            params
                         }
                     }
 
-                    const options = getConstData(params.data.key)
+                    if (key === 'Model') {
+                        return {
+                            component: 'fileEditor',
+                            params
+                        }
+                    }
+
+                    const options = getConstData(key)
                     if (options.length > 0) {
                         return {
                             component: 'agSelectCellEditor',
                             params: {
                                 values: options
-                            }
-                        }
-                    }
-
-                    if (Number.isInteger(params.data.value)) {
-                        return 'agTextCellEditor'
-                    } else {
-                        if (params.data.value[params.data.value.length - 1] === 's') {
-                            return {
-                                component: 'agTextCellEditor',
-                                params: {
-                                    value: params.data.value.splice(0, 1)
-                                }
                             }
                         }
                     }
@@ -114,8 +114,9 @@ export default {
         ],
         items: [],
         frameworkComponents: {
-            fileInput: AbilityCell,
-        },
+            abilityEditor: AbilityCell,
+            fileEditor: FileSelectCell,
+        }
     }),
     computed: {
         ...mapGetters([
@@ -156,8 +157,12 @@ export default {
             'addDebugLogs'
         ]),
         getRowHeight(params) {
-            const { data: { key }} = params
-            if (key.includes('Ability')) {
+            const { data: { key, value }} = params
+            if (typeof(value) === 'object') {
+                return Object.keys(flatten(value)).length * 40
+            }
+            const char = key.charAt(7)
+            if (key.includes('Ability') && char >= '0' && char <= '9') {
                 const keyArr = Object.keys(this.getDetails)
                 const index = keyArr.findIndex(value => value === key)
                 return keyArr.splice(0, index).findIndex(value => value.includes('Ability')) > -1 ? 40 : 80
@@ -170,45 +175,46 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            
+            console.log(getDescription('ArmorPhysical'), getKeyInformation('ArmorPhysical') ? getKeyInformation('ArmorPhysical').description : getDescription('ArmorPhysical') ? getDescription('ArmorPhysical') : 'No description')
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
-                description: getKeyInformation(key) ? getKeyInformation(key).description : 'No description'
+                description: getKeyInformation(key) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
             }))
         },
         items(value) {
             const newData = {}
+            value.forEach(item => newData[item.key] = item.value)
             const selected = this.getSelected
-            if (Object.keys(this.getCategories).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
+            if (Object.keys(this.getCategories).includes(selected)) {
                 this.setCategories({
                     ...this.getCategories,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getHeros).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
+            } else if (Object.keys(this.getHeros).includes(selected)) {
                 this.setHeros({
                     ...this.getHeros,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getAbilities).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getAbilities).includes(selected)) {
+                this.setAbilities({
                     ...this.getAbilities,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getAbilitiesOverride).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getAbilitiesOverride).includes(selected)) {
+                this.setAbilitiesOverride({
                     ...this.getAbilitiesOverride,
-                    [this.selected]: newData
+                    [selected]: newData
                 })
-            } else if (Object.keys(this.getPrecache).includes(this.selected)) {
-                value.forEach(item => newData[item.key] = item.value)
-                this.setHeros({
+            } else if (Object.keys(this.getPrecache).includes(selected)) {
+                this.setPrecache({
                     ...this.getPrecache,
-                    [this.selected]: newData
+                    [selected]: newData
+                })
+            } else if (Object.keys(this.getItems).includes(selected)) {
+                this.setItems({
+                    ...this.getItems,
+                    [selected]: newData
                 })
             }
         },
