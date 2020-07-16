@@ -7,7 +7,7 @@
         :key="item"
         class="table"
       >
-        <span>{{getKey(item)}}</span>
+        <span class="pl-2">{{getKey(item)}}</span>
         <span>
           <v-text-field
             hide-details
@@ -33,7 +33,7 @@ export default Vue.extend({
   }),
   created() {
     this.getKeys.forEach((key => {
-      this.models[key] = this.getValue(key)
+      this.models[key] = this.getVal(key)
     }))
   },
   computed: {
@@ -43,13 +43,10 @@ export default Vue.extend({
     },
     getKeys() {
       return Object.keys(flatten(this.params.value))
-    },
-    getHeight() {
-      return `${Object.keys(flatten(this.params.value)).length * 40}px`
     }
   },
   methods: {
-    getValue(key) {
+    getVal(key) {
       const depth = key.split('.')
       let value = this.params.value
       depth.forEach(nest => value = value[nest])
@@ -58,6 +55,18 @@ export default Vue.extend({
     getKey(key) {
       const depth = key.split('.').pop()
       return depth
+    },
+    isPopup() {
+      return true
+    },
+    getValue() {
+      const res = {}
+      Object.keys(this.models).forEach(key => {
+        const list = key.split('.')
+        res[list[0]] = {...res[list[0]]}
+        res[list[0]][list[1]] = this.models[key]
+      })
+      return res
     }
   }
 })
@@ -70,6 +79,8 @@ export default Vue.extend({
   span {
     flex: 50%;
     position: relative;
+    display: flex;
+    align-items: center;
 
     &:first-child {
       &:after {
