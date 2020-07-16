@@ -9,11 +9,20 @@
       >
         <span class="pl-2">{{getKey(item)}}</span>
         <span>
+          <v-select
+            v-if="getType(item) === 1"
+            v-model="models[item]"
+            dense
+            hide-details
+            outlined
+            :items="getFields('FieldType')"
+          ></v-select>
           <v-text-field
             hide-details
             dense
             outlined
             v-model="models[item]"
+            v-else
           ></v-text-field>
         </span>
       </div>
@@ -25,6 +34,7 @@
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { flatten } from '../utils/file'
+import { getConstData } from '../utils/cellEditor'
 
 export default Vue.extend({
   name: 'ValueCell',
@@ -56,9 +66,6 @@ export default Vue.extend({
       const depth = key.split('.').pop()
       return depth
     },
-    isPopup() {
-      return true
-    },
     getValue() {
       const res = {}
       Object.keys(this.models).forEach(key => {
@@ -67,6 +74,17 @@ export default Vue.extend({
         res[list[0]][list[1]] = this.models[key]
       })
       return res
+    },
+    getFields(key) {
+      return getConstData(key)
+    },
+    getType(item) {
+      if (this.getKey(item) === 'var_type') return 1
+      return 2
+    },
+    getArray(item) {
+      
+      return this.models[item].split(' ')
     }
   }
 })
