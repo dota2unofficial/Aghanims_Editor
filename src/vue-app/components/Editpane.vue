@@ -40,7 +40,7 @@ import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
 
-import { getConstData } from '../utils/cellEditor'
+import { getConstData, getDescription } from '../utils/cellEditor'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import { schemas } from 'dota-data/lib/schemas'
@@ -175,11 +175,11 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            
+            console.log(getDescription('ArmorPhysical'), getKeyInformation('ArmorPhysical') ? getKeyInformation('ArmorPhysical').description : getDescription('ArmorPhysical') ? getDescription('ArmorPhysical') : 'No description')
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
-                description: getKeyInformation(key) ? getKeyInformation(key).description : 'No description'
+                description: getKeyInformation(key) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
             }))
         },
         items(value) {
