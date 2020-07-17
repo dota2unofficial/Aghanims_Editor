@@ -71,7 +71,7 @@ export default {
                 sortable: true, 
                 filter: true,
                 resizable: true,
-                tooltip: (params) => `${params.data.description ? params.data.description : 'No Description'}`,
+                tooltip: (params) => `${params.data.description ? params.data.description : getDescription[params.data.key] ? getDescription[params.data.key] : 'No Description'}`,
                 cellRendererFramework: KeyCell,
             },
             {
