@@ -54,7 +54,6 @@ import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
 import path from 'path'
 import chardet from 'chardet'
-import parseKV from 'parse-kv'
 const vdfplus = require('vdfplus')
 
 export default {
