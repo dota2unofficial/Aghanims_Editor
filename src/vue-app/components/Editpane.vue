@@ -203,7 +203,7 @@ export default {
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
-                description: getKeyInformation(key) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
+                description: (getKeyInformation(key) && getKeyInformation(key).description) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
             }))
         },
         items(value) {

@@ -1,8 +1,8 @@
 version: 1.4.1
 files:
   - url: mod-explorer-Setup-1.4.1.exe
-    sha512: PzPtN9kMGQnIkdyz1nIf3C4W2FlYTRvVXdZQbSTOMTF4Lvy0PzU+RhvorPxOHcG0axc7x3ykfdjp3hm79CnbSw==
-    size: 352249423
+    sha512: l/X4HcdNIlTrCox2aID0OqUn48YXgHnXcfBiN+uOhi9Syf2Hn3dcLjbld9LqUWSN2b/vN0D9ciuROYSP4/oqIQ==
+    size: 352249015
 path: mod-explorer-Setup-1.4.1.exe
-sha512: PzPtN9kMGQnIkdyz1nIf3C4W2FlYTRvVXdZQbSTOMTF4Lvy0PzU+RhvorPxOHcG0axc7x3ykfdjp3hm79CnbSw==
-releaseDate: '2020-07-17T09:12:34.375Z'
+sha512: l/X4HcdNIlTrCox2aID0OqUn48YXgHnXcfBiN+uOhi9Syf2Hn3dcLjbld9LqUWSN2b/vN0D9ciuROYSP4/oqIQ==
+releaseDate: '2020-07-18T01:20:35.084Z'
