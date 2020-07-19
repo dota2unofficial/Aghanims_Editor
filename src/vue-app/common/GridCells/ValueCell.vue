@@ -2,7 +2,7 @@
   <div
     :style="{height: getHeight}"
   >
-    <span v-if="!isObject">{{params.value}}</span>
+    <span v-if="!isObject">{{getFormattedValue}}</span>
     <div v-else>
       <div
         v-for="item in getKeys"
@@ -24,6 +24,9 @@ import { flatten } from '../../utils/file'
 export default Vue.extend({
   name: 'ValueCell',
   computed: {
+    ...mapGetters([
+      'getLocalizationData',
+    ]),
     isObject() {
       if (typeof(this.params.value) !== 'object') return false
       return true
@@ -33,6 +36,9 @@ export default Vue.extend({
     },
     getHeight() {
       return `${Object.keys(this.params.value).length * 40}px`
+    },
+    getFormattedValue() {
+      return this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`] ? this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`].replace('{s:value}', this.params.value.split('_').pop()) : this.params.value
     }
   },
   methods: {
@@ -43,6 +49,7 @@ export default Vue.extend({
       return value
     },
     getKey(key) {
+      console.log(Object.keys(this.localization).length)
       const depth = key.split('.').pop()
       return depth
     }

@@ -48,6 +48,7 @@
 import fileMixin from '../mixin/fileMixin'
 import localizationMixin from '../mixin/localizationMixin'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import fs from 'fs'
 
 import { mdiAlienOutline  } from '@mdi/js'
 
@@ -80,6 +81,8 @@ export default {
             'getCustomLocalization',
             'getDetails',
             'getPrecache',
+            'getD2Path',
+            'getPath',
         ]),
         path() {
             return this.getPath
@@ -120,12 +123,29 @@ export default {
                 return 1
             })
         },
+        movable() {
+            return this.categories.map(item => ({id: item, name: item})).filter(item => this.getCategories[item.id]['MovementCapabilities'] !== 'DOTA_UNIT_CAP_MOVE_NONE')
+        },
+        unmovable() {
+            return this.categories.map(item => ({id: item, name: item})).filter(item => this.getCategories[item.id]['MovementCapabilities'] === 'DOTA_UNIT_CAP_MOVE_NONE')
+        },
         treeNodes() {
             return [
                 {
                     id: "CUSTOM_UNITS",
                     name: 'Units :',
-                    children: this.categories.map(item => ({id: item, name: item}))
+                    children: [
+                        {
+                            id: "CUSTOM_UNITS_MOVABLE",
+                            name: "Movable :",
+                            children: this.movable
+                        },
+                        {
+                            id: "CUSTOM_UNITS_UNMOVABLE",
+                            name: "Unmovable :",
+                            children: this.unmovable
+                        },
+                    ]
                 },
                 {
                     id: "CUSTOM_HEROS",
@@ -133,19 +153,25 @@ export default {
                     children: this.heros.map(item => ({id: item, name: item}))
                 },
                 {
-                    id: "CUSTOM_Abilities",
+                    id: "ABILITIES",
                     name: 'Abilities :',
-                    children: this.abilities.map(item => ({id: item, name: item}))
+                    children: [
+                        {
+                            id: "CUSTOM_Abilities",
+                            name: 'Abilities :',
+                            children: this.abilities.map(item => ({id: item, name: item}))
+                        },
+                        {
+                            id: "CUSTOM_ABILITIES",
+                            name: 'Override Abilities :',
+                            children: this.overrideAbilities.map(item => ({id: item, name: item})).filter(key => !this.abilities.includes(key.id))
+                        },
+                    ]
                 },
                 {
                     id: "CUSTOM ITEMS",
                     name: 'Items :',
                     children: this.items.map(item => ({id: item, name: item}))
-                },
-                {
-                    id: "CUSTOM_ABILITIES",
-                    name: 'Override Abilities :',
-                    children: this.overrideAbilities.map(item => ({id: item, name: item}))
                 },
                 {
                     id: "CUSTOM_PRECACHE",
@@ -169,20 +195,21 @@ export default {
                 this.setSelected("")
                 return
             }
-            if (item[0] === 'Units :' || item[0] === 'Heros: ' || item[0] === 'Override Abilities :' || item[0] === 'Precache :') return
-            this.setSelected(item[0])
-            if (this.categories.findIndex(category => category === item[0]) > -1)
-                this.setDetails(this.getCategories[item[0]])
-            else if (this.heros.findIndex(hero => hero === item[0]) > -1)
-                this.setDetails(this.getHeros[item[0]])
-            else if (this.abilities.findIndex(category => category === item[0]) > -1)
-                this.setDetails(this.getAbilities[item[0]])
-            else if (this.items.findIndex(category => category === item[0]) > -1)
-                this.setDetails(this.getItems[item[0]])
-            else if (this.overrideAbilities.findIndex(hero => hero === item[0]) > -1)
-                this.setDetails(this.getAbilitiesOverride[item[0]])
+            const selectedKey = item[0]
+            if (selectedKey === 'Units :' || selectedKey === 'Heros: ' || selectedKey === 'Override Abilities :' || selectedKey === 'Precache :' || selectedKey === 'Movable :' || selectedKey === 'Unmovable :') return
+            this.setSelected(selectedKey)
+            if (this.categories.findIndex(category => category === selectedKey) > -1)
+                this.setDetails(this.getCategories[selectedKey])
+            else if (this.heros.findIndex(hero => hero === selectedKey) > -1)
+                this.setDetails(this.getHeros[selectedKey])
+            else if (this.abilities.findIndex(category => category === selectedKey) > -1)
+                this.setDetails(this.getAbilities[selectedKey])
+            else if (this.items.findIndex(category => category === selectedKey) > -1)
+                this.setDetails(this.getItems[selectedKey])
+            else if (this.overrideAbilities.findIndex(hero => hero === selectedKey) > -1)
+                this.setDetails(this.getAbilitiesOverride[selectedKey])
             else {
-                this.setDetails(this.getPrecache[item[0]])
+                this.setDetails(this.getPrecache[selectedKey])
             }
             this.addDebugLogs(`Custom Unit ${item} is loaded.`)
 
@@ -192,17 +219,25 @@ export default {
             if (this.categories.findIndex(category => category === hero) >= 0) {
                 this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
             }
-            if (this.precache.findIndex(precache => precache === hero) >= 0) {
+            else if (this.precache.findIndex(precache => precache === hero) >= 0) {
                 this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`)
             }
-            if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
+            else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
                 if (!this.getHeros[hero.override_hero]) this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero}_png.png`)
                 else this.setCurrentAvatar(`${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`)
             }
-            if (this.items.findIndex(item => item === hero) >= 0) {
+            else if (this.items.findIndex(item => item === hero) >= 0) {
                 this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
             }
-            if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
+            else if (this.abilities.findIndex(item => item === hero) >= 0) {
+                if (this.getAbilities[hero]['AbilityTextureName']) {
+                    if (fs.existsSync(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)) this.setCurrentAvatar(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)
+                    else this.setCurrentAvatar(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}.png`)
+                }
+                else if (hero.includes('item_')) this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
+                else this.setCurrentAvatar(`${defaultPath}\\spells\\${hero}_png.png`)
+            }
+            else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
                 if (hero.includes('item_')) this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
                 else this.setCurrentAvatar(`${defaultPath}\\spells\\${hero}_png.png`)
             }
@@ -283,6 +318,13 @@ export default {
                 return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
             } else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
                 if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                return `${defaultPath}\\spells\\${hero}_png.png`
+            } else if (this.abilities.findIndex(over => over === hero) >= 0) {
+                if (this.getAbilities[hero]['AbilityTextureName']) {
+                    if (fs.existsSync(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)) return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`
+                    else return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}.png`
+                }
+                else if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
                 return `${defaultPath}\\spells\\${hero}_png.png`
             } else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
                 if (!this.getHeros[hero.override_hero]) {

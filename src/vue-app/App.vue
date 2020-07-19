@@ -78,6 +78,9 @@ export default {
 		...mapActions([
 			'findD2Path',
 		]),
+		...mapMutations([
+			'setLocalizationData'
+		]),
 		toggleDebugger() {
 			this.isDebugger = !this.isDebugger
 		}
@@ -87,6 +90,7 @@ export default {
 	},
 	async mounted() {
 		this.localizationData = await this.getLocalization()
+		this.setLocalizationData(this.localizationData)
 	},
 	data: () => ({
 		isDebugger: false,
@@ -121,5 +125,15 @@ ul {
 
 .ag-popup-child {
 	width: 49%;
+}
+
+.v-input__slot {
+	.v-label {
+		white-space: normal !important;
+	}
+}
+
+.ag-tooltip {
+	user-select: none !important;
 }
 </style>

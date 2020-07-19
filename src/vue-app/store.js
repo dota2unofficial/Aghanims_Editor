@@ -27,6 +27,7 @@ const store = new Vuex.Store({
         debugLogs: [],
         availability: true,
         currentAvatar: '',
+        localizationData: {}
     },
     getters: {
         getPath: state => state.path,
@@ -47,6 +48,7 @@ const store = new Vuex.Store({
         getCustomLocalization: state => state.customLocalization,
         getAbility: state => state.availability,
         getCurrentAvatar: state => state.currentAvatar,
+        getLocalizationData: state => state.localizationData,
     },
     mutations: {
         setPath(state, path) {
@@ -102,6 +104,9 @@ const store = new Vuex.Store({
         },
         setCurrentAvatar(state, avatar) {
             state.currentAvatar = avatar
+        },
+        setLocalizationData(state, localization) {
+            state.localizationData = localization
         }
     },
     actions: {
