@@ -8,6 +8,7 @@
         v-for="item in getKeys"
         :key="item"
         class="table"
+        :class="getClass(item)"
       >
         <span>{{getKey(item)}}</span>
         <span>{{getValue(item)}}</span>
@@ -49,9 +50,11 @@ export default Vue.extend({
       return value
     },
     getKey(key) {
-      console.log(Object.keys(this.localization).length)
       const depth = key.split('.').pop()
       return depth
+    },
+    getClass(item) {
+      return this.getKey(item) === 'var_type' ? 'border-top' : ''
     }
   }
 })
@@ -60,6 +63,19 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .table {
   display: flex;
+  position: relative;
+
+  &.border-top {
+    &:before {
+      content: "";
+      height: 1px;
+      position: absolute;
+      left: -17px;
+      right: -17px;
+      top: -1px;
+      background-color: #000;
+    }
+  }
 
   span {
     flex: 50%;
