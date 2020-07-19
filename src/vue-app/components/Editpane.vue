@@ -14,6 +14,7 @@
                 ></v-img>
             </v-avatar>
         </v-sheet>
+
         <ag-grid-vue
             style="width: 100%; height: calc(100vh - 241px)"
             class="ag-theme-alpine"
@@ -26,6 +27,13 @@
             stopEditingWhenGridLosesFocus
             v-if="getSelected"
         ></ag-grid-vue>
+
+        <v-sheet v-if="isOverride">
+            <p
+                v-for="(item, index) in getPreExisting"
+                :key="index"
+            ></p>
+        </v-sheet>
     </v-sheet>
 </template>
 
@@ -37,6 +45,7 @@ import AbilityCell from '../common/GridCells/AbilityCell'
 import AbilitySelectCell from '../common/GridCells/AbilitySelectCell'
 import VScriptCell from '../common/GridCells/VScriptCell'
 import ScriptFile from '../common/GridCells/ScriptFile'
+import NumberCell from '../common/GridCells/NumberCell'
 import FileSelectCell from '../common/GridCells/FileSelectCell'
 import { flatten } from '../utils/file'
 
@@ -82,6 +91,13 @@ export default {
                 cellRendererFramework: ValueCell,
                 cellEditorSelector: (params) => {
                     const { data: { key, value } } = params
+                    
+                    if (!isNaN(value)) {
+                        return {
+                            component: 'numberEditor',
+                            params
+                        }
+                    }
                     
                     if (typeof(value) === 'object' && value) {
                         return {
@@ -138,6 +154,7 @@ export default {
         frameworkComponents: {
             abilityEditor: AbilityCell,
             fileEditor: FileSelectCell,
+            numberEditor: NumberCell,
             abilitySelector: AbilitySelectCell,
             vscriptSelector: VScriptCell,
             scriptSelector: ScriptFile,
@@ -168,6 +185,13 @@ export default {
         path() {
             return this.getPath
         },
+        isOverride() {
+            if (this.getAbilitiesOverride[this.getSelected]) return true
+        },
+        getPreExisting() {
+            const list = this.getAbilities[this.getSelected]
+            return []
+        }
     },
     methods: {
         ...mapMutations([

@@ -55,6 +55,7 @@ import fs, { lstatSync, readdirSync } from 'fs'
 import path from 'path'
 import chardet from 'chardet'
 const vdfplus = require('vdfplus')
+import vdfextra from 'vdf-extra'
 
 export default {
     name: 'Toolbar',
@@ -256,10 +257,10 @@ export default {
                     const filePath = `${d2path}\\dota_addons\\${file}\\resource\\addon_english.txt`
                     const encoding = chardet.detectFileSync(filePath)
                     const result = fs.readFileSync(filePath, encoding)
-                    const root = vdfplus.parse(result)
+                    const root = vdfextra.parse(result, {parseUnquotedStrings: true})
                     return {
                         value: file,
-                        text: root.lang.Tokens['addon_game_name'] ? root.lang.Tokens['addon_game_name'] : file
+                        text: root.Tokens['addon_game_name'] ? root.Tokens['addon_game_name'] : file
                     }
                 })
             } catch (err) {
@@ -284,7 +285,8 @@ export default {
             this.readItems(itemsPath)
             this.readAbilitiesOverride(abilitiesOverridePath)
             this.readPrecache(precachePath)
-        }
+        },
+        
     }
 }
 </script>

@@ -23,6 +23,7 @@
             outlined
             v-model="models[item]"
             v-else
+            :type="getType(item) === 3 ? 'number' : 'text'"
           ></v-text-field>
         </span>
       </div>
@@ -80,10 +81,10 @@ export default Vue.extend({
     },
     getType(item) {
       if (this.getKey(item) === 'var_type') return 1
+      if (!isNaN(this.models[item])) return 3
       return 2
     },
     getArray(item) {
-      
       return this.models[item].split(' ')
     }
   }
