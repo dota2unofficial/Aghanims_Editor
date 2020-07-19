@@ -23,6 +23,7 @@
             outlined
             v-model="models[item]"
             v-else
+            :type="getType(item) === 3 ? 'number' : 'text'"
           ></v-text-field>
         </span>
       </div>
@@ -33,8 +34,8 @@
 <script>
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { flatten } from '../utils/file'
-import { getConstData } from '../utils/cellEditor'
+import { flatten } from '../../utils/file'
+import { getConstData } from '../../utils/cellEditor'
 
 export default Vue.extend({
   name: 'ValueCell',
@@ -80,10 +81,10 @@ export default Vue.extend({
     },
     getType(item) {
       if (this.getKey(item) === 'var_type') return 1
+      if (!isNaN(this.models[item])) return 3
       return 2
     },
     getArray(item) {
-      
       return this.models[item].split(' ')
     }
   }

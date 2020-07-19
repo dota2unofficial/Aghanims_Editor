@@ -2,12 +2,13 @@
   <div
     :style="{height: getHeight}"
   >
-    <span v-if="!isObject">{{params.value}}</span>
+    <span v-if="!isObject">{{getFormattedValue}}</span>
     <div v-else>
       <div
         v-for="item in getKeys"
         :key="item"
         class="table"
+        :class="getClass(item)"
       >
         <span>{{getKey(item)}}</span>
         <span>{{getValue(item)}}</span>
@@ -19,11 +20,14 @@
 <script>
 import Vue from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { flatten } from '../utils/file'
+import { flatten } from '../../utils/file'
 
 export default Vue.extend({
   name: 'ValueCell',
   computed: {
+    ...mapGetters([
+      'getLocalizationData',
+    ]),
     isObject() {
       if (typeof(this.params.value) !== 'object') return false
       return true
@@ -33,6 +37,9 @@ export default Vue.extend({
     },
     getHeight() {
       return `${Object.keys(this.params.value).length * 40}px`
+    },
+    getFormattedValue() {
+      return this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`] ? this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`].replace('{s:value}', this.params.value.split('_').pop()) : this.params.value
     }
   },
   methods: {
@@ -45,6 +52,9 @@ export default Vue.extend({
     getKey(key) {
       const depth = key.split('.').pop()
       return depth
+    },
+    getClass(item) {
+      return this.getKey(item) === 'var_type' ? 'border-top' : ''
     }
   }
 })
@@ -53,6 +63,19 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .table {
   display: flex;
+  position: relative;
+
+  &.border-top {
+    &:before {
+      content: "";
+      height: 1px;
+      position: absolute;
+      left: -17px;
+      right: -17px;
+      top: -1px;
+      background-color: #000;
+    }
+  }
 
   span {
     flex: 50%;

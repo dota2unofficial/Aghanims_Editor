@@ -14,6 +14,7 @@
                 ></v-img>
             </v-avatar>
         </v-sheet>
+
         <ag-grid-vue
             style="width: 100%; height: calc(100vh - 241px)"
             class="ag-theme-alpine"
@@ -26,16 +27,26 @@
             stopEditingWhenGridLosesFocus
             v-if="getSelected"
         ></ag-grid-vue>
+
+        <v-sheet v-if="isOverride">
+            <p
+                v-for="(item, index) in getPreExisting"
+                :key="index"
+            ></p>
+        </v-sheet>
     </v-sheet>
 </template>
 
 <script>
 import { AgGridVue } from 'ag-grid-vue'
-import MetaFile from '../common/MetaFile'
-import KeyCell from '../common/KeyCell'
-import ValueCell from '../common/ValueCell'
-import AbilityCell from '../common/AbilityCell'
-import FileSelectCell from '../common/FileSelectCell'
+import KeyCell from '../common/GridCells/KeyCell'
+import ValueCell from '../common/GridCells/ValueCell'
+import AbilityCell from '../common/GridCells/AbilityCell'
+import AbilitySelectCell from '../common/GridCells/AbilitySelectCell'
+import VScriptCell from '../common/GridCells/VScriptCell'
+import ScriptFile from '../common/GridCells/ScriptFile'
+import NumberCell from '../common/GridCells/NumberCell'
+import FileSelectCell from '../common/GridCells/FileSelectCell'
 import { flatten } from '../utils/file'
 
 import fileMixin from '../mixin/fileMixin'
@@ -55,7 +66,6 @@ export default {
         }
     },
     components: { 
-        MetaFile,
         AgGridVue,
         KeyCell,
         ValueCell,
@@ -70,7 +80,7 @@ export default {
                 sortable: true, 
                 filter: true,
                 resizable: true,
-                tooltip: (params) => `${params.data.description ? params.data.description : 'No Description'}`,
+                tooltip: (params) => `${params.data.description ? params.data.description : getDescription[params.data.key] ? getDescription[params.data.key] : 'No Description'}`,
                 cellRendererFramework: KeyCell,
             },
             {
@@ -82,6 +92,13 @@ export default {
                 cellEditorSelector: (params) => {
                     const { data: { key, value } } = params
                     
+                    if (!isNaN(value)) {
+                        return {
+                            component: 'numberEditor',
+                            params
+                        }
+                    }
+                    
                     if (typeof(value) === 'object' && value) {
                         return {
                             component: 'abilityEditor',
@@ -89,9 +106,30 @@ export default {
                         }
                     }
 
-                    if (key === 'Model') {
+                    if (key === 'Model' || key === 'ProjectileModel') {
                         return {
                             component: 'fileEditor',
+                            params
+                        }
+                    }
+
+                    if (key === 'vscripts') {
+                        return {
+                            component: 'vscriptSelector',
+                            params
+                        }
+                    }
+
+                    if (key === 'ScriptFile') {
+                        return {
+                            component: 'scriptSelector',
+                            params
+                        }
+                    }
+
+                    if (key.includes('Ability')) {
+                        return {
+                            component: 'abilitySelector',
                             params
                         }
                     }
@@ -116,6 +154,10 @@ export default {
         frameworkComponents: {
             abilityEditor: AbilityCell,
             fileEditor: FileSelectCell,
+            numberEditor: NumberCell,
+            abilitySelector: AbilitySelectCell,
+            vscriptSelector: VScriptCell,
+            scriptSelector: ScriptFile,
         }
     }),
     computed: {
@@ -143,6 +185,13 @@ export default {
         path() {
             return this.getPath
         },
+        isOverride() {
+            if (this.getAbilitiesOverride[this.getSelected]) return true
+        },
+        getPreExisting() {
+            const list = this.getAbilities[this.getSelected]
+            return []
+        }
     },
     methods: {
         ...mapMutations([
@@ -175,11 +224,10 @@ export default {
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);
-            console.log(getDescription('ArmorPhysical'), getKeyInformation('ArmorPhysical') ? getKeyInformation('ArmorPhysical').description : getDescription('ArmorPhysical') ? getDescription('ArmorPhysical') : 'No description')
             this.items = Object.keys(details).map(key => ({
                 key: key,
                 value: details[key],
-                description: getKeyInformation(key) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
+                description: (getKeyInformation(key) && getKeyInformation(key).description) ? getKeyInformation(key).description : getDescription(key) ? getDescription(key) : 'No description'
             }))
         },
         items(value) {
