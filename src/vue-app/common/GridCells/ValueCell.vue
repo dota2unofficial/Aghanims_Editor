@@ -1,17 +1,15 @@
 <template>
-  <div
-    :style="{height: getHeight}"
-  >
+  <div>
     <span v-if="!isObject">{{getFormattedValue}}</span>
     <div v-else>
       <div
-        v-for="item in getKeys"
-        :key="item"
+        v-for="(item, index) in data"
+        :key="index"
         class="table"
-        :class="getClass(item)"
       >
-        <span>{{getKey(item)}}</span>
-        <span>{{getValue(item)}}</span>
+        <span>{{getTitle(item)}}</span>
+        <span>{{getKey(index)}}</span>
+        <span>{{getValue(index)}}</span>
       </div>
     </div>
   </div>
@@ -24,9 +22,24 @@ import { flatten } from '../../utils/file'
 
 export default Vue.extend({
   name: 'ValueCell',
+  data: () => ({
+    data: [],
+    models: [],
+  }),
+  created() {
+    Object.keys(this.params.value).forEach(key => {
+      let newValue = {}
+      Object.keys(this.params.value[key]).forEach(index => {
+        newValue[index] = this.params.value[key][index]
+      })
+      this.data.push(newValue)
+      this.models.push(newValue)
+    })
+  },
   computed: {
     ...mapGetters([
       'getLocalizationData',
+      'getCustomLocalization'
     ]),
     isObject() {
       if (typeof(this.params.value) !== 'object') return false
@@ -39,22 +52,23 @@ export default Vue.extend({
       return `${Object.keys(this.params.value).length * 40}px`
     },
     getFormattedValue() {
+      if (this.getCustomLocalization[`DOTA_Tooltip_ability_${this.params.value}`]) return this.getCustomLocalization[`DOTA_Tooltip_ability_${this.params.value}`].replace('{s:value}', this.params.value.split('_').pop())
       return this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`] ? this.getLocalizationData[`DOTA_Tooltip_ability_${this.params.value}`].replace('{s:value}', this.params.value.split('_').pop()) : this.params.value
     }
   },
   methods: {
-    getValue(key) {
-      const depth = key.split('.')
-      let value = this.params.value
-      depth.forEach(nest => value = value[nest])
-      return value
+    getValue(index) {
+      return this.models[index][Object.keys(this.models[index])[1]]
     },
-    getKey(key) {
-      const depth = key.split('.').pop()
-      return depth
+    getKey(index) {
+      return this.models[index][Object.keys(this.models[index])[0]]
     },
-    getClass(item) {
-      return this.getKey(item) === 'var_type' ? 'border-top' : ''
+    getFlattenArray(item) {
+      return Object.keys(item)
+    },
+    getTitle(item) {
+      const str = this.getFlattenArray(item)[1]
+      return str.toUpperCase()
     }
   }
 })
@@ -82,7 +96,7 @@ export default Vue.extend({
     position: relative;
     overflow: hidden;
 
-    &:first-child {
+    &:not(last-child) {
       &:after {
         content: "";
         position: absolute;

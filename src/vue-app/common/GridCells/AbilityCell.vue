@@ -3,27 +3,26 @@
     <span v-if="!isObject">{{params.value}}</span>
     <div v-else>
       <div
-        v-for="item in getKeys"
-        :key="item"
+        v-for="(item, index) in data"
+        :key="index"
         class="table"
       >
-        <span class="pl-2">{{getKey(item)}}</span>
+        <span class="pl-2">{{getFlattenArray(item)[1].toUpperCase()}}</span>
         <span>
           <v-select
-            v-if="getType(item) === 1"
-            v-model="models[item]"
             dense
             hide-details
             outlined
             :items="getFields('FieldType')"
+            v-model="models[index]['var_type']"
           ></v-select>
+        </span>
+        <span>
           <v-text-field
             hide-details
             dense
             outlined
-            v-model="models[item]"
-            v-else
-            :type="getType(item) === 3 ? 'number' : 'text'"
+            v-model="models[index][getFlattenArray(item)[1]]"
           ></v-text-field>
         </span>
       </div>
@@ -40,12 +39,18 @@ import { getConstData } from '../../utils/cellEditor'
 export default Vue.extend({
   name: 'ValueCell',
   data: () => ({
-    models: {}
+    models: [],
+    data: [],
   }),
   created() {
-    this.getKeys.forEach((key => {
-      this.models[key] = this.getVal(key)
-    }))
+    Object.keys(this.params.value).forEach(key => {
+      let newValue = {}
+      Object.keys(this.params.value[key]).forEach(index => {
+        newValue[index] = this.params.value[key][index]
+      })
+      this.data.push(newValue)
+      this.models.push(newValue)
+    })
   },
   computed: {
     isObject() {
@@ -69,10 +74,11 @@ export default Vue.extend({
     },
     getValue() {
       const res = {}
-      Object.keys(this.models).forEach(key => {
-        const list = key.split('.')
-        res[list[0]] = {...res[list[0]]}
-        res[list[0]][list[1]] = this.models[key]
+      this.models.map((model, index) => {
+        res[index + 1] = {}
+        Object.keys(model).forEach((value, idx) => {
+          res[index + 1][value] = model[value]
+        })
       })
       return res
     },
@@ -86,6 +92,9 @@ export default Vue.extend({
     },
     getArray(item) {
       return this.models[item].split(' ')
+    },
+    getFlattenArray(item) {
+      return Object.keys(item)
     }
   }
 })

@@ -20,7 +20,6 @@
             class="ag-theme-alpine"
             :columnDefs="columns"
             v-model="items"
-            :defaultColDef="{flex: 1}"
             :tooltipShowDelay="0"
             :getRowHeight="getRowHeight"
             :frameworkComponents="frameworkComponents"
@@ -82,6 +81,7 @@ export default {
                 resizable: true,
                 tooltip: (params) => `${params.data.description ? params.data.description : getDescription[params.data.key] ? getDescription[params.data.key] : 'No Description'}`,
                 cellRendererFramework: KeyCell,
+                flex: 2,
             },
             {
                 headerName: 'Value',
@@ -89,6 +89,7 @@ export default {
                 editable: true,
                 resizable: true,
                 cellRendererFramework: ValueCell,
+                flex: 3,
                 cellEditorSelector: (params) => {
                     const { data: { key, value } } = params
                     
@@ -208,7 +209,7 @@ export default {
         getRowHeight(params) {
             const { data: { key, value }} = params
             if (typeof(value) === 'object') {
-                return Object.keys(flatten(value)).length * 40
+                return Object.keys(value).length * 40
             }
             const char = key.charAt(7)
             if (key.includes('Ability') && char >= '0' && char <= '9') {
