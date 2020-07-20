@@ -48,7 +48,7 @@
 import fileMixin from '../mixin/fileMixin'
 import localizationMixin from '../mixin/localizationMixin'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import fs from 'fs'
+import fs, { existsSync } from 'fs'
 
 import { mdiAlienOutline  } from '@mdi/js'
 
@@ -103,13 +103,13 @@ export default {
             return Object.keys(this.getAbilities).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
-            })
+            }).filter(key => this.customLocalization(key).indexOf('{s:value}') < 0)
         },
         overrideAbilities() {
             return Object.keys(this.getAbilitiesOverride).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
                 if (this.customLocalization(first) < this.customLocalization(next)) return -1
                 return 1
-            })
+            }).filter(key => this.customLocalization(key).indexOf('{s:value}') < 0)
         },
         items() {
             return Object.keys(this.getItems).filter(key => key.includes(this.filterString) && key !== 'Version').sort((first, next) => {
@@ -137,14 +137,22 @@ export default {
                     children: [
                         {
                             id: "CUSTOM_UNITS_MOVABLE",
-                            name: "Movable :",
+                            name: "Can Move :",
                             children: this.movable
                         },
                         {
                             id: "CUSTOM_UNITS_UNMOVABLE",
-                            name: "Unmovable :",
+                            name: "Cannot Move :",
                             children: this.unmovable
                         },
+                        {
+                            id: "CUSTOM_UNITS_ALL",
+                            name: "All :",
+                            children: [
+                                ...this.movable,
+                                ...this.unmovable,
+                            ]
+                        }
                     ]
                 },
                 {
@@ -158,7 +166,7 @@ export default {
                     children: [
                         {
                             id: "CUSTOM_Abilities",
-                            name: 'Abilities :',
+                            name: 'Custom Abilities :',
                             children: this.abilities.map(item => ({id: item, name: item}))
                         },
                         {
@@ -196,7 +204,7 @@ export default {
                 return
             }
             const selectedKey = item[0]
-            if (selectedKey === 'Units :' || selectedKey === 'Heros: ' || selectedKey === 'Override Abilities :' || selectedKey === 'Precache :' || selectedKey === 'Movable :' || selectedKey === 'Unmovable :') return
+            if (selectedKey === 'Units :' || selectedKey === 'Abilities :' || selectedKey === 'Heros: ' || selectedKey === 'Override Abilities :' || selectedKey === 'Precache :' || selectedKey === 'Can Move :' || selectedKey === 'Cannot Move :' || selectedKey === 'All :') return
             this.setSelected(selectedKey)
             if (this.categories.findIndex(category => category === selectedKey) > -1)
                 this.setDetails(this.getCategories[selectedKey])
@@ -217,7 +225,10 @@ export default {
             const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
 
             if (this.categories.findIndex(category => category === hero) >= 0) {
-                this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+                if (existsSync(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`))
+                    this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+                else
+                    this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '_full.png')}`)
             }
             else if (this.precache.findIndex(precache => precache === hero) >= 0) {
                 this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`)
@@ -311,6 +322,8 @@ export default {
         getHeroAvatar(hero) {
             const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
             if (this.categories.findIndex(category => category === hero) >= 0) {
+                if (this.heros.findIndex(heroName => heroName === hero) >= 0)
+                    return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '_full.png')}`
                 return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
             } else if (this.precache.findIndex(precache => precache === hero) >= 0) {
                 return `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`

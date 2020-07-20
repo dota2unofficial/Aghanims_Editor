@@ -27,7 +27,8 @@ const store = new Vuex.Store({
         debugLogs: [],
         availability: true,
         currentAvatar: '',
-        localizationData: {}
+        localizationData: {},
+        hideValueType: false,
     },
     getters: {
         getPath: state => state.path,
@@ -49,6 +50,7 @@ const store = new Vuex.Store({
         getAbility: state => state.availability,
         getCurrentAvatar: state => state.currentAvatar,
         getLocalizationData: state => state.localizationData,
+        getHideValueType: state => state.hideValueType,
     },
     mutations: {
         setPath(state, path) {
@@ -107,6 +109,9 @@ const store = new Vuex.Store({
         },
         setLocalizationData(state, localization) {
             state.localizationData = localization
+        },
+        setHideValueType(state, payload) {
+            state.hideValueType = payload
         }
     },
     actions: {
@@ -120,7 +125,8 @@ const store = new Vuex.Store({
                 }
                 commit('setD2Found', true)
             } catch (err) {
-                commit('setD2Found', false)
+                commit('setD2Path', 'C:\\D2\\game')
+                commit('setD2Found', true)
                 throw err
             }
             commit('setD2Path', `${dota2Path}\\game`)

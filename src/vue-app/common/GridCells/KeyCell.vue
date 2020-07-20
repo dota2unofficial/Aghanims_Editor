@@ -18,6 +18,14 @@
       class="pt-0 mt-0"
       v-if="isAbilitySet"
     ></v-checkbox>
+    <v-checkbox
+      label="Hide Variable Input Type"
+      dense
+      hide-details
+      class="pt-0 mt-0"
+      v-if="isObjectType && !hide"
+      v-model="getHideValueType"
+    ></v-checkbox>
   </div>
 </template>
 
@@ -32,6 +40,7 @@ export default Vue.extend({
   data: () => ({
     iconArray: [],
     ability: false,
+    hide: false,
   }),
   created() {
     const path = `${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\`
@@ -41,7 +50,8 @@ export default Vue.extend({
   },
   methods: {
     ...mapMutations([
-      'setAbility'
+      'setAbility',
+      'setHideValueType',
     ]),
     hasIconInsideAssets(key) {
       return this.iconArray.includes(key) || this.iconArray.includes(key.toLowerCase())
@@ -55,12 +65,17 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters([
-      'getAbility'
+      'getAbility',
+      'getDetails',
+      'getHideValueType'
     ]),
     isAbilitySet() {
       const char = this.params.value.charAt(7)
       return this.params.value.includes('Ability') && char >= '0' && char <= '9'
     },
+    isObjectType() {
+      return typeof(this.getDetails[this.params.value]) === 'object'
+    }
   },
   watch: {
     getAbility(able) {
@@ -70,6 +85,11 @@ export default Vue.extend({
       if (able !== this.getAbility)
         this.setAbility(able)
     },
+    hide(hidden) {
+      console.log(hidden, this.getHideValueType)
+      if (hidden !== this.getHideValueType)
+        this.setHideValueType(hidden)
+    }
   }
 })
 </script>

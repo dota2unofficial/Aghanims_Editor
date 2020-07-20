@@ -20,12 +20,12 @@ export default Vue.extend({
       data: 0,
     }
   },
-  created() {
-    console.log(this.param)
+  mounted() {
+    this.data = this.params.value
   },
   methods: {
     getValue() {
-      return this.number
+      return this.data
     },
   }
 })
