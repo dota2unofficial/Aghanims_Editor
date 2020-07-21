@@ -4,7 +4,6 @@
         color="primary"
         dark
     >
-        <input type="file" ref="openFile" style="display: none" @change="readFile">
         <v-select
             v-model="selectedMod"
             :items="addonList"
@@ -65,7 +64,8 @@ export default {
             'getFileLoading',
             'getD2Found',
             'getD2Path',
-            'getHeros'
+            'getHeros',
+            'getEntities'
         ]),
     },
     props: {
@@ -87,18 +87,19 @@ export default {
     methods: {
         ...mapMutations([
             'setFileLoading',
-            'setCategories',
             'setPath',
             'setD2Found',
             'setHeros',
             'setAbilities',
             'setItems',
             'setAbilitiesOverride',
-            'setPrecache'
+            'setPrecache',
+            'setEntities',
         ]),
         ...mapActions([
             'addDebugLogs',
-            'loadCustomLocalization'
+            'loadCustomLocalization',
+            'analyzeFullEntities'
         ]),
         saveConfirm() {
             this.confirmSave = true
@@ -142,96 +143,6 @@ export default {
             this.confirmSave = false
             this.addDebugLogs(`Custom Units Saved.`)
         },
-        readFile(unitpath) {
-            this.setFileLoading(true)
-            fs.readFile(unitpath, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadFinished(data)
-            })
-        },
-        readHeros(heropath) {
-            this.setFileLoading(true)
-            fs.readFile(heropath, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadHeroFinished(data)
-            })
-        },
-        readAbilities(abilitiesPath) {
-            this.setFileLoading(true)
-            fs.readFile(abilitiesPath, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadAbilitiesFinished(data)
-            })
-        },
-        readAbilitiesOverride(override) {
-            this.setFileLoading(true)
-            fs.readFile(override, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadAbilitiesOverrideFinished(data)
-            })
-        },
-        readItems(itemsPath) {
-            this.setFileLoading(true)
-            fs.readFile(itemsPath, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadItemsFinished(data)
-            })
-        },
-        readPrecache(precache) {
-            this.setFileLoading(true)
-            fs.readFile(precache, 'utf8', (err, data) => {
-                if (err) {
-                    this.setFileLoading(false)
-                    throw err
-                }
-                this.loadPrecacheFinished(data)
-            })
-        },
-        loadFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setCategories(root.DOTAUnits)
-            this.setFileLoading(false)
-        },
-        loadHeroFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setHeros(root.DOTAHeroes)
-            this.setFileLoading(false)
-        },
-        loadAbilitiesFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setAbilities(root.DOTAAbilities)
-            this.setFileLoading(false)
-        },
-        loadItemsFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setItems(root.DOTAAbilities)
-            this.setFileLoading(false)
-        },
-        loadAbilitiesOverrideFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setAbilitiesOverride(root.DOTAAbilities)
-            this.setFileLoading(false)
-        },
-        loadPrecacheFinished(result) {
-            const root = vdfplus.parse(result)
-            this.setPrecache(root.DOTAUnits)
-            this.setFileLoading(false)
-        },
         showDebugger() {
             this.$emit('toggleDebugger')
         }
@@ -268,22 +179,7 @@ export default {
             }
         },
         selectedMod(folder) {
-            const path = this.getD2Path + '\\dota_addons\\' + folder
-            const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
-            const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
-            const abilitiesPath = `${path}\\scripts\\npc\\npc_abilities_custom.txt`
-            const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`
-            const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`
-            const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`
-            this.setPath(folder)
-            this.addDebugLogs(`${folder} mod is loaded.`)
-            this.loadCustomLocalization(folder)
-            this.readFile(unitPath)
-            this.readHeros(heroPath)
-            this.readAbilities(abilitiesPath)
-            this.readItems(itemsPath)
-            this.readAbilitiesOverride(abilitiesOverridePath)
-            this.readPrecache(precachePath)
+            this.analyzeFullEntities(folder)
         },
         
     }
