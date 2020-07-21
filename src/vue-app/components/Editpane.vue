@@ -53,7 +53,8 @@ import fileMixin from '../mixin/fileMixin'
 import { getConstData, getDescription } from '../utils/cellEditor'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
-import { schemas } from 'dota-data/lib/schemas'
+import { schemas, precacheTypes } from 'dota-data/lib/schemas'
+import fs from 'fs'
 
 export default {
     name: 'EditPane',
@@ -128,7 +129,7 @@ export default {
                         }
                     }
 
-                    if (key.includes('Ability')) {
+                    if (key.includes('Ability') || key === 'Creature') {
                         return {
                             component: 'abilitySelector',
                             params
@@ -201,7 +202,8 @@ export default {
             'setItems',
             'setAbilitiesOverride',
             'setPrecache',
-            'setHeros'
+            'setHeros',
+            'setCurrentAvatar',
         ]),
         ...mapActions([
             'addDebugLogs'
@@ -209,6 +211,7 @@ export default {
         getRowHeight(params) {
             const { data: { key, value }} = params
             if (typeof(value) === 'object') {
+                if (Object.keys(value).length === 1) return 80
                 return Object.keys(value).length * 40
             }
             const char = key.charAt(7)
@@ -222,6 +225,12 @@ export default {
     },
     watch: {
         details(details) {
+            console.log(this.getSelected, this.getHeros[this.getSelected], this.getPrecache[`npc_precache_${this.getSelected}`])
+            
+            if (!fs.existsSync(this.getCurrentAvatar) && details.Model) {
+                const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+                this.setCurrentAvatar(`${defaultPath}\\${details.Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+            }
             if (!details) return []
             const { npc_units_custom } = schemas;
             const getKeyInformation = (name) => npc_units_custom._rest.schema._fields.find(field => field.name === name);

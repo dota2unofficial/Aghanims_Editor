@@ -8,7 +8,7 @@
         class="table"
       >
         <span class="pl-2">{{getFlattenArray(item)[1].toUpperCase()}}</span>
-        <span>
+        <span v-if="!getHideValueType">
           <v-select
             dense
             hide-details
@@ -22,6 +22,7 @@
             hide-details
             dense
             outlined
+            :type="isNumber(models[index]['var_type']) ? 'number' : 'string'"
             v-model="models[index][getFlattenArray(item)[1]]"
           ></v-text-field>
         </span>
@@ -53,6 +54,9 @@ export default Vue.extend({
     })
   },
   computed: {
+    ...mapGetters([
+      'getHideValueType'
+    ]),
     isObject() {
       if (typeof(this.params.value) !== 'object') return false
       return true
@@ -95,6 +99,9 @@ export default Vue.extend({
     },
     getFlattenArray(item) {
       return Object.keys(item)
+    },
+    isNumber(str) {
+      return !isNaN(str) || str.indexOf('.')
     }
   }
 })

@@ -4,43 +4,61 @@
         ref="drawer"
         :width="navigationWidth"
     >
-        <v-sheet
-            class="pa-2"
-        >
-            <v-text-field 
-                dense 
-                hide-details
-                outlined
-                v-model="filterString"
-            ></v-text-field>
+        <v-sheet>
+            <v-sheet
+                class="pa-2"
+            >
+                <v-text-field 
+                    dense 
+                    hide-details
+                    outlined
+                    v-model="filterString"
+                ></v-text-field>
+            </v-sheet>
+            <v-sheet
+                class="treeview"
+            >
+                <v-treeview 
+                    :items="treeNodes"
+                    dense
+                    open-on-click
+                    selected-color="primary"
+                    hoverable
+                    activatable
+                    item-key="name"
+                    @update:active="onItemChanged"
+                    ref="treeView"
+                >
+                    <template v-slot:label="{ item }">
+                        <span>
+                            {{ customLocalization(item.name) }}
+                        </span>
+                    </template>
+                    <template v-slot:prepend="{ item, leaf }">
+                        <v-img
+                            v-if="leaf"
+                            :src="getHeroAvatar(item.name)"
+                            :width="24"
+                            :height="24"
+                            tile
+                            contain
+                        ></v-img>
+                        <v-icon v-else>{{mdiParent}}</v-icon>
+                    </template>
+                </v-treeview>
+            </v-sheet>
         </v-sheet>
-        <v-treeview 
-            :items="treeNodes"
-            dense
-            open-on-click
-            selected-color="primary"
-            hoverable
-            activatable
-            item-key="name"
-            @update:active="onItemChanged"
-        >
-            <template v-slot:label="{ item }">
-                <span>
-                    {{ customLocalization(item.name) }}
-                </span>
-            </template>
-            <template v-slot:prepend="{ item, leaf }">
-                <v-img
-                    v-if="leaf"
-                    :src="getHeroAvatar(item.name)"
-                    :width="24"
-                    :height="24"
-                    tile
-                    contain
-                ></v-img>
-                <v-icon v-else>{{mdiParent}}</v-icon>
-            </template>
-        </v-treeview>
+        <v-sheet>
+            <v-btn
+                dark
+                color="purple"
+                block
+                tile
+                @click="collapseTree"
+            >
+                <v-icon>{{mdiCollapse}}</v-icon> Collapse
+            </v-btn>
+        </v-sheet>
     </v-navigation-drawer>
 </template>
 
@@ -50,7 +68,7 @@ import localizationMixin from '../mixin/localizationMixin'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import fs, { existsSync } from 'fs'
 
-import { mdiAlienOutline  } from '@mdi/js'
+import { mdiAlienOutline, mdiClose } from '@mdi/js'
 
 export default {
     name: 'Sidebar',
@@ -62,6 +80,7 @@ export default {
         navigationWidth: 300,
         filterString: '',
         mdiParent: mdiAlienOutline,
+        mdiCollapse: mdiClose,
     }),
     props: {
         localization: {
@@ -223,35 +242,38 @@ export default {
 
             const hero = item[0]
             const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
+            let avatarPath = ''
 
             if (this.categories.findIndex(category => category === hero) >= 0) {
-                if (existsSync(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`))
-                    this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`)
+                if (this.heros.findIndex(heroName => heroName === hero) >= 0)
+                    avatarPath = `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '_full.png')}`
                 else
-                    this.setCurrentAvatar(`${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '_full.png')}`)
+                    avatarPath = `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
             }
             else if (this.precache.findIndex(precache => precache === hero) >= 0) {
-                this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`)
+                avatarPath = `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
             }
             else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
-                if (!this.getHeros[hero.override_hero]) this.setCurrentAvatar(`${defaultPath}\\heroes\\${hero}_png.png`)
-                else this.setCurrentAvatar(`${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`)
+                if (!this.getHeros[hero.override_hero]) avatarPath = `${defaultPath}\\heroes\\${hero}.png`
+                else avatarPath = `${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}.png`
             }
             else if (this.items.findIndex(item => item === hero) >= 0) {
-                this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
+                avatarPath = `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
             }
             else if (this.abilities.findIndex(item => item === hero) >= 0) {
                 if (this.getAbilities[hero]['AbilityTextureName']) {
-                    if (fs.existsSync(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)) this.setCurrentAvatar(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)
-                    else this.setCurrentAvatar(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}.png`)
+                    if (fs.existsSync(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)) avatarPath = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`
+                    else avatarPath = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}.png`
                 }
-                else if (hero.includes('item_')) this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
-                else this.setCurrentAvatar(`${defaultPath}\\spells\\${hero}_png.png`)
+                else if (hero.includes('item_')) avatarPath = `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                else avatarPath = `${defaultPath}\\spells\\${hero}_png.png`
             }
             else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
-                if (hero.includes('item_')) this.setCurrentAvatar(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`)
-                else this.setCurrentAvatar(`${defaultPath}\\spells\\${hero}_png.png`)
+                if (hero.includes('item_')) avatarPath = `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                else avatarPath = `${defaultPath}\\spells\\${hero}_png.png`
             }
+
+            this.setCurrentAvatar(avatarPath)
         },
         setBorderWidth() {
             const node = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
@@ -324,14 +346,22 @@ export default {
             if (this.categories.findIndex(category => category === hero) >= 0) {
                 if (this.heros.findIndex(heroName => heroName === hero) >= 0)
                     return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '_full.png')}`
-                return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
+                else if (this.getCategories[hero].Model)
+                    return `${defaultPath}\\${this.getCategories[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
+                else
+                    return ''
             } else if (this.precache.findIndex(precache => precache === hero) >= 0) {
-                return `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}_png.png`
+                return `${defaultPath}\\heroes\\${hero.replace('npc_precache_', '')}.png`
             } else if (this.items.findIndex(item => item === hero) >= 0) {
-                return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                if (fs.existsSync(`${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`))
+                    return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
+                else if (this.getItems[hero].Model)
+                    return `${defaultPath}\\${this.getItems[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
+                else
+                    return ''
             } else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
-                if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
-                return `${defaultPath}\\spells\\${hero}_png.png`
+                if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}.png`
+                return `${defaultPath}\\spells\\${hero}.png`
             } else if (this.abilities.findIndex(over => over === hero) >= 0) {
                 if (this.getAbilities[hero]['AbilityTextureName']) {
                     if (fs.existsSync(`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`)) return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[hero]['AbilityTextureName']}_lua.png`
@@ -341,12 +371,16 @@ export default {
                 return `${defaultPath}\\spells\\${hero}_png.png`
             } else if (this.heros.findIndex(heroName => heroName === hero) >= 0) {
                 if (!this.getHeros[hero.override_hero]) {
-                    return `${defaultPath}\\heroes\\${hero}_png.png`
+                    return `${defaultPath}\\heroes\\${hero}.png`
                 } else {
-                    return `${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}_png.png`
+                    return `${defaultPath}\\heroes\\${this.getHeros[hero].override_hero}.png`
                 }
             }
         },
+        collapseTree() {
+            const tree = this.$refs.treeView
+            tree.updateAll(false)
+        }
     },
     mounted() {
         this.setBorderWidth()
@@ -356,4 +390,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.treeview {
+    height: calc(100vh - 156px) !important;
+    overflow-y: auto;
+}
 </style>

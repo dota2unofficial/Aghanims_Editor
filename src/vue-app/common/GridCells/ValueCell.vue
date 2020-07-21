@@ -8,7 +8,7 @@
         class="table"
       >
         <span>{{getTitle(item)}}</span>
-        <span>{{getKey(index)}}</span>
+        <span v-if="!getHideValueType">{{getKey(index)}}</span>
         <span>{{getValue(index)}}</span>
       </div>
     </div>
@@ -39,7 +39,8 @@ export default Vue.extend({
   computed: {
     ...mapGetters([
       'getLocalizationData',
-      'getCustomLocalization'
+      'getCustomLocalization',
+      'getHideValueType'
     ]),
     isObject() {
       if (typeof(this.params.value) !== 'object') return false

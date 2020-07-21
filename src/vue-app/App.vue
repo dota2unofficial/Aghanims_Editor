@@ -136,4 +136,10 @@ ul {
 .ag-tooltip {
 	user-select: none !important;
 }
+
+.v-input--checkbox {
+	.v-label {
+		font-size: 12px;
+	}
+}
 </style>
