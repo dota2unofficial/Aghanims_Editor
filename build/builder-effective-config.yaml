@@ -1,8 +1,0 @@
-directories:
-  output: build/
-  buildResources: build
-appId: app.id
-extraResources:
-  - filter:
-      - ./assets/**
-electronVersion: 8.4.0
