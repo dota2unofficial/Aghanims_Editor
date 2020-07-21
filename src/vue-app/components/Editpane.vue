@@ -225,8 +225,6 @@ export default {
     },
     watch: {
         details(details) {
-            console.log(this.getSelected, this.getHeros[this.getSelected], this.getPrecache[`npc_precache_${this.getSelected}`])
-            
             if (!fs.existsSync(this.getCurrentAvatar) && details.Model) {
                 const defaultPath = `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets`
                 this.setCurrentAvatar(`${defaultPath}\\${details.Model.split('/').join('\\').replace('.vmdl', '.png')}`)
