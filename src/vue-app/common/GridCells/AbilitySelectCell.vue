@@ -1,0 +1,40 @@
+<template>
+  <div>
+    <v-file-input
+      outlined
+      dense
+      hide-details
+      v-model="file"
+    ></v-file-input>
+  </div>
+</template>
+
+<script>
+import Vue from 'vue'
+import { mapGetters } from 'vuex'
+
+export default Vue.extend({
+  name: 'AbilitySelectCell',
+  data: () => ({
+    file: null,
+  }),
+  computed: {
+    ...mapGetters([
+      'getD2Path',
+      'getPath',
+    ]),
+  },
+  methods: {
+    getValue() {
+      if (!this.file) return this.params.value
+      return this.file.name.split('.')[0]
+    },
+    isPopup() {
+      return true
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

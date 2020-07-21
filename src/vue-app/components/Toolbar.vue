@@ -18,7 +18,6 @@
             dark
             @click="saveConfirm"
             outlined
-            :disabled="fileName === null"
             class="mr-3"
         >
             Save
@@ -38,7 +37,7 @@
         >
             <v-card>
                 <v-card-title>Confirm Save</v-card-title>
-                <v-card-text>Are you reall sure to save it?</v-card-text>
+                <v-card-text>Are you really sure to save it?</v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" outlined @click="confirmSave = false">Cancel</v-btn>
@@ -53,7 +52,10 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex'
 import { indent } from '../utils/text'
 import fs, { lstatSync, readdirSync } from 'fs'
+import path from 'path'
 import chardet from 'chardet'
+const vdfplus = require('vdfplus')
+import vdfextra from 'vdf-extra'
 
 export default {
     name: 'Toolbar',
@@ -89,6 +91,10 @@ export default {
             'setPath',
             'setD2Found',
             'setHeros',
+            'setAbilities',
+            'setItems',
+            'setAbilitiesOverride',
+            'setPrecache'
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -102,6 +108,7 @@ export default {
             node.click()
         },
         saveFile() {
+            console.log(vdfplus.stringify(this.getCategories))
             const lines = this.fileContent.split('\n')
 
             let i = 5
@@ -156,61 +163,74 @@ export default {
                 this.loadHeroFinished(data)
             })
         },
-        loadFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 5
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
+        readAbilities(abilitiesPath) {
+            this.setFileLoading(true)
+            fs.readFile(abilitiesPath, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
                 }
-            }
-            this.setCategories(root)
+                this.loadAbilitiesFinished(data)
+            })
+        },
+        readAbilitiesOverride(override) {
+            this.setFileLoading(true)
+            fs.readFile(override, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadAbilitiesOverrideFinished(data)
+            })
+        },
+        readItems(itemsPath) {
+            this.setFileLoading(true)
+            fs.readFile(itemsPath, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadItemsFinished(data)
+            })
+        },
+        readPrecache(precache) {
+            this.setFileLoading(true)
+            fs.readFile(precache, 'utf8', (err, data) => {
+                if (err) {
+                    this.setFileLoading(false)
+                    throw err
+                }
+                this.loadPrecacheFinished(data)
+            })
+        },
+        loadFinished(result) {
+            const root = vdfplus.parse(result)
+            this.setCategories(root.DOTAUnits)
             this.setFileLoading(false)
         },
         loadHeroFinished(result) {
-            this.fileContent = result
-            const lines = result.split('\n')
-            const items = []
-            items[lines[3].substring(1, lines[3].length - 1)] = {}
-
-            let root = items[lines[3].substring(1, lines[3].length - 1)]
-            let i = 1
-            while (i < lines.length - 1) {
-                const line = lines[i].trim()
-                if (line[0] === '"' && lines[i + 1].trim()[0] === '{' && line.length > 0) {
-                    const lineName = lines[i].split('"')[1]
-                    root[lineName] = {}
-                    let j = i + 2
-                    
-                    while (lines[j].trim()[0] !== '}') {
-                        const pair = lines[j].trim().split('"')
-                        if (pair[0].includes(`//`)) console.log(pair[1], pair[3])
-                        if (!pair[0].includes(`//`) && pair.length > 1 && pair[3]) root[lineName][pair[1]] = pair[3].trim()
-                        j ++
-                    }
-                    i = j
-                } else {
-                    i ++
-                }
-            }
-            this.setHeros(root)
+            const root = vdfplus.parse(result)
+            this.setHeros(root.DOTAHeroes)
+            this.setFileLoading(false)
+        },
+        loadAbilitiesFinished(result) {
+            const root = vdfplus.parse(result)
+            this.setAbilities(root.DOTAAbilities)
+            this.setFileLoading(false)
+        },
+        loadItemsFinished(result) {
+            const root = vdfplus.parse(result)
+            this.setItems(root.DOTAAbilities)
+            this.setFileLoading(false)
+        },
+        loadAbilitiesOverrideFinished(result) {
+            const root = vdfplus.parse(result)
+            this.setAbilitiesOverride(root.DOTAAbilities)
+            this.setFileLoading(false)
+        },
+        loadPrecacheFinished(result) {
+            const root = vdfplus.parse(result)
+            this.setPrecache(root.DOTAUnits)
             this.setFileLoading(false)
         },
         showDebugger() {
@@ -224,43 +244,49 @@ export default {
                 const files = readdirSync(`${d2path}\\dota_addons\\`, { withFileTypes: true })
                 .filter(dirent => dirent.isDirectory())
                 .map(dirent => dirent.name)
+                .filter(dirent => {
+                    const filePath = `${d2path}\\dota_addons\\${dirent}\\resource\\addon_english.txt`
+                    if (fs.existsSync(filePath)) return true
+                    return false
+                })
                 this.addDebugLogs(`Dota2 mods List`)
                 this.addDebugLogs(files.toString())
                 this.addDebugLogs(`Dota2 is found on your pc.`)
                 this.addonList = files
                 this.addonList = files.map(file => {
-                    const filePath = `${this.getD2Path}\\dota_addons\\${file}\\resource\\addon_english.txt`
+                    const filePath = `${d2path}\\dota_addons\\${file}\\resource\\addon_english.txt`
                     const encoding = chardet.detectFileSync(filePath)
                     const result = fs.readFileSync(filePath, encoding)
-                    const lines = result.split('\n')
-
-                    let root = {}
-                    let i = 3
-                    while (i < lines.length - 1) {
-                        const line = lines[i].trim()
-                        const arr = line.split(`"`)
-                        if (arr[1] === "addon_game_name") {
-                            return {
-                                value: file,
-                                text: arr[3]
-                            }
-                        }
-                        i ++
+                    const root = vdfextra.parse(result, {parseUnquotedStrings: true})
+                    return {
+                        value: file,
+                        text: root.Tokens['addon_game_name'] ? root.Tokens['addon_game_name'] : file
                     }
                 })
             } catch (err) {
                 this.addDebugLogs(`Dota2 : `, err)
+                throw err
             }
         },
         selectedMod(folder) {
             const path = this.getD2Path + '\\dota_addons\\' + folder
             const unitPath = `${path}\\scripts\\npc\\npc_units_custom.txt`
             const heroPath = `${path}\\scripts\\npc\\npc_heroes_custom.txt`
+            const abilitiesPath = `${path}\\scripts\\npc\\npc_abilities_custom.txt`
+            const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`
+            const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`
+            const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`
+            this.setPath(folder)
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
             this.readFile(unitPath)
             this.readHeros(heroPath)
-        }
+            this.readAbilities(abilitiesPath)
+            this.readItems(itemsPath)
+            this.readAbilitiesOverride(abilitiesOverridePath)
+            this.readPrecache(precachePath)
+        },
+        
     }
 }
 </script>

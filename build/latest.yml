@@ -1,8 +1,8 @@
 version: 1.4.1
 files:
-  - url: mod-explorer-Setup-1.4.1.exe
-    sha512: fA3i9ygw/ZSw+uA3HSsqIa1c6blyhOE54RzTDH7pjyjVQLftgIHSC6tXfyL5whQkTQNzmenJvd2tTWWGnRpcDg==
-    size: 65642564
-path: mod-explorer-Setup-1.4.1.exe
-sha512: fA3i9ygw/ZSw+uA3HSsqIa1c6blyhOE54RzTDH7pjyjVQLftgIHSC6tXfyL5whQkTQNzmenJvd2tTWWGnRpcDg==
-releaseDate: '2020-07-09T03:58:50.330Z'
+  - url: aghnims_editor-Setup-1.4.1.exe
+    sha512: pVgZM/oUn7rcUiS1dAcgbr1MpbCxgxCOHvONRG4qVMwITX8/4BWxYXSdNaD26TkDD7FqiJqPF3lHYagldNIB6g==
+    size: 351698512
+path: aghnims_editor-Setup-1.4.1.exe
+sha512: pVgZM/oUn7rcUiS1dAcgbr1MpbCxgxCOHvONRG4qVMwITX8/4BWxYXSdNaD26TkDD7FqiJqPF3lHYagldNIB6g==
+releaseDate: '2020-07-20T23:12:58.057Z'

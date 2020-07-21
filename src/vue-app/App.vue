@@ -78,6 +78,9 @@ export default {
 		...mapActions([
 			'findD2Path',
 		]),
+		...mapMutations([
+			'setLocalizationData'
+		]),
 		toggleDebugger() {
 			this.isDebugger = !this.isDebugger
 		}
@@ -87,6 +90,7 @@ export default {
 	},
 	async mounted() {
 		this.localizationData = await this.getLocalization()
+		this.setLocalizationData(this.localizationData)
 	},
 	data: () => ({
 		isDebugger: false,
@@ -112,5 +116,30 @@ ul {
 	display: flex;
 	height: calc(100vh - 64px);
 	overflow-y: auto;
+}
+
+.ag-cell-inline-editing {
+	overflow: visible !important;
+	height: 100% !important;
+}
+
+.ag-popup-child {
+	width: 49%;
+}
+
+.v-input__slot {
+	.v-label {
+		white-space: normal !important;
+	}
+}
+
+.ag-tooltip {
+	user-select: none !important;
+}
+
+.v-input--checkbox {
+	.v-label {
+		font-size: 12px;
+	}
 }
 </style>

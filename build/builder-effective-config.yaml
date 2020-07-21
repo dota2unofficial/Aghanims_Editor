@@ -5,4 +5,4 @@ appId: app.id
 extraResources:
   - filter:
       - ./assets/**
-electronVersion: 8.3.4
+electronVersion: 8.4.0

@@ -12,7 +12,11 @@ const store = new Vuex.Store({
         path: null,
         categories: {},
         heros: {},
+        abilities: {},
+        ablitiesOverride: {},
+        precache: {},
         details: {},
+        items: {},
         selected: null,
         fileLoading: false,
         d2Found: false,
@@ -22,12 +26,18 @@ const store = new Vuex.Store({
         customLocalization: {},
         debugLogs: [],
         availability: true,
-        currentAvatar: null,
+        currentAvatar: '',
+        localizationData: {},
+        hideValueType: false,
     },
     getters: {
         getPath: state => state.path,
         getCategories: state => state.categories,
         getHeros: state => state.heros,
+        getAbilities: state => state.abilities,
+        getItems: state => state.items,
+        getAbilitiesOverride: state => state.ablitiesOverride,
+        getPrecache: state => state.precache,
         getDetails: state => state.details,
         getSelected: state => state.selected,
         getFileLoading: state => state.fileLoading,
@@ -39,6 +49,8 @@ const store = new Vuex.Store({
         getCustomLocalization: state => state.customLocalization,
         getAbility: state => state.availability,
         getCurrentAvatar: state => state.currentAvatar,
+        getLocalizationData: state => state.localizationData,
+        getHideValueType: state => state.hideValueType,
     },
     mutations: {
         setPath(state, path) {
@@ -49,6 +61,18 @@ const store = new Vuex.Store({
         },
         setHeros(state, heros) {
             state.heros = heros
+        },
+        setAbilities(state, abilities) {
+            state.abilities = abilities
+        },
+        setItems(state, items) {
+            state.items = items
+        },
+        setAbilitiesOverride(state, abilities) {
+            state.ablitiesOverride = abilities
+        },
+        setPrecache(state, precache) {
+            state.precache = precache
         },
         setDetails(state, details) {
             state.details = details
@@ -82,6 +106,12 @@ const store = new Vuex.Store({
         },
         setCurrentAvatar(state, avatar) {
             state.currentAvatar = avatar
+        },
+        setLocalizationData(state, localization) {
+            state.localizationData = localization
+        },
+        setHideValueType(state, payload) {
+            state.hideValueType = payload
         }
     },
     actions: {
@@ -95,7 +125,8 @@ const store = new Vuex.Store({
                 }
                 commit('setD2Found', true)
             } catch (err) {
-                commit('setD2Found', false)
+                commit('setD2Path', 'C:\\D2\\game')
+                commit('setD2Found', true)
                 throw err
             }
             commit('setD2Path', `${dota2Path}\\game`)
