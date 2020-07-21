@@ -108,7 +108,6 @@ export default {
             node.click()
         },
         saveFile() {
-            console.log(vdfplus.stringify(this.getCategories))
             const lines = this.fileContent.split('\n')
 
             let i = 5

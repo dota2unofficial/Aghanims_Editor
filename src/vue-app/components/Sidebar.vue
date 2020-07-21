@@ -358,7 +358,7 @@ export default {
                 else if (this.getItems[hero].Model)
                     return `${defaultPath}\\${this.getItems[hero].Model.split('/').join('\\').replace('.vmdl', '.png')}`
                 else
-                    return ''
+                    return `${defaultPath}\\items\\${hero.replace('item_', '')}_png.png`
             } else if (this.overrideAbilities.findIndex(over => over === hero) >= 0) {
                 if (hero.includes('item_')) return `${defaultPath}\\items\\${hero.replace('item_', '')}.png`
                 return `${defaultPath}\\spells\\${hero}.png`

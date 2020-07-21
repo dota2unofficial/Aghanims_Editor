@@ -23,8 +23,9 @@
       dense
       hide-details
       class="pt-0 mt-0"
-      v-if="isObjectType && !hide"
-      v-model="getHideValueType"
+      v-if="isObjectType"
+      v-model="hide"
+      @change="toggleShow"
     ></v-checkbox>
   </div>
 </template>
@@ -47,6 +48,7 @@ export default Vue.extend({
     const result = fs.readdirSync(path)
     this.iconArray = result.map(file => file.split('.')[0])
     this.ability = this.getAbility
+    this.hide = this.getHideValueType
   },
   methods: {
     ...mapMutations([
@@ -62,6 +64,9 @@ export default Vue.extend({
         return path
       return `file:\\${process.cwd()}\\${process.env.NODE_ENV === 'development' ? '' : 'resources\\'}assets\\icons\\${item.toLowerCase()}.png`
     },
+    toggleShow() {
+      this.setHideValueType(!this.getHideValueType)
+    }
   },
   computed: {
     ...mapGetters([
@@ -86,7 +91,6 @@ export default Vue.extend({
         this.setAbility(able)
     },
     hide(hidden) {
-      console.log(hidden, this.getHideValueType)
       if (hidden !== this.getHideValueType)
         this.setHideValueType(hidden)
     }
