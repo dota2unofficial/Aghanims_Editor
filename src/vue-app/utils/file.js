@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 export const flatten = function(ob) {
 	var toReturn = {};
 	
@@ -17,3 +19,19 @@ export const flatten = function(ob) {
 	}
 	return toReturn;
 };
+
+export const getData = (fileName, type) => {
+  return new Promise(function(resolve, reject){
+    fs.readFile(fileName, type, (err, data) => {
+        err ? reject(err) : resolve(data);
+    });
+  });
+}
+
+export const checkItemType = (key) => {
+	if (key.includes("npc_precache")) return "PRECACHE";
+	else if (key.includes("npc_dota_hero")) return "HERO";
+	else if (key.includes("npc_dota")) return "UNIT";
+	else if (key.includes("item_")) return "ITEM";
+	else return "ABILITY";
+}
