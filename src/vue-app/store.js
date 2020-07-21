@@ -9,6 +9,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
+        entities: {},
         path: null,
         categories: {},
         heros: {},
@@ -51,6 +52,7 @@ const store = new Vuex.Store({
         getCurrentAvatar: state => state.currentAvatar,
         getLocalizationData: state => state.localizationData,
         getHideValueType: state => state.hideValueType,
+        getEntities: state => state.entities,
     },
     mutations: {
         setPath(state, path) {
@@ -112,6 +114,9 @@ const store = new Vuex.Store({
         },
         setHideValueType(state, payload) {
             state.hideValueType = payload
+        },
+        setEntities(state, payload) {
+            state.entities = payload
         }
     },
     actions: {

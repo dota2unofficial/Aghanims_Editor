@@ -4,7 +4,7 @@
         color="primary"
         dark
     >
-        <input type="file" ref="openFile" style="display: none" @change="readFile">
+        <input type="file" ref="openFile" style="display: none" @change="readUnits">
         <v-select
             v-model="selectedMod"
             :items="addonList"
@@ -65,7 +65,8 @@ export default {
             'getFileLoading',
             'getD2Found',
             'getD2Path',
-            'getHeros'
+            'getHeros',
+            'getEntities'
         ]),
     },
     props: {
@@ -94,7 +95,8 @@ export default {
             'setAbilities',
             'setItems',
             'setAbilitiesOverride',
-            'setPrecache'
+            'setPrecache',
+            'setEntities',
         ]),
         ...mapActions([
             'addDebugLogs',
@@ -143,14 +145,14 @@ export default {
             this.confirmSave = false
             this.addDebugLogs(`Custom Units Saved.`)
         },
-        readFile(unitpath) {
+        readUnits(unitpath) {
             this.setFileLoading(true)
             fs.readFile(unitpath, 'utf8', (err, data) => {
                 if (err) {
                     this.setFileLoading(false)
                     throw err
                 }
-                this.loadFinished(data)
+                this.loadCategoriesFinished(data)
             })
         },
         readHeros(heropath) {
@@ -203,34 +205,52 @@ export default {
                 this.loadPrecacheFinished(data)
             })
         },
-        loadFinished(result) {
+        loadCategoriesFinished(result) {
             const root = vdfplus.parse(result)
-            this.setCategories(root.DOTAUnits)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAUnits
+            })
             this.setFileLoading(false)
         },
         loadHeroFinished(result) {
             const root = vdfplus.parse(result)
-            this.setHeros(root.DOTAHeroes)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAHeros
+            })
             this.setFileLoading(false)
         },
         loadAbilitiesFinished(result) {
             const root = vdfplus.parse(result)
-            this.setAbilities(root.DOTAAbilities)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAAbilities
+            })
             this.setFileLoading(false)
         },
         loadItemsFinished(result) {
             const root = vdfplus.parse(result)
-            this.setItems(root.DOTAAbilities)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAAbilities
+            })
             this.setFileLoading(false)
         },
         loadAbilitiesOverrideFinished(result) {
             const root = vdfplus.parse(result)
-            this.setAbilitiesOverride(root.DOTAAbilities)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAAbilities
+            })
             this.setFileLoading(false)
         },
         loadPrecacheFinished(result) {
             const root = vdfplus.parse(result)
-            this.setPrecache(root.DOTAUnits)
+            this.setEntities({
+                ...this.getEntities,
+                ...root.DOTAUnits
+            })
             this.setFileLoading(false)
         },
         showDebugger() {
@@ -279,7 +299,7 @@ export default {
             this.setPath(folder)
             this.addDebugLogs(`${folder} mod is loaded.`)
             this.loadCustomLocalization(folder)
-            this.readFile(unitPath)
+            this.readUnits(unitPath)
             this.readHeros(heroPath)
             this.readAbilities(abilitiesPath)
             this.readItems(itemsPath)
