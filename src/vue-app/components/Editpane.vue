@@ -108,13 +108,6 @@ export default {
 							};
 						}
 
-						if (key === "Model" || key === "ProjectileModel") {
-							return {
-								component: "fileEditor",
-								params
-							};
-						}
-
 						if (key === "vscripts") {
 							return {
 								component: "vscriptSelector",
@@ -206,7 +199,8 @@ export default {
 			"setAbilitiesOverride",
 			"setPrecache",
 			"setHeros",
-			"setCurrentAvatar"
+			"setCurrentAvatar",
+			"setDetails"
 		]),
 		...mapActions(["addDebugLogs"]),
 		getRowHeight(params) {
@@ -266,14 +260,33 @@ export default {
 							? getDescription(key)
 							: "No description",
 					weight: details[key] ? 2 : 1
-                }))
-                .sort((first, second) => {
-                    return first.weight > second.weight ? -1 : 1
-                })
+				}))
+				.sort((first, second) => {
+					return first.weight > second.weight ? -1 : 1;
+				});
 		},
 		items(value) {
-			const newData = {};
-            value
+			let convertedDetails = {};
+			switch (checkItemType(this.getSelected)) {
+				case "HERO":
+					convertedDetails = {
+						...this.getDefaultHeroes[this.getSelected],
+						...convertedDetails
+					};
+					break;
+				default:
+					break;
+			}
+
+			this.originalItems = [];
+			value.forEach(data => {
+				if (convertedDetails[data.key] !== data["value"]) {
+					this.originalItems.push(data.key);
+				}
+			});
+
+			let newData = {};
+			value
 				.filter(item => this.originalItems.includes(item["key"]))
 				.forEach(item => (newData[item.key] = item.value));
 			const selected = this.getSelected;
