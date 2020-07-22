@@ -9,41 +9,184 @@
 					v-model="filterString"
 				></v-text-field>
 			</v-sheet>
-			<v-sheet class="treeview">
-				<v-treeview
-					:items="treeNodes"
-					dense
-					open-on-click
-					selected-color="primary"
-					hoverable
-					activatable
-					item-key="name"
-					@update:active="onItemChanged"
-					ref="treeView"
-				>
-					<template v-slot:label="{ item }">
-						<span>
-							{{ customLocalization(item.name) }}
-						</span>
-					</template>
-					<template v-slot:prepend="{ item, leaf }">
-						<v-img
-							v-if="leaf"
-							:src="getEntityIcon(item.name)"
-							:width="24"
-							:height="24"
-							tile
-							contain
-						></v-img>
-						<v-icon v-else>{{ mdiParent }}</v-icon>
-					</template>
-				</v-treeview>
+			<v-sheet>
+				<v-expansion-panels accordion hover tile>
+					<v-expansion-panel>
+						<v-expansion-panel-header class="panel-header"
+							>Units</v-expansion-panel-header
+						>
+						<v-expansion-panel-content class="expansion-panel-content">
+							<v-treeview
+								:items="unitTree"
+								dense
+								open-on-click
+								selected-color="primary"
+								hoverable
+								activatable
+								item-key="name"
+								@update:active="onItemChanged"
+							>
+								<template v-slot:label="{ item }">
+									<span>
+										{{ customLocalization(item.name) }}
+									</span>
+								</template>
+								<template v-slot:prepend="{ item, leaf }">
+									<v-img
+										v-if="leaf"
+										:src="getEntityIcon(item.name)"
+										:width="24"
+										:height="24"
+										tile
+										contain
+									></v-img>
+									<v-icon v-else>{{ mdiParent }}</v-icon>
+								</template>
+							</v-treeview>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+
+					<v-expansion-panel>
+						<v-expansion-panel-header class="panel-header"
+							>Heroes</v-expansion-panel-header
+						>
+						<v-expansion-panel-content class="expansion-panel-content">
+							<v-treeview
+								:items="heroTree"
+								dense
+								open-on-click
+								selected-color="primary"
+								hoverable
+								activatable
+								item-key="name"
+								@update:active="onItemChanged"
+							>
+								<template v-slot:label="{ item }">
+									<span>
+										{{ customLocalization(item.name) }}
+									</span>
+								</template>
+								<template v-slot:prepend="{ item, leaf }">
+									<v-img
+										v-if="leaf"
+										:src="getEntityIcon(item.name)"
+										:width="24"
+										:height="24"
+										tile
+										contain
+									></v-img>
+									<v-icon v-else>{{ mdiParent }}</v-icon>
+								</template>
+							</v-treeview>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+
+					<v-expansion-panel>
+						<v-expansion-panel-header class="panel-header"
+							>Abilities</v-expansion-panel-header
+						>
+						<v-expansion-panel-content class="expansion-panel-content">
+							<v-treeview
+								:items="abilityTree"
+								dense
+								open-on-click
+								selected-color="primary"
+								hoverable
+								activatable
+								item-key="name"
+								@update:active="onItemChanged"
+							>
+								<template v-slot:label="{ item }">
+									<span>
+										{{ customLocalization(item.name) }}
+									</span>
+								</template>
+								<template v-slot:prepend="{ item, leaf }">
+									<v-img
+										v-if="leaf"
+										:src="getEntityIcon(item.name)"
+										:width="24"
+										:height="24"
+										tile
+										contain
+									></v-img>
+									<v-icon v-else>{{ mdiParent }}</v-icon>
+								</template>
+							</v-treeview>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+
+					<v-expansion-panel>
+						<v-expansion-panel-header class="panel-header"
+							>Items</v-expansion-panel-header
+						>
+						<v-expansion-panel-content class="expansion-panel-content">
+							<v-treeview
+								:items="itemTree"
+								dense
+								open-on-click
+								selected-color="primary"
+								hoverable
+								activatable
+								item-key="name"
+								@update:active="onItemChanged"
+							>
+								<template v-slot:label="{ item }">
+									<span>
+										{{ customLocalization(item.name) }}
+									</span>
+								</template>
+								<template v-slot:prepend="{ item, leaf }">
+									<v-img
+										v-if="leaf"
+										:src="getEntityIcon(item.name)"
+										:width="24"
+										:height="24"
+										tile
+										contain
+									></v-img>
+									<v-icon v-else>{{ mdiParent }}</v-icon>
+								</template>
+							</v-treeview>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+
+					<v-expansion-panel>
+						<v-expansion-panel-header class="panel-header"
+							>Precache</v-expansion-panel-header
+						>
+						<v-expansion-panel-content class="expansion-panel-content">
+							<v-treeview
+								:items="precacheTree"
+								dense
+								open-on-click
+								selected-color="primary"
+								hoverable
+								activatable
+								item-key="name"
+								@update:active="onItemChanged"
+							>
+								<template v-slot:label="{ item }">
+									<span>
+										{{ customLocalization(item.name) }}
+									</span>
+								</template>
+								<template v-slot:prepend="{ item, leaf }">
+									<v-img
+										v-if="leaf"
+										:src="getEntityIcon(item.name)"
+										:width="24"
+										:height="24"
+										tile
+										contain
+									></v-img>
+									<v-icon v-else>{{ mdiParent }}</v-icon>
+								</template>
+							</v-treeview>
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+				</v-expansion-panels>
 			</v-sheet>
-		</v-sheet>
-		<v-sheet>
-			<v-btn dark color="purple" block tile @click="collapseTree">
-				<v-icon>{{ mdiCollapse }}</v-icon> Collapse
-			</v-btn>
 		</v-sheet>
 	</v-navigation-drawer>
 </template>
@@ -206,84 +349,70 @@ export default {
 						"DOTA_UNIT_CAP_MOVE_NONE"
 				);
 		},
-		treeNodes() {
+		unitTree() {
 			return [
 				{
-					id: "CUSTOM_UNITS",
-					name: "Units :",
-					children: [
-						{
-							id: "CUSTOM_UNITS_MOVABLE",
-							name: "Can Move :",
-							children: this.movable
-						},
-						{
-							id: "CUSTOM_UNITS_UNMOVABLE",
-							name: "Cannot Move :",
-							children: this.unmovable
-						},
-						{
-							id: "CUSTOM_UNITS_ALL",
-							name: "All :",
-							children: [...this.movable, ...this.unmovable]
-						}
-					]
+					id: "CUSTOM_UNITS_MOVABLE",
+					name: "Can Move :",
+					children: this.movable
 				},
 				{
-					id: "CUSTOM_HEROS",
-					name: "Heros :",
-					children: this.heros.map(item => ({ id: item, name: item }))
+					id: "CUSTOM_UNITS_UNMOVABLE",
+					name: "Cannot Move :",
+					children: this.unmovable
 				},
 				{
-					id: "ABILITIES",
-					name: "Abilities :",
-					children: [
-						{
-							id: "CUSTOM_ABILITIES",
-							name: "Override Abilities :",
-							children: this.abilities
-								.map(item => ({
-									id: item,
-									name: item
-								}))
-								.filter(
-									item =>
-										this.localization[
-											`DOTA_Tooltip_ability_${item.id}`
-										]
-								)
-						},
-						{
-							id: "CUSTOM_Abilities",
-							name: "Custom Abilities :",
-							children: this.abilities
-								.map(item => ({
-									id: item,
-									name: item
-								}))
-								.filter(
-									item =>
-										this.getCustomLocalization[
-											`DOTA_Tooltip_ability_${item.id}`
-										]
-								)
-						}
-					]
-				},
-				{
-					id: "CUSTOM ITEMS",
-					name: "Items :",
-					children: this.items.map(item => ({ id: item, name: item }))
-				},
-				{
-					id: "CUSTOM_PRECACHE",
-					name: "Precache :",
-					children: this.precache.map(item => ({
-						id: item,
-						name: item
-					}))
+					id: "CUSTOM_UNITS_ALL",
+					name: "All :",
+					children: [...this.movable, ...this.unmovable]
 				}
 			];
+		},
+		heroTree() {
+			return this.heros.map(item => ({ id: item, name: item }));
+		},
+		abilityTree() {
+			return [
+				{
+					id: "CUSTOM_ABILITIES",
+					name: "Override Abilities :",
+					children: this.abilities
+						.map(item => ({
+							id: item,
+							name: item
+						}))
+						.filter(
+							item =>
+								this.localization[
+									`DOTA_Tooltip_ability_${item.id}`
+								]
+						)
+				},
+				{
+					id: "CUSTOM_Abilities",
+					name: "Custom Abilities :",
+					children: this.abilities
+						.map(item => ({
+							id: item,
+							name: item
+						}))
+						.filter(
+							item =>
+								this.getCustomLocalization[
+									`DOTA_Tooltip_ability_${item.id}`
+								]
+						)
+				}
+			];
+		},
+		itemTree() {
+			return this.items.map(item => ({ id: item, name: item }));
+		},
+		precacheTree() {
+			return this.precache.map(item => ({
+				id: item,
+				name: item
+			}));
 		}
 	},
 	methods: {
@@ -308,7 +437,7 @@ export default {
 				return;
 
 			this.setSelected(selectedKey);
-			const itemType = this.checkItemType(selectedKey);
+			const itemType = checkItemType(selectedKey);
 			this.addDebugLogs(`Custom Unit ${item} is loaded.`);
 
 			const defaultPath = `file:\\${process.cwd()}\\${
@@ -329,8 +458,7 @@ export default {
 							".vmdl",
 							"_full.png"
 						)}`;
-					else
-						avatarPath = `heroes\\${selectedKey}.png`;
+					else avatarPath = `heroes\\${selectedKey}.png`;
 					break;
 				case "ITEM":
 					selectedEntity = this.getItems[selectedKey];
@@ -348,7 +476,7 @@ export default {
 					break;
 				case "PRECACHE":
 					selectedEntity = this.getPrecache[selectedKey];
-					avatarPath = selectedKey.replace("npc_precache_", "");
+					avatarPath = `heroes\\${selectedKey.replace("npc_precache_", "")}.png`;
 					break;
 			}
 
@@ -361,6 +489,7 @@ export default {
 			);
 			node.style.width = `3px`;
 			node.style.cursor = "ew-resize";
+			node.style.zIndex = 100;
 			node.style.backgroundColor = "primary";
 		},
 		setDragEvents() {
@@ -449,7 +578,10 @@ export default {
 					)
 						.join("\\")
 						.replace(".vmdl", ".png")}`;
-				return `${defaultPath}\\items\\${entity.replace("item_", "")}_png.png`;
+				return `${defaultPath}\\items\\${entity.replace(
+					"item_",
+					""
+				)}_png.png`;
 			}
 			if (this.abilities.includes(entity)) {
 				if (this.getAbilities[entity]["AbilityTextureName"]) {
@@ -477,10 +609,6 @@ export default {
 				return `${defaultPath}\\heroes\\${entity}.png`;
 			}
 		},
-		collapseTree() {
-			const tree = this.$refs.treeView;
-			tree.updateAll(false);
-		},
 		checkItemType(key) {
 			if (key.includes("npc_dota_hero")) return "HERO";
 			else if (key.includes("npc_dota_precache")) return "PRECACHE";
@@ -497,8 +625,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.treeview {
-	height: calc(100vh - 156px) !important;
-	overflow-y: auto;
+.expansion-panel-content {
+	max-height: calc(100vh - 377px);
+	padding-top: 16px;
+	overflow: auto;
+}
+
+.panel-header {
+	position: relative;
+
+	&:after {
+		content: "";
+		position: absolute;
+		bottom: -1px;
+		height: 1px;
+		left: 0;
+		right: 0;
+		background-color: #ccc;
+	}
 }
 </style>
