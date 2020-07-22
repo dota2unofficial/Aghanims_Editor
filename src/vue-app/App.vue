@@ -132,4 +132,9 @@ ul {
 		font-size: 12px;
 	}
 }
+
+::-webkit-scrollbar {
+	width: 0;
+	background-color: transparent;
+}
 </style>
