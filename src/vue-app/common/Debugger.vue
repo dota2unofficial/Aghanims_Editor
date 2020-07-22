@@ -51,7 +51,7 @@
               </tr>
               <tr>
                 <td>Current Editing Item</td>
-                <td>{{ getSelected ? getCategories : 'Not Editing yet' }}</td>
+                <td>{{ getSelected ? getUnits : 'Not Editing yet' }}</td>
               </tr>
             </tbody>
           </template>
@@ -93,7 +93,7 @@ export default {
       'getD2Path',
       'getD2Found',
       'getLocalization',
-      'getCategories',
+      'getUnits',
       'getSelected',
       'getDebugLogs',
     ])

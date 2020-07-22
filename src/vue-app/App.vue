@@ -1,37 +1,29 @@
 <template lang="html">
 	<div id="app">
 		<v-app>
-			<Toolbar 
+			<Toolbar
 				@toggleDebugger="toggleDebugger"
 				:localization="localizationData"
 			/>
 			<v-main>
 				<div class="content">
-					<Sidebar 
-						:localization="localizationData"
-					/>
-					<Editpane
-						:localization="localizationData"
-					/>
+					<Sidebar :localization="localizationData" />
+					<Editpane :localization="localizationData" />
 				</div>
 			</v-main>
-			
-			<v-overlay
-				:value="getFileLoading"
-			>
+
+			<v-overlay :value="getFileLoading">
 				<v-progress-linear
-					indeterminate 
+					indeterminate
 					color="pink"
 					style="width: 40vw"
 					striped
 				></v-progress-linear>
 			</v-overlay>
 
-			<v-overlay
-				:value="getLocalizationLoading"
-			>
+			<v-overlay :value="getLocalizationLoading">
 				<v-progress-linear
-					indeterminate 
+					indeterminate
 					color="pink"
 					style="width: 40vw"
 					striped
@@ -49,53 +41,51 @@
 </template>
 
 <script>
-import Toolbar from './components/Toolbar'
-import Sidebar from './components/Sidebar'
-import Editpane from './components/Editpane'
-import Alert from './common/Alert'
-import Debugger from './common/Debugger'
-import { mapGetters, mapActions, mapMutations } from 'vuex';
-import localizationMixin from './mixin/localizationMixin'
+import Toolbar from "./components/Toolbar";
+import Sidebar from "./components/Sidebar";
+import Editpane from "./components/Editpane";
+import Alert from "./common/Alert";
+import Debugger from "./common/Debugger";
+import { mapGetters, mapActions, mapMutations } from "vuex";
+import localizationMixin from "./mixin/localizationMixin";
 
 export default {
 	name: "App",
-	mixins: [ localizationMixin ],
+	mixins: [localizationMixin],
 	components: {
 		Toolbar,
 		Sidebar,
 		Editpane,
 		Alert,
-		Debugger,
+		Debugger
 	},
 	computed: {
 		...mapGetters([
-			'getFileLoading',
-			'getLocalizationLoading',
-			'getD2Found',
-		]),
+			"getFileLoading",
+			"getLocalizationLoading",
+			"getD2Found"
+		])
 	},
 	methods: {
-		...mapActions([
-			'findD2Path',
-		]),
-		...mapMutations([
-			'setLocalizationData'
-		]),
+		...mapActions(["findD2Path"]),
+		...mapMutations(["setLocalizationData", "setDefaultHeroes"]),
 		toggleDebugger() {
-			this.isDebugger = !this.isDebugger
+			this.isDebugger = !this.isDebugger;
 		}
 	},
 	created() {
-		this.findD2Path()
+		this.findD2Path();
 	},
 	async mounted() {
-		this.localizationData = await this.getLocalization()
-		this.setLocalizationData(this.localizationData)
+		this.localizationData = await this.getLocalization();
+		const heroes = await this.getHeroData();
+		this.setLocalizationData(this.localizationData);
+		this.setDefaultHeroes(heroes);
 	},
 	data: () => ({
 		isDebugger: false,
 		localizationData: {}
-	}),
+	})
 };
 </script>
 
