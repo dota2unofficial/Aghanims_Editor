@@ -465,14 +465,14 @@ export default {
 					avatarPath = `items\\${selectedKey.replace(
 						"item_",
 						""
-					)}_png.png`;
+					)}.png`;
 					break;
 				case "ABILITY":
 					selectedEntity = this.getAbilities[selectedKey];
 					const texture = selectedEntity["AbilityTextureName"];
 					if (fs.existsSync(texture))
 						avatarPath = `spells\\${texture}_icon.png`;
-					avatarPath = `spells\\${selectedKey}_png.png`;
+					avatarPath = `spells\\${selectedKey}.png`;
 					break;
 				case "PRECACHE":
 					selectedEntity = this.getPrecache[selectedKey];
@@ -581,7 +581,7 @@ export default {
 				return `${defaultPath}\\items\\${entity.replace(
 					"item_",
 					""
-				)}_png.png`;
+				)}.png`;
 			}
 			if (this.abilities.includes(entity)) {
 				if (this.getAbilities[entity]["AbilityTextureName"]) {
@@ -594,7 +594,7 @@ export default {
 					else
 						return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[entity]["AbilityTextureName"]}.png`;
 				}
-				return `${defaultPath}\\spells\\${entity}_png.png`;
+				return `${defaultPath}\\spells\\${entity}.png`;
 			}
 			if (this.heros.includes(entity)) {
 				if (
