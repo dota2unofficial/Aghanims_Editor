@@ -324,8 +324,11 @@ export default {
 					break;
 				case "HERO":
 					selectedEntity = this.getHeros[selectedKey];
-					if (selectedEntity['Model'])
-						avatarPath = `${selectedEntity['Model'].replace('.vmdl', '_full.png')}`;
+					if (selectedEntity["Model"])
+						avatarPath = `${selectedEntity["Model"].replace(
+							".vmdl",
+							"_full.png"
+						)}`;
 					else
 						avatarPath = `heroes\\${selectedKey}.png`;
 					break;
@@ -351,7 +354,6 @@ export default {
 
 			this.setDetails(selectedEntity);
 			this.setCurrentAvatar(`${defaultPath}${avatarPath}`);
-			console.log(defaultPath + avatarPath)
 		},
 		setBorderWidth() {
 			const node = this.$refs.drawer.$el.querySelector(
@@ -463,8 +465,14 @@ export default {
 				return `${defaultPath}\\spells\\${entity}_png.png`;
 			}
 			if (this.heros.includes(entity)) {
-				if (this.getHeros[entity].Model) {
-					return `${defaultPath}\\${this.getHeros[entity].Model}`.replace('.vmdl', '_full.png');
+				if (
+					this.getHeros[entity].Model &&
+					!fs.existsSync(`${defaultPath}\\heroes\\${entity}.png`)
+				) {
+					return `${defaultPath}\\${this.getHeros[entity].Model}`.replace(
+						".vmdl",
+						"_full.png"
+					);
 				}
 				return `${defaultPath}\\heroes\\${entity}.png`;
 			}

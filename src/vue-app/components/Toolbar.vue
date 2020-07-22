@@ -60,7 +60,7 @@ export default {
     name: 'Toolbar',
     computed: {
         ...mapGetters([
-            'getCategories',
+            'getUnits',
             'getFileLoading',
             'getD2Found',
             'getD2Path',
@@ -122,8 +122,8 @@ export default {
                     while (lines[j].trim()[0] !== '}') {
                         const pair = lines[j].trim().split('"')
                         let text = ''
-                        if (pair.length > 1 && this.getCategories[lineName][pair[1]]) {
-                            text = indent(`"${pair[1]}" "${indent(this.getCategories[lineName][pair[1]], 1, 8)}"`, 2, 8)
+                        if (pair.length > 1 && this.getUnits[lineName][pair[1]]) {
+                            text = indent(`"${pair[1]}" "${indent(this.getUnits[lineName][pair[1]], 1, 8)}"`, 2, 8)
                             lines[j] = text;
                         }
                         j ++

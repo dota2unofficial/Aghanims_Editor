@@ -15,6 +15,7 @@
 			:getRowHeight="getRowHeight"
 			:frameworkComponents="frameworkComponents"
 			stopEditingWhenGridLosesFocus
+			:animateRows="true"
 			v-if="getSelected"
 		></ag-grid-vue>
 
@@ -35,13 +36,14 @@ import ScriptFile from "../common/GridCells/ScriptFile";
 import NumberCell from "../common/GridCells/NumberCell";
 import FileSelectCell from "../common/GridCells/FileSelectCell";
 import { flatten } from "../utils/file";
+import { checkItemType } from "../utils/file";
 
 import fileMixin from "../mixin/fileMixin";
 
 import { getConstData, getDescription } from "../utils/cellEditor";
 import { mapGetters, mapMutations, mapActions } from "vuex";
 
-import { schemas, precacheTypes } from "dota-data/lib/schemas";
+import { schemas } from "dota-data/lib/schemas";
 import fs from "fs";
 
 export default {
@@ -59,106 +61,109 @@ export default {
 		ValueCell,
 		FileSelectCell
 	},
-	data: () => ({
-		isFirst: false,
-		columns: [
-			{
-				headerName: "Key",
-				field: "key",
-				sortable: true,
-				filter: true,
-				resizable: true,
-				tooltip: params =>
-					`${
-						params.data.description
-							? params.data.description
-							: getDescription[params.data.key]
-							? getDescription[params.data.key]
-							: "No Description"
-					}`,
-				cellRendererFramework: KeyCell,
-				flex: 2
-			},
-			{
-				headerName: "Value",
-				field: "value",
-				editable: true,
-				resizable: true,
-				cellRendererFramework: ValueCell,
-				flex: 3,
-				cellEditorSelector: params => {
-					const {
-						data: { key, value }
-					} = params;
+	data() {
+		return {
+			isFirst: false,
+			columns: [
+				{
+					headerName: "Key",
+					field: "key",
+					sortable: true,
+					filter: true,
+					resizable: true,
+					tooltip: params =>
+						`${
+							params.data.description
+								? params.data.description
+								: getDescription[params.data.key]
+								? getDescription[params.data.key]
+								: "No Description"
+						}`,
+					cellRendererFramework: KeyCell,
+					flex: 2
+				},
+				{
+					headerName: "Value",
+					field: "value",
+					editable: true,
+					resizable: true,
+					cellRendererFramework: ValueCell,
+					flex: 3,
+					cellEditorSelector: params => {
+						const {
+							data: { key, value }
+						} = params;
 
-					if (!isNaN(value)) {
+						if (!isNaN(value)) {
+							return {
+								component: "numberEditor",
+								params
+							};
+						}
+
+						if (key === "AbilitySpecial") {
+							return {
+								component: "abilityEditor",
+								params
+							};
+						}
+
+						if (key === "Model" || key === "ProjectileModel") {
+							return {
+								component: "fileEditor",
+								params
+							};
+						}
+
+						if (key === "vscripts") {
+							return {
+								component: "vscriptSelector",
+								params
+							};
+						}
+
+						if (key === "ScriptFile") {
+							return {
+								component: "scriptSelector",
+								params
+							};
+						}
+
+						if (key.includes("Ability") || key === "Creature") {
+							return {
+								component: "abilitySelector",
+								params
+							};
+						}
+
+						const options = getConstData(key);
+						if (options.length > 0) {
+							return {
+								component: "agSelectCellEditor",
+								params: {
+									values: options
+								}
+							};
+						}
+
 						return {
-							component: "numberEditor",
-							params
+							component: "agTextCellEditor"
 						};
 					}
-
-					if (typeof value === "object" && value) {
-						return {
-							component: "abilityEditor",
-							params
-						};
-					}
-
-					if (key === "Model" || key === "ProjectileModel") {
-						return {
-							component: "fileEditor",
-							params
-						};
-					}
-
-					if (key === "vscripts") {
-						return {
-							component: "vscriptSelector",
-							params
-						};
-					}
-
-					if (key === "ScriptFile") {
-						return {
-							component: "scriptSelector",
-							params
-						};
-					}
-
-					if (key.includes("Ability") || key === "Creature") {
-						return {
-							component: "abilitySelector",
-							params
-						};
-					}
-
-					const options = getConstData(key);
-					if (options.length > 0) {
-						return {
-							component: "agSelectCellEditor",
-							params: {
-								values: options
-							}
-						};
-					}
-
-					return {
-						component: "agTextCellEditor"
-					};
 				}
-			}
-		],
-		items: [],
-		frameworkComponents: {
-			abilityEditor: AbilityCell,
-			fileEditor: FileSelectCell,
-			numberEditor: NumberCell,
-			abilitySelector: AbilitySelectCell,
-			vscriptSelector: VScriptCell,
-			scriptSelector: ScriptFile
-		}
-	}),
+			],
+			items: [],
+			frameworkComponents: {
+				abilityEditor: AbilityCell,
+				fileEditor: FileSelectCell,
+				numberEditor: NumberCell,
+				abilitySelector: AbilitySelectCell,
+				vscriptSelector: VScriptCell,
+				scriptSelector: ScriptFile
+			},
+			originalItems: []
+		};
+	},
 	computed: {
 		...mapGetters([
 			"getDetails",
@@ -173,7 +178,8 @@ export default {
 			"getItems",
 			"getAbilitiesOverride",
 			"getPrecache",
-			"getSelected"
+			"getSelected",
+			"getDefaultHeroes"
 		]),
 		details() {
 			return this.getDetails;
@@ -227,25 +233,49 @@ export default {
 	watch: {
 		details(details) {
 			if (!details) return [];
+
+			this.originalItems = Object.keys(details);
+
+			let convertedDetails = details;
+			switch (checkItemType(this.getSelected)) {
+				case "HERO":
+					convertedDetails = {
+						...this.getDefaultHeroes[this.getSelected],
+						...convertedDetails
+					};
+					break;
+				default:
+					break;
+			}
+
 			const { npc_units_custom } = schemas;
 			const getKeyInformation = name =>
 				npc_units_custom._rest.schema._fields.find(
 					field => field.name === name
 				);
-			this.items = Object.keys(details).map(key => ({
-				key: key,
-				value: details[key],
-				description:
-					getKeyInformation(key) && getKeyInformation(key).description
-						? getKeyInformation(key).description
-						: getDescription(key)
-						? getDescription(key)
-						: "No description"
-			}));
+
+			this.items = Object.keys(convertedDetails)
+				.map(key => ({
+					key: key,
+					value: convertedDetails[key],
+					description:
+						getKeyInformation(key) &&
+						getKeyInformation(key).description
+							? getKeyInformation(key).description
+							: getDescription(key)
+							? getDescription(key)
+							: "No description",
+					weight: details[key] ? 2 : 1
+                }))
+                .sort((first, second) => {
+                    return first.weight > second.weight ? -1 : 1
+                })
 		},
 		items(value) {
 			const newData = {};
-			value.forEach(item => (newData[item.key] = item.value));
+            value
+				.filter(item => this.originalItems.includes(item["key"]))
+				.forEach(item => (newData[item.key] = item.value));
 			const selected = this.getSelected;
 			if (Object.keys(this.getUnits).includes(selected)) {
 				this.setUnits({
