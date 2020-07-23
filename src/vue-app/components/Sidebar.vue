@@ -475,7 +475,7 @@ export default {
 					avatarPath = `items\\${selectedKey.replace(
 						"item_",
 						""
-					)}_png.png`;
+					)}.png`;
 					break;
 				case "ABILITY":
 					selectedEntity = this.getAbilities[selectedKey];
@@ -623,7 +623,7 @@ export default {
 				return `${defaultPath}\\items\\${entity.replace(
 					"item_",
 					""
-				)}_png.png`;
+				)}.png`;
 			}
 			if (this.abilities.includes(entity)) {
 				const currentEntity = this.getAbilities[entity];
