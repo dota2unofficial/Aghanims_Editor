@@ -15,7 +15,9 @@
 						<v-expansion-panel-header class="panel-header"
 							>Units</v-expansion-panel-header
 						>
-						<v-expansion-panel-content class="expansion-panel-content">
+						<v-expansion-panel-content
+							class="expansion-panel-content"
+						>
 							<v-treeview
 								:items="unitTree"
 								dense
@@ -50,7 +52,9 @@
 						<v-expansion-panel-header class="panel-header"
 							>Heroes</v-expansion-panel-header
 						>
-						<v-expansion-panel-content class="expansion-panel-content">
+						<v-expansion-panel-content
+							class="expansion-panel-content"
+						>
 							<v-treeview
 								:items="heroTree"
 								dense
@@ -85,7 +89,9 @@
 						<v-expansion-panel-header class="panel-header"
 							>Abilities</v-expansion-panel-header
 						>
-						<v-expansion-panel-content class="expansion-panel-content">
+						<v-expansion-panel-content
+							class="expansion-panel-content"
+						>
 							<v-treeview
 								:items="abilityTree"
 								dense
@@ -120,7 +126,9 @@
 						<v-expansion-panel-header class="panel-header"
 							>Items</v-expansion-panel-header
 						>
-						<v-expansion-panel-content class="expansion-panel-content">
+						<v-expansion-panel-content
+							class="expansion-panel-content"
+						>
 							<v-treeview
 								:items="itemTree"
 								dense
@@ -155,7 +163,9 @@
 						<v-expansion-panel-header class="panel-header"
 							>Precache</v-expansion-panel-header
 						>
-						<v-expansion-panel-content class="expansion-panel-content">
+						<v-expansion-panel-content
+							class="expansion-panel-content"
+						>
 							<v-treeview
 								:items="precacheTree"
 								dense
@@ -469,19 +479,51 @@ export default {
 					break;
 				case "ABILITY":
 					selectedEntity = this.getAbilities[selectedKey];
-					const texture = selectedEntity["AbilityTextureName"];
-					if (fs.existsSync(texture))
-						avatarPath = `spells\\${texture}_icon.png`;
-					avatarPath = `spells\\${selectedKey}_png.png`;
+					const currentEntity = this.getAbilities[selectedKey];
+					if (currentEntity["AbilityTextureName"]) {
+						const defaultD2Res = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${currentEntity["AbilityTextureName"]}`;
+						const localizationData = this.localization[
+							`DOTA_Tooltip_ability_${currentEntity["AbilityTextureName"]}`
+						];
+						if (fs.existsSync(`${defaultD2Res}_lua.png`))
+							avatarPath = `${defaultD2Res}_lua.png`;
+						else if (fs.existsSync(`${defaultD2Res}.png`))
+							avatarPath = `${defaultD2Res}.png`;
+						else if (localizationData) {
+							const localizedIcon = `spells\\${localizationData
+								.split(" ")
+								.join("_")}_icon.png`;
+
+							if (fs.existsSync(localizedIcon))
+								avatarPath = localizedIcon;
+							else
+								avatarPath = `spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+						} else
+							avatarPath = `spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+					} else if (currentEntity["BaseClass"]) {
+						avatarPath = `spells\\${currentEntity["BaseClass"]}_png.png`;
+					} else {
+						avatarPath = `spells\\${selectedKey.replace(
+							"_lua",
+							""
+						)}_png.png`;
+					}
 					break;
 				case "PRECACHE":
 					selectedEntity = this.getPrecache[selectedKey];
-					avatarPath = `heroes\\${selectedKey.replace("npc_precache_", "")}.png`;
+					avatarPath = `heroes\\${selectedKey.replace(
+						"npc_precache_",
+						""
+					)}.png`;
 					break;
 			}
 
 			this.setDetails(selectedEntity);
-			this.setCurrentAvatar(`${defaultPath}${avatarPath}`);
+			this.setCurrentAvatar(
+				`${
+					avatarPath.indexOf(this.getD2Path) > -1 ? "" : defaultPath
+				}${avatarPath}`
+			);
 		},
 		setBorderWidth() {
 			const node = this.$refs.drawer.$el.querySelector(
@@ -584,17 +626,33 @@ export default {
 				)}_png.png`;
 			}
 			if (this.abilities.includes(entity)) {
-				if (this.getAbilities[entity]["AbilityTextureName"]) {
-					if (
-						fs.existsSync(
-							`${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[entity]["AbilityTextureName"]}_lua.png`
-						)
-					)
-						return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[entity]["AbilityTextureName"]}_lua.png`;
-					else
-						return `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${this.getAbilities[entity]["AbilityTextureName"]}.png`;
+				const currentEntity = this.getAbilities[entity];
+				if (currentEntity["AbilityTextureName"]) {
+					const defaultD2Res = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${currentEntity["AbilityTextureName"]}`;
+					const localizationData = this.localization[
+						`DOTA_Tooltip_ability_${currentEntity["AbilityTextureName"]}`
+					];
+					if (fs.existsSync(`${defaultD2Res}_lua.png`))
+						return `${defaultD2Res}_lua.png`;
+					else if (fs.existsSync(`${defaultD2Res}.png`))
+						return `${defaultD2Res}.png`;
+					else if (localizationData) {
+						const localizedIcon = `${defaultPath}\\spells\\${localizationData
+							.split(" ")
+							.join("_")}_icon.png`;
+
+						if (fs.existsSync(localizedIcon)) return localizedIcon;
+						else
+							return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+					} else
+						return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+				} else if (currentEntity["BaseClass"]) {
+					return `${defaultPath}\\spells\\${currentEntity["BaseClass"]}_png.png`;
 				}
-				return `${defaultPath}\\spells\\${entity}_png.png`;
+				return `${defaultPath}\\spells\\${entity.replace(
+					"_lua",
+					""
+				)}_png.png`;
 			}
 			if (this.heros.includes(entity)) {
 				if (

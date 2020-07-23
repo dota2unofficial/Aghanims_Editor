@@ -122,7 +122,7 @@ export default {
 							};
 						}
 
-						if (key.includes("Ability") || key === "Creature") {
+						if (key === "Creature") {
 							return {
 								component: "abilitySelector",
 								params
