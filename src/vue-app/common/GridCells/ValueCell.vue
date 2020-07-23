@@ -1,13 +1,25 @@
 <template>
 	<div :class="{ default: isDefault }">
-		<span v-if="!isAbilitySpecial">{{ getFormattedValue }}</span>
-		<div v-else>
+		<div v-if="isAbilitySpecial">
 			<div v-for="(item, index) in data" :key="index" class="table">
 				<span>{{ getTitle(item) }}</span>
 				<span v-if="!getHideValueType">{{ getKey(index) }}</span>
 				<span>{{ getValue(index) }}</span>
 			</div>
 		</div>
+		<div v-else-if="isAbility" class="d-flex align-center">
+			<div class="d-flex align-center" v-if="hasIcon">
+				<img
+					width="24px"
+					height="24px"
+					:src="getAbilityIcon"
+					class="mr-2"
+					alt="skill"
+				/>
+			</div>
+			<div>{{ getFormattedValue }}</div>
+		</div>
+		<span v-else>{{ getFormattedValue }}</span>
 	</div>
 </template>
 
@@ -15,6 +27,8 @@
 import Vue from "vue";
 import { mapGetters, mapMutations } from "vuex";
 import { flatten } from "../../utils/file";
+
+import fs from "fs";
 
 export default Vue.extend({
 	name: "ValueCell",
@@ -42,6 +56,9 @@ export default Vue.extend({
 			if (this.params.data.key !== "AbilitySpecial") return false;
 			return true;
 		},
+		isAbility() {
+			return /Ability\d/.test(this.params.data.key);
+		},
 		isDefault() {
 			return this.params.data.weight === 1;
 		},
@@ -50,6 +67,38 @@ export default Vue.extend({
 		},
 		getHeight() {
 			return `${Object.keys(this.params.value).length * 40}px`;
+		},
+		getAbilityIcon() {
+			const defaultPath = `file:\\${process.cwd()}\\${
+				process.env.NODE_ENV === "development" ? "" : "resources\\"
+			}assets`;
+			const texture = this.getLocalizationData[
+				`DOTA_Tooltip_ability_${this.params.value}`
+			];
+
+			const textureIcon = `${defaultPath}\\spells\\${texture
+				.split(" ")
+				.join("_")}_icon.png`;
+
+			let retUrl = null;
+
+			try {
+				fs.accessSync(textureIcon);
+				retUrl = textureIcon;
+			} catch (err) {
+				const normalPath = `${defaultPath}\\spells\\${this.params.value}.png`;
+				retUrl = normalPath;
+			}
+
+			return retUrl;
+		},
+		hasIcon() {
+			const data = this.getLocalizationData[
+				`DOTA_Tooltip_ability_${this.params.value}`
+			];
+			return data === undefined
+				? false
+				: data.indexOf("{s:value}") === -1;
 		},
 		getFormattedValue() {
 			if (
