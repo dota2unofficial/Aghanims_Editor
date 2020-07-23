@@ -181,7 +181,9 @@ export default {
 			"getAbilitiesOverride",
 			"getPrecache",
 			"getSelected",
-			"getDefaultHeroes"
+			"getDefaultHeroes",
+			"getDefaultAbilities",
+			"getDefaultItems",
 		]),
 		details() {
 			return this.getDetails;
@@ -247,6 +249,18 @@ export default {
 						...convertedDetails
 					};
 					break;
+				case "ABILITY":
+					convertedDetails = {
+						...this.getDefaultAbilities[this.getSelected],
+						...convertedDetails
+					}
+					break;
+				case "ITEM":
+					convertedDetails = {
+						...this.getDefaultItems[this.getSelected],
+						...convertedDetails
+					}
+					break;
 				default:
 					break;
 			}
@@ -280,6 +294,18 @@ export default {
 				case "HERO":
 					convertedDetails = {
 						...this.getDefaultHeroes[this.getSelected],
+						...convertedDetails
+					};
+					break;
+				case "ABILITY":
+					convertedDetails = {
+						...this.getDefaultAbilities[this.getSelected],
+						...convertedDetails
+					};
+					break;
+				case "ITEM":
+					convertedDetails = {
+						...this.getDefaultItems[this.getSelected],
 						...convertedDetails
 					};
 					break;

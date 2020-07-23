@@ -68,7 +68,12 @@ export default {
 	},
 	methods: {
 		...mapActions(["findD2Path"]),
-		...mapMutations(["setLocalizationData", "setDefaultHeroes"]),
+		...mapMutations([
+			"setLocalizationData",
+			"setDefaultHeroes",
+			"setDefaultAbilities",
+			"setDefaultItems"
+		]),
 		toggleDebugger() {
 			this.isDebugger = !this.isDebugger;
 		}
@@ -79,8 +84,12 @@ export default {
 	async mounted() {
 		this.localizationData = await this.getLocalization();
 		const heroes = await this.getHeroData();
+		const abilities = await this.getAbilitiesData();
+		const items = await this.getItemsData();
 		this.setLocalizationData(this.localizationData);
 		this.setDefaultHeroes(heroes);
+		this.setDefaultAbilities(abilities);
+		this.setDefaultItems(items);
 	},
 	data: () => ({
 		isDebugger: false,
