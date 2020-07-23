@@ -194,7 +194,6 @@ const store = new Vuex.Store({
 						abilitiesOverride,
 						precache
 					]) => {
-						console.log(vdfextra.parse(abilities), vdfplus.parse(abilities))
 						const fullEntities = {
 							...vdfplus.parse(units).DOTAUnits,
 							...vdfplus.parse(heros).DOTAHeroes,
