@@ -197,7 +197,7 @@ const store = new Vuex.Store({
 						const fullEntities = {
 							...vdfplus.parse(units).DOTAUnits,
 							...vdfplus.parse(heros).DOTAHeroes,
-							...vdfplus.parse(abilities).DOTAAbilities,
+							...vdfextra.parse(abilities),
 							...vdfplus.parse(items).DOTAAbilities,
 							...vdfplus.parse(abilitiesOverride).DOTAAbilities,
 							...vdfplus.parse(precache).DOTAUnits
