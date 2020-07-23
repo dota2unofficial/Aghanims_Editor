@@ -34,6 +34,8 @@ const store = new Vuex.Store({
 		currentAvatar: "",
 		localizationData: {},
 		defaultHeroes: {},
+		defaultAbilities: {},
+		defaultItems: {},
 		hideValueType: false
 	},
 	getters: {
@@ -57,6 +59,8 @@ const store = new Vuex.Store({
 		getCurrentAvatar: state => state.currentAvatar,
 		getLocalizationData: state => state.localizationData,
 		getDefaultHeroes: state => state.defaultHeroes,
+		getDefaultAbilities: state => state.defaultAbilities,
+		getDefaultItems: state => state.defaultItems,
 		getHideValueType: state => state.hideValueType
 	},
 	mutations: {
@@ -119,6 +123,12 @@ const store = new Vuex.Store({
 		},
 		setDefaultHeroes(state, heroes) {
 			state.defaultHeroes = heroes;
+		},
+		setDefaultAbilities(state, abilities) {
+			state.defaultAbilities = abilities;
+		},
+		setDefaultItems(state, items) {
+			state.defaultItems = items;
 		},
 		setHideValueType(state, payload) {
 			state.hideValueType = payload;
