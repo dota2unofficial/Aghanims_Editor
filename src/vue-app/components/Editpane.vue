@@ -30,6 +30,7 @@ import { AgGridVue } from "ag-grid-vue";
 import KeyCell from "../common/GridCells/KeyCell";
 import ValueCell from "../common/GridCells/ValueCell";
 import AbilityCell from "../common/GridCells/AbilityCell";
+import AbilityHrefCell from "../common/GridCells/AbilityHrefCell";
 import AbilitySelectCell from "../common/GridCells/AbilitySelectCell";
 import VScriptCell from "../common/GridCells/VScriptCell";
 import ScriptFile from "../common/GridCells/ScriptFile";
@@ -122,6 +123,13 @@ export default {
 							};
 						}
 
+						if (/Ability\d/.test(key)) {
+							return {
+								component: "abilityHrefSelector",
+								params
+							};
+						}
+
 						if (key.includes("Ability") || key === "Creature") {
 							return {
 								component: "abilitySelector",
@@ -152,7 +160,8 @@ export default {
 				numberEditor: NumberCell,
 				abilitySelector: AbilitySelectCell,
 				vscriptSelector: VScriptCell,
-				scriptSelector: ScriptFile
+				scriptSelector: ScriptFile,
+				abilityHrefSelector: AbilityHrefCell
 			},
 			originalItems: []
 		};

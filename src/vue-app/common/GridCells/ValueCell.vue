@@ -90,7 +90,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .default {
-  color: #aaa !important;
+	color: #aaa !important;
 }
 .table {
 	display: flex;

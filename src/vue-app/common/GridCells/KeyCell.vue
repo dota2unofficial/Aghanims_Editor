@@ -1,5 +1,5 @@
 <template>
-	<div style="height: 100px" :class="{default: isDefault}">
+	<div style="height: 100px" :class="{ default: isDefault }">
 		<div class="cell">
 			<img
 				:src="getIcon(params.value)"
@@ -83,10 +83,10 @@ export default Vue.extend({
 		},
 		isObjectType() {
 			return typeof this.getDetails[this.params.value] === "object";
-    },
-    isDefault() {
-			return this.params.data.weight === 1;
 		},
+		isDefault() {
+			return this.params.data.weight === 1;
+		}
 	},
 	watch: {
 		getAbility(able) {
@@ -115,6 +115,6 @@ export default Vue.extend({
 }
 
 .default {
-  color: #aaa !important;
+	color: #aaa !important;
 }
 </style>
