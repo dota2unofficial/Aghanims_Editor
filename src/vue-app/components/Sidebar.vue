@@ -501,7 +501,7 @@ export default {
 						} else
 							avatarPath = `spells\\${currentEntity["AbilityTextureName"]}_png.png`;
 					} else if (currentEntity["BaseClass"]) {
-						avatarPath = `spells\\${currentEntity["BaseClass"]}_png.png`;
+						avatarPath = `spells\\${currentEntity["BaseClass"]}.png`;
 					} else {
 						avatarPath = `spells\\${selectedKey.replace(
 							"_lua",
@@ -641,18 +641,23 @@ export default {
 							.split(" ")
 							.join("_")}_icon.png`;
 
-						if (fs.existsSync(localizedIcon)) return localizedIcon;
-						else
-							return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+						let retUrl;
+						try {
+							fs.accessSync(localizedIcon);
+							return localizedIcon;
+						} catch {
+							retUrl = `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}.png`;
+						}
+						return retUrl;
 					} else
-						return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}_png.png`;
+						return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}.png`;
 				} else if (currentEntity["BaseClass"]) {
-					return `${defaultPath}\\spells\\${currentEntity["BaseClass"]}_png.png`;
+					return `${defaultPath}\\spells\\${currentEntity["BaseClass"]}.png`;
 				}
 				return `${defaultPath}\\spells\\${entity.replace(
 					"_lua",
 					""
-				)}_png.png`;
+				)}.png`;
 			}
 			if (this.heros.includes(entity)) {
 				if (
