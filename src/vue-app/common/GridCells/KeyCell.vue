@@ -1,12 +1,12 @@
 <template>
-	<div style="height: 100px" :class="{ default: isDefault }">
+	<div :class="{ default: isDefault }">
 		<div class="cell">
 			<img
 				:src="getIcon(params.value)"
 				alt="skill"
 				v-if="hasIconInsideAssets(params.value)"
 			/>
-			{{ params.value }}
+			<span class="text">{{ params.value }}</span>
 		</div>
 		<v-checkbox
 			v-model="ability"
@@ -106,11 +106,16 @@ export default Vue.extend({
 .cell {
 	display: flex;
 	align-items: center;
+	white-space: normal;
 
 	img {
 		width: 24px;
 		height: 24px;
 		margin-right: 6px;
+	}
+
+	.text {
+		word-break: break-all;
 	}
 }
 
