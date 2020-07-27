@@ -45,11 +45,11 @@
 			:columnDefs="columns"
 			v-model="items"
 			:tooltipShowDelay="0"
-			:getRowHeight="getRowHeight"
 			:frameworkComponents="frameworkComponents"
 			stopEditingWhenGridLosesFocus
 			:animateRows="true"
 			v-if="getSelected"
+			@column-resized="onColumnResized"
 		></ag-grid-vue>
 
 		<v-sheet v-if="isOverride">
@@ -107,6 +107,7 @@ export default {
 					sortable: true,
 					filter: true,
 					resizable: true,
+					autoHeight: true,
 					tooltip: params =>
 						`${
 							params.data.description
@@ -116,6 +117,7 @@ export default {
 								: "No Description"
 						}`,
 					cellRendererFramework: KeyCell,
+					cellClass: 'wrap-cell',
 					flex: 2
 				},
 				{
@@ -278,7 +280,10 @@ export default {
 					: 80;
 			}
 			return 40;
-		}
+		},
+		onColumnResized(params) {
+      params.api.resetRowHeights();
+    },
 	},
 	watch: {
 		details(details) {
@@ -505,5 +510,9 @@ export default {
 		text-align: left;
 		border: 1px solid #ccc;
 	}
+}
+
+.wrap-cell {
+	white-space: normal !important;
 }
 </style>
