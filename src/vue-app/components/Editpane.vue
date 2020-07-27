@@ -4,6 +4,39 @@
 			<v-avatar :size="128" tile>
 				<v-img :src="getCurrentAvatar" contain></v-img>
 			</v-avatar>
+
+			<v-sheet class="backdrop">
+				<v-dialog width="50vw">
+					<template #activator="{ on, attrs }">
+						<v-btn icon v-bind="attrs" v-on="on">
+							<v-icon color="#fff">{{ penIcon }}</v-icon>
+						</v-btn>
+					</template>
+
+					<v-card>
+						<v-card-title>Edit Localization Data</v-card-title>
+
+						<v-card-text>
+							<v-row
+								v-for="row in localizationEditable"
+								:key="Object.keys(row)[0]"
+							>
+								<v-col cols="12">
+									<v-text-field
+										dense
+										hide-details
+										outlined
+										:label="Object.keys(row)[0]"
+										v-model="
+											localization[Object.keys(row)[0]]
+										"
+									></v-text-field>
+								</v-col>
+							</v-row>
+						</v-card-text>
+					</v-card>
+				</v-dialog>
+			</v-sheet>
 		</v-sheet>
 
 		<ag-grid-vue
@@ -40,6 +73,7 @@ import { flatten } from "../utils/file";
 import { checkItemType } from "../utils/file";
 
 import fileMixin from "../mixin/fileMixin";
+import { mdiPencil } from "@mdi/js";
 
 import { getConstData, getDescription } from "../utils/cellEditor";
 import { mapGetters, mapMutations, mapActions } from "vuex";
@@ -65,6 +99,7 @@ export default {
 	data() {
 		return {
 			isFirst: false,
+			penIcon: mdiPencil,
 			columns: [
 				{
 					headerName: "Key",
@@ -184,6 +219,7 @@ export default {
 			"getDefaultHeroes",
 			"getDefaultAbilities",
 			"getDefaultItems",
+			"getLocalizationData"
 		]),
 		details() {
 			return this.getDetails;
@@ -200,6 +236,15 @@ export default {
 		getPreExisting() {
 			const list = this.getAbilities[this.getSelected];
 			return [];
+		},
+		localizationEditable() {
+			const heroName = this.getSelected.replace("npc_dota_hero_", "");
+			return Object.keys(this.getLocalizationData)
+				.filter(key => key.indexOf(heroName) > -1)
+				.map(key => ({ [key]: this.getLocalizationData[key] }));
+		},
+		localization() {
+			return this.getLocalizationData;
 		}
 	},
 	methods: {
@@ -253,13 +298,13 @@ export default {
 					convertedDetails = {
 						...this.getDefaultAbilities[this.getSelected],
 						...convertedDetails
-					}
+					};
 					break;
 				case "ITEM":
 					convertedDetails = {
 						...this.getDefaultItems[this.getSelected],
 						...convertedDetails
-					}
+					};
 					break;
 				default:
 					break;
@@ -390,6 +435,27 @@ export default {
 		display: flex;
 		justify-content: center;
 		padding: 16px;
+		width: 128px;
+		position: relative;
+		margin: 0 auto;
+
+		.backdrop {
+			background-color: rgba(0, 0, 0, 0.5);
+			position: absolute;
+			left: 0;
+			top: 16px;
+			width: 128px;
+			height: 128px;
+			display: none;
+		}
+
+		&:hover {
+			.backdrop {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+		}
 	}
 
 	.mod-unit-avatar {
