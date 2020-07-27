@@ -459,7 +459,6 @@ export default {
 			switch (itemType) {
 				case "UNIT":
 					selectedEntity = this.getUnits[selectedKey];
-					avatarPath = selectedEntity.Model.replace(".vmdl", ".png");
 					break;
 				case "HERO":
 					selectedEntity = this.getHeros[selectedKey];
@@ -468,62 +467,20 @@ export default {
 							".vmdl",
 							"_full.png"
 						)}`;
-					else avatarPath = `heroes\\${selectedKey}.png`;
 					break;
 				case "ITEM":
 					selectedEntity = this.getItems[selectedKey];
-					avatarPath = `items\\${selectedKey.replace(
-						"item_",
-						""
-					)}.png`;
 					break;
 				case "ABILITY":
 					selectedEntity = this.getAbilities[selectedKey];
-					const currentEntity = this.getAbilities[selectedKey];
-					if (currentEntity["AbilityTextureName"]) {
-						const defaultD2Res = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${currentEntity["AbilityTextureName"]}`;
-						const localizationData = this.localization[
-							`DOTA_Tooltip_ability_${currentEntity["AbilityTextureName"]}`
-						];
-						if (fs.existsSync(`${defaultD2Res}_lua.png`))
-							avatarPath = `${defaultD2Res}_lua.png`;
-						else if (fs.existsSync(`${defaultD2Res}.png`))
-							avatarPath = `${defaultD2Res}.png`;
-						else if (localizationData) {
-							const localizedIcon = `spells\\${localizationData
-								.split(" ")
-								.join("_")}_icon.png`;
-
-							if (fs.existsSync(localizedIcon))
-								avatarPath = localizedIcon;
-							else
-								avatarPath = `spells\\${currentEntity["AbilityTextureName"]}_png.png`;
-						} else
-							avatarPath = `spells\\${currentEntity["AbilityTextureName"]}_png.png`;
-					} else if (currentEntity["BaseClass"]) {
-						avatarPath = `spells\\${currentEntity["BaseClass"]}.png`;
-					} else {
-						avatarPath = `spells\\${selectedKey.replace(
-							"_lua",
-							""
-						)}_png.png`;
-					}
 					break;
 				case "PRECACHE":
 					selectedEntity = this.getPrecache[selectedKey];
-					avatarPath = `heroes\\${selectedKey.replace(
-						"npc_precache_",
-						""
-					)}.png`;
 					break;
 			}
 
 			this.setDetails(selectedEntity);
-			this.setCurrentAvatar(
-				`${
-					avatarPath.indexOf(this.getD2Path) > -1 ? "" : defaultPath
-				}${avatarPath}`
-			);
+			this.setCurrentAvatar(this.getEntityIcon(selectedKey));
 		},
 		setBorderWidth() {
 			const node = this.$refs.drawer.$el.querySelector(
@@ -654,10 +611,7 @@ export default {
 				} else if (currentEntity["BaseClass"]) {
 					return `${defaultPath}\\spells\\${currentEntity["BaseClass"]}.png`;
 				}
-				return `${defaultPath}\\spells\\${entity.replace(
-					"_lua",
-					""
-				)}.png`;
+				return `${defaultPath}\\spells\\${entity}.png`;
 			}
 			if (this.heros.includes(entity)) {
 				if (
