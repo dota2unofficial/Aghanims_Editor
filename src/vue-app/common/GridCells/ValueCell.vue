@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ default: isDefault }">
+	<div :class="{ default: isDefault }" :style="{height: getHeight}">
 		<div v-if="isAbilitySpecial">
 			<div v-for="(item, index) in data" :key="index" class="table">
 				<span>{{ getTitle(item) }}</span>
