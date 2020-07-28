@@ -47,8 +47,8 @@
 			:tooltipShowDelay="0"
 			:frameworkComponents="frameworkComponents"
 			stopEditingWhenGridLosesFocus
-			:animateRows="true"
 			v-if="getSelected"
+			:getRowHeight="getRowHeight"
 			@column-resized="onColumnResized"
 		></ag-grid-vue>
 
@@ -84,12 +84,6 @@ import fs from "fs";
 export default {
 	name: "EditPane",
 	mixins: [fileMixin],
-	props: {
-		localization: {
-			type: Object,
-			required: true
-		}
-	},
 	components: {
 		AgGridVue,
 		KeyCell,
@@ -206,7 +200,6 @@ export default {
 	computed: {
 		...mapGetters([
 			"getDetails",
-			"getSelected",
 			"getPath",
 			"getUnits",
 			"getAbility",
@@ -240,6 +233,7 @@ export default {
 			return [];
 		},
 		localizationEditable() {
+			if (!this.getSelected) return [];
 			const heroName = this.getSelected.replace("npc_dota_hero_", "");
 			return Object.keys(this.getLocalizationData)
 				.filter(key => key.indexOf(heroName) > -1)
@@ -409,24 +403,6 @@ export default {
 				});
 			}
 		},
-		getAbility(ability) {
-			const { npc_units_custom } = schemas;
-			const getKeyInformation = name =>
-				npc_units_custom._rest.schema._fields.find(
-					field => field.name === name
-				);
-			this.items = Object.keys(this.details).map(key => ({
-				key: key,
-				value: key.includes("Ability")
-					? this.localization[this.details[key]]
-						? this.localization[this.details[key]]
-						: this.details[key]
-					: this.details[key],
-				description: getKeyInformation(key)
-					? getKeyInformation(key).description
-					: "No description"
-			}));
-		}
 	}
 };
 </script>

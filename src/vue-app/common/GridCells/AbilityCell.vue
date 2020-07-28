@@ -20,11 +20,7 @@
 						hide-details
 						dense
 						outlined
-						:type="
-							isNumber(models[index]['var_type'])
-								? 'number'
-								: 'string'
-						"
+						:type="isNumber(models[index]) ? 'number' : 'string'"
 						v-model="models[index][getFlattenArray(item)[1]]"
 					></v-text-field>
 				</span>
@@ -101,7 +97,8 @@ export default Vue.extend({
 			return Object.keys(item);
 		},
 		isNumber(str) {
-			return !isNaN(str) || str.indexOf(".");
+			const value = str[Object.keys(str)[1]];
+			return typeof value === "number";
 		}
 	}
 });

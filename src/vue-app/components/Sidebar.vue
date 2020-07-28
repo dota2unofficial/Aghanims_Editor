@@ -159,7 +159,7 @@
 						</v-expansion-panel-content>
 					</v-expansion-panel>
 
-					<v-expansion-panel>
+					<!-- <v-expansion-panel>
 						<v-expansion-panel-header class="panel-header"
 							>Precache</v-expansion-panel-header
 						>
@@ -194,7 +194,7 @@
 								</template>
 							</v-treeview>
 						</v-expansion-panel-content>
-					</v-expansion-panel>
+					</v-expansion-panel> -->
 				</v-expansion-panels>
 			</v-sheet>
 		</v-sheet>
@@ -430,7 +430,9 @@ export default {
 		...mapActions(["addDebugLogs"]),
 		onItemChanged(item) {
 			if (item.length === 0) {
-				this.setSelected("");
+				this.setSelected(null);
+				this.setDetails(null);
+				this.setCurrentAvatar("");
 				return;
 			}
 			const selectedKey = item[0];
@@ -643,7 +645,7 @@ export default {
 
 <style lang="scss" scoped>
 .expansion-panel-content {
-	max-height: calc(100vh - 377px);
+	max-height: calc(100vh - 329px);
 	padding-top: 16px;
 	overflow: auto;
 }

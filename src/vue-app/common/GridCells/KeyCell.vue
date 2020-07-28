@@ -9,12 +9,13 @@
 			<span class="text">{{ params.value }}</span>
 		</div>
 		<v-checkbox
-			v-model="ability"
 			label="Always show ingame names for abilities"
 			dense
 			hide-details
 			class="pt-0 mt-0"
-			v-if="isAbilitySet"
+			v-if="isAbilitySet && !isDefault"
+			v-model="ability"
+			@change="toggleAbility"
 		></v-checkbox>
 		<v-checkbox
 			label="Hide Variable Input Type"
@@ -69,34 +70,27 @@ export default Vue.extend({
 		},
 		toggleShow() {
 			this.setHideValueType(!this.getHideValueType);
+		},
+		toggleAbility() {
+			this.setAbility(!this.getAbility);
 		}
 	},
 	computed: {
 		...mapGetters(["getAbility", "getDetails", "getHideValueType"]),
 		isAbilitySet() {
-			const char = this.params.value.charAt(7);
-			return (
-				this.params.value.includes("Ability") &&
-				char >= "0" &&
-				char <= "9"
+			if (!/Ability\d/.test(this.params.value)) return false;
+			const newArray = Object.keys(this.getDetails).filter(key =>
+				/Ability\d/.test(key)
 			);
+			if (newArray.length === 0) return false;
+			if (this.params.value === newArray[0]) return true;
+			return false;
 		},
 		isObjectType() {
-			return typeof this.getDetails[this.params.value] === "object";
+			return this.params.value === "AbilitySpecial"
 		},
 		isDefault() {
 			return this.params.data.weight === 1;
-		}
-	},
-	watch: {
-		getAbility(able) {
-			this.ability = able;
-		},
-		ability(able) {
-			if (able !== this.getAbility) this.setAbility(able);
-		},
-		hide(hidden) {
-			if (hidden !== this.getHideValueType) this.setHideValueType(hidden);
 		}
 	}
 });

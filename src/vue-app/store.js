@@ -171,9 +171,12 @@ const store = new Vuex.Store({
 			const abilitiesPath = `${path}\\scripts\\npc\\npc_abilities_custom.txt`;
 			const itemsPath = `${path}\\scripts\\npc\\npc_items_custom.txt`;
 			const abilitiesOverridePath = `${path}\\scripts\\npc\\npc_abilities_override.txt`;
-			const precachePath = `${path}\\scripts\\npc\\npc_unit_precache.txt`;
-
+			commit("setHeros", {});
+			commit("setItems", {});
+			commit("setUnits", {});
+			commit("setAbilities", {});
 			commit("setPath", folder);
+			
 			commit("setFileLoading", true);
 			dispatch("loadCustomLocalization", folder);
 
@@ -182,63 +185,46 @@ const store = new Vuex.Store({
 				getData(heroPath, "utf8"),
 				getData(abilitiesPath, "utf8"),
 				getData(itemsPath, "utf8"),
-				getData(abilitiesOverridePath, "utf8"),
-				getData(precachePath, "utf8")
+				getData(abilitiesOverridePath, "utf8")
 			])
-				.then(
-					([
-						units,
-						heros,
-						abilities,
-						items,
-						abilitiesOverride,
-						precache
-					]) => {
-						const fullEntities = {
-							...vdfplus.parse(units).DOTAUnits,
-							...vdfplus.parse(heros).DOTAHeroes,
-							...vdfextra.parse(abilities),
-							...vdfplus.parse(items).DOTAAbilities,
-							...vdfplus.parse(abilitiesOverride).DOTAAbilities,
-							...vdfplus.parse(precache).DOTAUnits
-						};
+				.then(([units, heros, abilities, items, abilitiesOverride]) => {
+					const fullEntities = {
+						...vdfplus.parse(units).DOTAUnits,
+						...vdfplus.parse(heros).DOTAHeroes,
+						...vdfextra.parse(abilities),
+						...vdfplus.parse(items).DOTAAbilities,
+						...vdfplus.parse(abilitiesOverride).DOTAAbilities
+					};
 
-						Object.keys(fullEntities).forEach(entity => {
-							switch (checkItemType(entity)) {
-								case "HERO":
-									commit("setHeros", {
-										...getters.getHeros,
-										[entity]: fullEntities[entity]
-									});
-									break;
-								case "ITEM":
-									commit("setItems", {
-										...getters.getItems,
-										[entity]: fullEntities[entity]
-									});
-									break;
-								case "UNIT":
-									commit("setUnits", {
-										...getters.getUnits,
-										[entity]: fullEntities[entity]
-									});
-									break;
-								case "ABILITY":
-									commit("setAbilities", {
-										...getters.getAbilities,
-										[entity]: fullEntities[entity]
-									});
-									break;
-								case "PRECACHE":
-									commit("setPrecache", {
-										...getters.getPrecache,
-										[entity]: fullEntities[entity]
-									});
-									break;
-							}
-						});
-					}
-				)
+					Object.keys(fullEntities).forEach(entity => {
+						switch (checkItemType(entity)) {
+							case "HERO":
+								commit("setHeros", {
+									...getters.getHeros,
+									[entity]: fullEntities[entity]
+								});
+								break;
+							case "ITEM":
+								commit("setItems", {
+									...getters.getItems,
+									[entity]: fullEntities[entity]
+								});
+								break;
+							case "UNIT":
+								commit("setUnits", {
+									...getters.getUnits,
+									[entity]: fullEntities[entity]
+								});
+								break;
+							case "ABILITY":
+								commit("setAbilities", {
+									...getters.getAbilities,
+									[entity]: fullEntities[entity]
+								});
+								break;
+						}
+					});
+				})
 				.finally(() => commit("setFileLoading", false));
 		}
 	}
