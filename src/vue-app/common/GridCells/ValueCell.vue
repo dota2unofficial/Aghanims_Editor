@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ default: isDefault }" :style="{height: getHeight}">
+	<div :class="{ default: isDefault }">
 		<div v-if="isAbilitySpecial">
 			<div v-for="(item, index) in data" :key="index" class="table">
 				<span>{{ getTitle(item) }}</span>
@@ -64,9 +64,6 @@ export default Vue.extend({
 		},
 		getKeys() {
 			return Object.keys(flatten(this.params.value));
-		},
-		getHeight() {
-			return `${Object.keys(this.params.value).length * 40}px`;
 		},
 		getAbilityIcon() {
 			const defaultPath = `file:\\${process.cwd()}\\${
@@ -162,7 +159,7 @@ export default Vue.extend({
 		position: relative;
 		overflow: hidden;
 
-		&:not(last-child) {
+		&:not(:last-child) {
 			&:after {
 				content: "";
 				position: absolute;

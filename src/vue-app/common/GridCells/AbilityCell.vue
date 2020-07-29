@@ -98,7 +98,11 @@ export default Vue.extend({
 		},
 		isNumber(str) {
 			const value = str[Object.keys(str)[1]];
-			return typeof value === "number";
+			console.log(value);
+			return (
+				typeof value === "number" ||
+				(typeof value === "string" && value.indexOf(".") > -1)
+			);
 		}
 	}
 });
