@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ default: isDefault }">
+	<div>
 		<div v-if="isAbilitySpecial">
 			<div v-for="(item, index) in data" :key="index" class="table">
 				<span>{{ getTitle(item) }}</span>
@@ -58,9 +58,6 @@ export default Vue.extend({
 		},
 		isAbility() {
 			return /Ability\d/.test(this.params.data.key);
-		},
-		isDefault() {
-			return this.params.data.weight === 1;
 		},
 		getKeys() {
 			return Object.keys(flatten(this.params.value));

@@ -36,7 +36,8 @@ const store = new Vuex.Store({
 		defaultHeroes: {},
 		defaultAbilities: {},
 		defaultItems: {},
-		hideValueType: false
+		hideValueType: false,
+		showDefaultValues: false
 	},
 	getters: {
 		getPath: state => state.path,
@@ -61,7 +62,8 @@ const store = new Vuex.Store({
 		getDefaultHeroes: state => state.defaultHeroes,
 		getDefaultAbilities: state => state.defaultAbilities,
 		getDefaultItems: state => state.defaultItems,
-		getHideValueType: state => state.hideValueType
+		getHideValueType: state => state.hideValueType,
+		getShowDefaultValues: state => state.showDefaultValues
 	},
 	mutations: {
 		setPath(state, path) {
@@ -132,6 +134,9 @@ const store = new Vuex.Store({
 		},
 		setHideValueType(state, payload) {
 			state.hideValueType = payload;
+		},
+		setShowDefaultValues(state, payload) {
+			state.showDefaultValues = payload;
 		}
 	},
 	actions: {
@@ -157,6 +162,9 @@ const store = new Vuex.Store({
 		addDebugLogs({ commit, getters }, log) {
 			commit("setDebugLogs", [...getters.getDebugLogs, log]);
 		},
+		toggleShowDefaultValues({ commit, state }) {
+			commit("setShowDefaultValues", !state.showDefaultValues)
+		},
 		loadCustomLocalization({ commit, getters }, mod) {
 			const filePath = `${getters.getD2Path}\\dota_addons\\${mod}\\resource\\addon_english.txt`;
 			const encoding = chardet.detectFileSync(filePath);
@@ -176,7 +184,7 @@ const store = new Vuex.Store({
 			commit("setUnits", {});
 			commit("setAbilities", {});
 			commit("setPath", folder);
-			
+
 			commit("setFileLoading", true);
 			dispatch("loadCustomLocalization", folder);
 
