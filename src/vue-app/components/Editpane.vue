@@ -48,7 +48,6 @@
 			:frameworkComponents="frameworkComponents"
 			stopEditingWhenGridLosesFocus
 			v-if="getSelected"
-			:getRowHeight="getRowHeight"
 			@column-resized="onColumnResized"
 		></ag-grid-vue>
 
@@ -119,6 +118,7 @@ export default {
 					field: "value",
 					editable: true,
 					resizable: true,
+					autoHeight: true,
 					cellRendererFramework: ValueCell,
 					flex: 3,
 					cellEditorSelector: params => {

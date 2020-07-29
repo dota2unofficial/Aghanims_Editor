@@ -1,8 +1,8 @@
 version: 1.4.1
 files:
   - url: aghnims_editor-Setup-1.4.1.exe
-    sha512: pe0rgSxUT2XyQQ16Ivj/e5sR2v/+VZcq6Que6Ss68rY1/JN0FC3ILvKrwjgRuWolZgdvm5JuK/8Uv3GK32m5/g==
-    size: 359353554
+    sha512: 7NKqEdIpT5BNWPKCG4XJsSLezwoef+Kkn2zmDSLgWTJmGvQRZFs63zveFh+jqqyU0nNvdTkLkKpD/to1MHo3Hw==
+    size: 359249856
 path: aghnims_editor-Setup-1.4.1.exe
-sha512: pe0rgSxUT2XyQQ16Ivj/e5sR2v/+VZcq6Que6Ss68rY1/JN0FC3ILvKrwjgRuWolZgdvm5JuK/8Uv3GK32m5/g==
-releaseDate: '2020-07-28T14:24:14.878Z'
+sha512: 7NKqEdIpT5BNWPKCG4XJsSLezwoef+Kkn2zmDSLgWTJmGvQRZFs63zveFh+jqqyU0nNvdTkLkKpD/to1MHo3Hw==
+releaseDate: '2020-07-29T01:03:12.359Z'
