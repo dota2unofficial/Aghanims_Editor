@@ -77,6 +77,7 @@
 			v-if="getSelected && getShowDefaultValues"
 			@column-resized="onColumnResized"
 			@cellValueChanged="onCellValueChanged"
+			@cellClicked="onCellClicked"
 		></ag-grid-vue>
 
 		<v-sheet v-if="isOverride">
@@ -182,13 +183,6 @@ export default {
 							};
 						}
 
-						if (/Ability\d/.test(key)) {
-							return {
-								component: "abilityHrefSelector",
-								params
-							};
-						}
-
 						if (key === "Creature") {
 							return {
 								component: "abilitySelector",
@@ -222,7 +216,7 @@ export default {
 				scriptSelector: ScriptFile,
 				abilityHrefSelector: AbilityHrefCell
 			},
-			originalItems: [],
+			originalItems: []
 		};
 	},
 	computed: {
@@ -263,7 +257,7 @@ export default {
 		},
 		localizationEditable() {
 			if (!this.getSelected) return [];
-			const heroName = this.getSelected.replace("npc_dota_hero_", "");
+			const heroName = this.getSelected;
 			return Object.keys(this.getLocalizationData)
 				.filter(key => key.indexOf(heroName) > -1)
 				.map(key => ({ [key]: this.getLocalizationData[key] }));
@@ -281,7 +275,8 @@ export default {
 			"setPrecache",
 			"setHeros",
 			"setCurrentAvatar",
-			"setDetails"
+			"setDetails",
+			"setSelected"
 		]),
 		...mapActions(["addDebugLogs", "toggleShowDefaultValues"]),
 		getRowHeight(params) {
@@ -314,6 +309,36 @@ export default {
 				item => item.key !== data.key
 			);
 		},
+		onCellClicked(event) {
+			if (this.getDefaultAbilities[event.value]) {
+				const selectedKey = event.value;
+				this.setSelected(selectedKey);
+				this.setDetails(this.getDefaultAbilities[event.value]);
+
+				const defaultPath = `file:\\${process.cwd()}\\${
+					process.env.NODE_ENV === "development" ? "" : "resources\\"
+				}assets`;
+				const texture = this.getLocalizationData[
+					`DOTA_Tooltip_ability_${event.value}`
+				];
+
+				const textureIcon = `${defaultPath}\\spells\\${(texture ? texture : "")
+					.split(" ")
+					.join("_")}_icon.png`;
+
+				let retUrl = null;
+
+				try {
+					fs.accessSync(textureIcon);
+					retUrl = textureIcon;
+				} catch (err) {
+					const normalPath = `${defaultPath}\\spells\\${event.value}.png`;
+					retUrl = normalPath;
+				}
+
+				this.setCurrentAvatar(retUrl);
+			}
+		}
 	},
 	watch: {
 		details(details) {
@@ -349,6 +374,8 @@ export default {
 				default:
 					break;
 			}
+
+			if (!orginalData) orginalData = {};
 
 			this.originalItems = Object.keys(orginalData)
 				.map(key => ({

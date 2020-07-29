@@ -384,7 +384,7 @@ export default {
 		abilityTree() {
 			return [
 				{
-					id: "CUSTOM_ABILITIES",
+					id: "OVERRIDE_ABILITIES",
 					name: "Override Abilities :",
 					children: this.abilities
 						.map(item => ({
@@ -399,7 +399,7 @@ export default {
 						)
 				},
 				{
-					id: "CUSTOM_Abilities",
+					id: "CUSTOM_ABILITIES",
 					name: "Custom Abilities :",
 					children: this.abilities
 						.map(item => ({
@@ -416,7 +416,32 @@ export default {
 			];
 		},
 		itemTree() {
-			return this.items.map(item => ({ id: item, name: item }));
+			return [
+				{
+					id: "OVERRIDE_ITEMS",
+					name: "Override Items :",
+					children: this.items
+						.map(item => ({ id: item, name: item }))
+						.filter(
+							item =>
+								this.localization[
+									`DOTA_Tooltip_Ability_${item.id}`
+								]
+						)
+				},
+				{
+					id: "CUSTOM_ITEMS",
+					name: "Custom Items :",
+					children: this.items
+						.map(item => ({ id: item, name: item }))
+						.filter(
+							item =>
+								this.getCustomLocalization[
+									`DOTA_Tooltip_ability_${item.id}`
+								]
+						)
+				}
+			];
 		},
 		precacheTree() {
 			return this.precache.map(item => ({
@@ -436,17 +461,6 @@ export default {
 				return;
 			}
 			const selectedKey = item[0];
-			if (
-				selectedKey === "Units :" ||
-				selectedKey === "Abilities :" ||
-				selectedKey === "Heros: " ||
-				selectedKey === "Override Abilities :" ||
-				selectedKey === "Precache :" ||
-				selectedKey === "Can Move :" ||
-				selectedKey === "Cannot Move :" ||
-				selectedKey === "All :"
-			)
-				return;
 
 			this.setSelected(selectedKey);
 			const itemType = checkItemType(selectedKey);

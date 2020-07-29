@@ -17,7 +17,7 @@
 					alt="skill"
 				/>
 			</div>
-			<div>{{ getFormattedValue }}</div>
+			<div>{{ getAbility ? getFormattedValue : this.params.value }}</div>
 		</div>
 		<span v-else>{{ getFormattedValue }}</span>
 	</div>
@@ -50,7 +50,8 @@ export default Vue.extend({
 		...mapGetters([
 			"getLocalizationData",
 			"getCustomLocalization",
-			"getHideValueType"
+			"getHideValueType",
+			"getAbility",
 		]),
 		isAbilitySpecial() {
 			if (this.params.data.key !== "AbilitySpecial") return false;
