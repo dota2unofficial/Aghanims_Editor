@@ -40,7 +40,7 @@
 		</v-sheet>
 
 		<ag-grid-vue
-			style="width: 100%; height: calc(100vh - 241px)"
+			style="width: 100%; height: calc(50vh - 140px)"
 			class="ag-theme-alpine"
 			:columnDefs="columns"
 			v-model="items"
@@ -49,6 +49,34 @@
 			stopEditingWhenGridLosesFocus
 			v-if="getSelected"
 			@column-resized="onColumnResized"
+		></ag-grid-vue>
+
+		<v-sheet
+			class="d-flex align-center justify-center expander"
+			v-if="getSelected"
+		>
+			<v-btn
+				x-small
+				text
+				outlined
+				color="primary"
+				@click="toggleShowDefaultValues"
+				>{{ `${getShowDefaultValues ? "Hide" : "Show"}` }} Unmodified
+				Default Values</v-btn
+			>
+		</v-sheet>
+
+		<ag-grid-vue
+			style="width: 100%; height: calc(50vh - 140px)"
+			class="ag-theme-alpine"
+			:columnDefs="columns"
+			v-model="originalItems"
+			:tooltipShowDelay="0"
+			:frameworkComponents="frameworkComponents"
+			stopEditingWhenGridLosesFocus
+			v-if="getSelected && getShowDefaultValues"
+			@column-resized="onColumnResized"
+			@cellValueChanged="onCellValueChanged"
 		></ag-grid-vue>
 
 		<v-sheet v-if="isOverride">
@@ -110,7 +138,7 @@ export default {
 								: "No Description"
 						}`,
 					cellRendererFramework: KeyCell,
-					cellClass: 'wrap-cell',
+					cellClass: "wrap-cell",
 					flex: 2
 				},
 				{
@@ -194,7 +222,7 @@ export default {
 				scriptSelector: ScriptFile,
 				abilityHrefSelector: AbilityHrefCell
 			},
-			originalItems: []
+			originalItems: [],
 		};
 	},
 	computed: {
@@ -214,7 +242,8 @@ export default {
 			"getDefaultHeroes",
 			"getDefaultAbilities",
 			"getDefaultItems",
-			"getLocalizationData"
+			"getLocalizationData",
+			"getShowDefaultValues"
 		]),
 		details() {
 			return this.getDetails;
@@ -254,7 +283,7 @@ export default {
 			"setCurrentAvatar",
 			"setDetails"
 		]),
-		...mapActions(["addDebugLogs"]),
+		...mapActions(["addDebugLogs", "toggleShowDefaultValues"]),
 		getRowHeight(params) {
 			const {
 				data: { key, value }
@@ -276,98 +305,73 @@ export default {
 			return 40;
 		},
 		onColumnResized(params) {
-      params.api.resetRowHeights();
-    },
+			params.api.resetRowHeights();
+		},
+		onCellValueChanged(event) {
+			const { data } = event;
+			this.items = [...this.items, data];
+			this.originalItems = this.originalItems.filter(
+				item => item.key !== data.key
+			);
+		},
 	},
 	watch: {
 		details(details) {
 			if (!details) return [];
-
-			this.originalItems = Object.keys(details);
-
-			let convertedDetails = details;
-			switch (checkItemType(this.getSelected)) {
-				case "HERO":
-					convertedDetails = {
-						...this.getDefaultHeroes[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				case "ABILITY":
-					convertedDetails = {
-						...this.getDefaultAbilities[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				case "ITEM":
-					convertedDetails = {
-						...this.getDefaultItems[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				default:
-					break;
-			}
-
 			const { npc_units_custom } = schemas;
 			const getKeyInformation = name =>
 				npc_units_custom._rest.schema._fields.find(
 					field => field.name === name
 				);
 
-			this.items = Object.keys(convertedDetails)
+			this.items = Object.keys(details).map(key => ({
+				key: key,
+				value: details[key],
+				description:
+					getKeyInformation(key) && getKeyInformation(key).description
+						? getKeyInformation(key).description
+						: getDescription(key)
+						? getDescription(key)
+						: "No description"
+			}));
+
+			let orginalData = {};
+			switch (checkItemType(this.getSelected)) {
+				case "HERO":
+					orginalData = this.getDefaultHeroes[this.getSelected];
+					break;
+				case "ABILITY":
+					orginalData = this.getDefaultAbilities[this.getSelected];
+					break;
+				case "ITEM":
+					orginalData = this.getDefaultItems[this.getSelected];
+					break;
+				default:
+					break;
+			}
+
+			this.originalItems = Object.keys(orginalData)
 				.map(key => ({
 					key: key,
-					value: convertedDetails[key],
+					value: orginalData[key],
 					description:
 						getKeyInformation(key) &&
 						getKeyInformation(key).description
 							? getKeyInformation(key).description
 							: getDescription(key)
 							? getDescription(key)
-							: "No description",
-					weight: details[key] ? 2 : 1
+							: "No description"
 				}))
-				.sort((first, second) => {
-					return first.weight > second.weight ? -1 : 1;
-				});
+				.filter(
+					item =>
+						!this.items
+							.map(modified => modified.key)
+							.includes(item.key)
+				);
 		},
 		items(value) {
-			let convertedDetails = {};
-			switch (checkItemType(this.getSelected)) {
-				case "HERO":
-					convertedDetails = {
-						...this.getDefaultHeroes[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				case "ABILITY":
-					convertedDetails = {
-						...this.getDefaultAbilities[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				case "ITEM":
-					convertedDetails = {
-						...this.getDefaultItems[this.getSelected],
-						...convertedDetails
-					};
-					break;
-				default:
-					break;
-			}
-
-			this.originalItems = [];
-			value.forEach(data => {
-				if (convertedDetails[data.key] !== data["value"]) {
-					this.originalItems.push(data.key);
-				}
-			});
-
 			let newData = {};
-			value
-				.filter(item => this.originalItems.includes(item["key"]))
-				.forEach(item => (newData[item.key] = item.value));
+			value.forEach(item => (newData[item.key] = item.value));
 			const selected = this.getSelected;
 			if (Object.keys(this.getUnits).includes(selected)) {
 				this.setUnits({
@@ -402,7 +406,7 @@ export default {
 					[selected]: newData
 				});
 			}
-		},
+		}
 	}
 };
 </script>
@@ -490,5 +494,9 @@ export default {
 
 .wrap-cell {
 	white-space: normal !important;
+}
+
+.expander {
+	height: 38px;
 }
 </style>
