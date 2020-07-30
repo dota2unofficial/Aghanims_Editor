@@ -18,19 +18,27 @@
 
 						<v-card-text>
 							<v-row
-								v-for="row in localizationEditable"
-								:key="Object.keys(row)[0]"
+								v-for="(row, index) in localizationEditable"
+								:key="index"
 							>
 								<v-col cols="12">
 									<v-text-field
+										v-if="index === 0"
 										dense
 										hide-details
 										outlined
-										:label="Object.keys(row)[0]"
-										v-model="
-											localization[Object.keys(row)[0]]
-										"
+										:label="row[1]"
+										v-model="localization[row[0]]"
 									></v-text-field>
+									<v-textarea
+										v-else
+										dense
+										hide-details
+										outlined
+										auto-grow
+										:label="row[1]"
+										v-model="localization[row[0]]"
+									></v-textarea>
 								</v-col>
 							</v-row>
 						</v-card-text>
@@ -257,10 +265,49 @@ export default {
 		},
 		localizationEditable() {
 			if (!this.getSelected) return [];
-			const heroName = this.getSelected;
-			return Object.keys(this.getLocalizationData)
-				.filter(key => key.indexOf(heroName) > -1)
-				.map(key => ({ [key]: this.getLocalizationData[key] }));
+			const entityName = this.getSelected;
+			switch (checkItemType(entityName)) {
+				case "UNIT":
+					return [
+						[entityName, "Name"],
+						[`${entityName}_hype`, "Hype"],
+						[`${entityName}_bio`, "Bio"]
+					]
+				case "HERO":
+					return [
+						[entityName, "Name"],
+						[`${entityName}_hype`, "Hype"],
+						[`${entityName}_bio`, "Bio"]
+					];
+				case "ABILITY":
+					return [
+						[`DOTA_Tooltip_ability_${entityName}`, "Name"],
+						[
+							`DOTA_Tooltip_ability_${entityName}_Description`,
+							"Description"
+						],
+						[`DOTA_Tooltip_ability_${entityName}_Lore`, "Lore"]
+					];
+				case "ITEM":
+					const isEntity = this.getLocalizationData[
+						`DOTA_Tooltip_ability_${entityName}`
+					];
+					return [
+						[
+							`DOTA_Tooltip_${
+								isEntity ? "ability" : "Ability"
+							}_${entityName}`,
+							"Name"
+						],
+						[
+							`DOTA_Tooltip_${
+								isEntity ? "ability" : "Ability"
+							}_${entityName}_Description`,
+							"Description"
+						]
+					];
+			}
+			return [];
 		},
 		localization() {
 			return this.getLocalizationData;
@@ -322,7 +369,10 @@ export default {
 					`DOTA_Tooltip_ability_${event.value}`
 				];
 
-				const textureIcon = `${defaultPath}\\spells\\${(texture ? texture : "")
+				const textureIcon = `${defaultPath}\\spells\\${(texture
+					? texture
+					: ""
+				)
 					.split(" ")
 					.join("_")}_icon.png`;
 
