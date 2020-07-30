@@ -18,33 +18,148 @@
 						<v-expansion-panel-content
 							class="expansion-panel-content"
 						>
-							<v-treeview
-								:items="unitTree"
-								dense
-								open-on-click
-								selected-color="primary"
-								hoverable
-								activatable
-								item-key="name"
-								@update:active="onItemChanged"
-							>
-								<template v-slot:label="{ item }">
-									<span>
-										{{ customLocalization(item.name) }}
-									</span>
-								</template>
-								<template v-slot:prepend="{ item, leaf }">
-									<v-img
-										v-if="leaf"
-										:src="getEntityIcon(item.name)"
-										:width="24"
-										:height="24"
-										tile
-										contain
-									></v-img>
-									<v-icon v-else>{{ mdiParent }}</v-icon>
-								</template>
-							</v-treeview>
+							<v-expansion-panels accordion hover tile>
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Can Move</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner-three"
+									>
+										<v-treeview
+											:items="movable"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Can't Move</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner-three"
+									>
+										<v-treeview
+											:items="unmovable"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>All</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner-three"
+									>
+										<v-treeview
+											:items="allUnits"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+							</v-expansion-panels>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
 
@@ -92,33 +207,103 @@
 						<v-expansion-panel-content
 							class="expansion-panel-content"
 						>
-							<v-treeview
-								:items="abilityTree"
-								dense
-								open-on-click
-								selected-color="primary"
-								hoverable
-								activatable
-								item-key="name"
-								@update:active="onItemChanged"
-							>
-								<template v-slot:label="{ item }">
-									<span>
-										{{ customLocalization(item.name) }}
-									</span>
-								</template>
-								<template v-slot:prepend="{ item, leaf }">
-									<v-img
-										v-if="leaf"
-										:src="getEntityIcon(item.name)"
-										:width="24"
-										:height="24"
-										tile
-										contain
-									></v-img>
-									<v-icon v-else>{{ mdiParent }}</v-icon>
-								</template>
-							</v-treeview>
+							<v-expansion-panels accordion hover tile>
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Override
+										Abilities</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner"
+									>
+										<v-treeview
+											:items="overrideAbilityTree"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Custom
+										Abilities</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner"
+									>
+										<v-treeview
+											:items="customAbilityTree"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+							</v-expansion-panels>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
 
@@ -129,72 +314,104 @@
 						<v-expansion-panel-content
 							class="expansion-panel-content"
 						>
-							<v-treeview
-								:items="itemTree"
-								dense
-								open-on-click
-								selected-color="primary"
-								hoverable
-								activatable
-								item-key="name"
-								@update:active="onItemChanged"
-							>
-								<template v-slot:label="{ item }">
-									<span>
-										{{ customLocalization(item.name) }}
-									</span>
-								</template>
-								<template v-slot:prepend="{ item, leaf }">
-									<v-img
-										v-if="leaf"
-										:src="getEntityIcon(item.name)"
-										:width="24"
-										:height="24"
-										tile
-										contain
-									></v-img>
-									<v-icon v-else>{{ mdiParent }}</v-icon>
-								</template>
-							</v-treeview>
+							<v-expansion-panels accordion hover tile>
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Override
+										Items</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner"
+									>
+										<v-treeview
+											:items="overrideItemTree"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>Custom Items</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner"
+									>
+										<v-treeview
+											:items="customItemTree"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+							</v-expansion-panels>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
-
-					<!-- <v-expansion-panel>
-						<v-expansion-panel-header class="panel-header"
-							>Precache</v-expansion-panel-header
-						>
-						<v-expansion-panel-content
-							class="expansion-panel-content"
-						>
-							<v-treeview
-								:items="precacheTree"
-								dense
-								open-on-click
-								selected-color="primary"
-								hoverable
-								activatable
-								item-key="name"
-								@update:active="onItemChanged"
-							>
-								<template v-slot:label="{ item }">
-									<span>
-										{{ customLocalization(item.name) }}
-									</span>
-								</template>
-								<template v-slot:prepend="{ item, leaf }">
-									<v-img
-										v-if="leaf"
-										:src="getEntityIcon(item.name)"
-										:width="24"
-										:height="24"
-										tile
-										contain
-									></v-img>
-									<v-icon v-else>{{ mdiParent }}</v-icon>
-								</template>
-							</v-treeview>
-						</v-expansion-panel-content>
-					</v-expansion-panel> -->
 				</v-expansion-panels>
 			</v-sheet>
 		</v-sheet>
@@ -237,7 +454,6 @@ export default {
 			"getTokens",
 			"getCustomLocalization",
 			"getDetails",
-			"getPrecache",
 			"getD2Path",
 			"getPath",
 			"getEntities"
@@ -253,8 +469,7 @@ export default {
 				.filter(
 					key =>
 						key.includes("npc_dota_") &&
-						!key.includes("npc_dota_hero") &&
-						!key.includes("npc_dota_precache")
+						!key.includes("npc_dota_hero")
 				)
 				.sort((first, next) => {
 					if (
@@ -327,20 +542,6 @@ export default {
 					return 1;
 				});
 		},
-		precache() {
-			return Object.keys(this.getPrecache)
-				.filter(
-					key => key.includes(this.filterString) && key !== "Version"
-				)
-				.sort((first, next) => {
-					if (
-						this.customLocalization(first) <
-						this.customLocalization(next)
-					)
-						return -1;
-					return 1;
-				});
-		},
 		movable() {
 			return this.units
 				.map(item => ({ id: item, name: item }))
@@ -359,95 +560,51 @@ export default {
 						"DOTA_UNIT_CAP_MOVE_NONE"
 				);
 		},
-		unitTree() {
-			return [
-				{
-					id: "CUSTOM_UNITS_MOVABLE",
-					name: "Can Move :",
-					children: this.movable
-				},
-				{
-					id: "CUSTOM_UNITS_UNMOVABLE",
-					name: "Cannot Move :",
-					children: this.unmovable
-				},
-				{
-					id: "CUSTOM_UNITS_ALL",
-					name: "All :",
-					children: [...this.movable, ...this.unmovable]
-				}
-			];
+		allUnits() {
+			return this.units.map(item => ({ id: item, name: item }));
 		},
 		heroTree() {
 			return this.heros.map(item => ({ id: item, name: item }));
 		},
-		abilityTree() {
-			return [
-				{
-					id: "OVERRIDE_ABILITIES",
-					name: "Override Abilities :",
-					children: this.abilities
-						.map(item => ({
-							id: item,
-							name: item
-						}))
-						.filter(
-							item =>
-								this.localization[
-									`DOTA_Tooltip_ability_${item.id}`
-								]
-						)
-				},
-				{
-					id: "CUSTOM_ABILITIES",
-					name: "Custom Abilities :",
-					children: this.abilities
-						.map(item => ({
-							id: item,
-							name: item
-						}))
-						.filter(
-							item =>
-								this.getCustomLocalization[
-									`DOTA_Tooltip_ability_${item.id}`
-								]
-						)
-				}
-			];
+		overrideAbilityTree() {
+			return this.abilities
+				.map(item => ({
+					id: item,
+					name: item
+				}))
+				.filter(
+					item => this.localization[`DOTA_Tooltip_ability_${item.id}`]
+				);
 		},
-		itemTree() {
-			return [
-				{
-					id: "OVERRIDE_ITEMS",
-					name: "Override Items :",
-					children: this.items
-						.map(item => ({ id: item, name: item }))
-						.filter(
-							item =>
-								this.localization[
-									`DOTA_Tooltip_Ability_${item.id}`
-								]
-						)
-				},
-				{
-					id: "CUSTOM_ITEMS",
-					name: "Custom Items :",
-					children: this.items
-						.map(item => ({ id: item, name: item }))
-						.filter(
-							item =>
-								this.getCustomLocalization[
-									`DOTA_Tooltip_ability_${item.id}`
-								]
-						)
-				}
-			];
+		customAbilityTree() {
+			return this.abilities
+				.map(item => ({
+					id: item,
+					name: item
+				}))
+				.filter(
+					item =>
+						this.getCustomLocalization[
+							`DOTA_Tooltip_ability_${item.id}`
+						]
+				);
 		},
-		precacheTree() {
-			return this.precache.map(item => ({
-				id: item,
-				name: item
-			}));
+		overrideItemTree() {
+			return this.items
+				.map(item => ({ id: item, name: item }))
+				.filter(
+					item => this.localization[`DOTA_Tooltip_Ability_${item.id}`]
+				);
+		},
+		customItemTree() {
+			return this.items
+				.map(item => ({ id: item, name: item }))
+				.filter(
+					item =>
+						this.getCustomLocalization[
+							`DOTA_Tooltip_ability_${item.id}`
+						]
+				);
 		}
 	},
 	methods: {
@@ -489,9 +646,6 @@ export default {
 					break;
 				case "ABILITY":
 					selectedEntity = this.getAbilities[selectedKey];
-					break;
-				case "PRECACHE":
-					selectedEntity = this.getPrecache[selectedKey];
 					break;
 			}
 
@@ -553,9 +707,6 @@ export default {
 					filteredKey = `DOTA_Tooltip_ability_${key}`;
 					altKey = `DOTA_Tooltip_Ability_${key}`;
 					break;
-				case "PRECACHE":
-					filteredKey = key.replace("npc_precache_", "");
-					break;
 			}
 
 			return this.localization[filteredKey]
@@ -579,12 +730,6 @@ export default {
 						.join("\\")
 						.replace(".vmdl", ".png")}`;
 				return "";
-			}
-			if (this.precache.includes(entity)) {
-				return `${defaultPath}\\heroes\\${entity.replace(
-					"npc_precache_",
-					""
-				)}.png`;
 			}
 			if (this.items.includes(entity)) {
 				if (this.getItems[entity].Model)
@@ -644,7 +789,6 @@ export default {
 		},
 		checkItemType(key) {
 			if (key.includes("npc_dota_hero")) return "HERO";
-			else if (key.includes("npc_dota_precache")) return "PRECACHE";
 			else if (key.includes("npc_dota")) return "UNIT";
 			else if (key.includes("item_")) return "ITEM";
 			else return "ABILITY";
@@ -660,12 +804,25 @@ export default {
 <style lang="scss" scoped>
 .expansion-panel-content {
 	max-height: calc(100vh - 329px);
-	padding-top: 16px;
+	padding-top: 1px;
+	overflow: auto;
+}
+
+.expansion-panel-content-inner {
+	max-height: calc(100vh - 442px);
+	padding-top: 1px;
+	overflow: auto;
+}
+
+.expansion-panel-content-inner-three {
+	max-height: calc(100vh - 490px);
+	padding-top: 1px;
 	overflow: auto;
 }
 
 .panel-header {
 	position: relative;
+	font-weight: 600;
 
 	&:after {
 		content: "";

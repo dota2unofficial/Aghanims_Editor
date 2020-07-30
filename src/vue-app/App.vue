@@ -142,6 +142,10 @@ ul {
 	}
 }
 
+.v-expansion-panel-content__wrap {
+	padding: 0 !important;
+}
+
 ::-webkit-scrollbar {
 	width: 0;
 	background-color: transparent;
