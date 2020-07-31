@@ -21,7 +21,54 @@
 							<v-expansion-panels accordion hover tile>
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>Can Move</v-expansion-panel-header
+										>ALL</v-expansion-panel-header
+									>
+									<v-expansion-panel-content
+										class="expansion-panel-content-inner-three"
+									>
+										<v-treeview
+											:items="allUnits"
+											dense
+											open-on-click
+											selected-color="primary"
+											hoverable
+											activatable
+											item-key="name"
+											@update:active="onItemChanged"
+										>
+											<template v-slot:label="{ item }">
+												<span>
+													{{
+														customLocalization(
+															item.name
+														)
+													}}
+												</span>
+											</template>
+											<template
+												v-slot:prepend="{ item, leaf }"
+											>
+												<v-img
+													v-if="leaf"
+													:src="
+														getEntityIcon(item.name)
+													"
+													:width="24"
+													:height="24"
+													tile
+													contain
+												></v-img>
+												<v-icon v-else>{{
+													mdiParent
+												}}</v-icon>
+											</template>
+										</v-treeview>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+								
+								<v-expansion-panel>
+									<v-expansion-panel-header
+										>MOBILE</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -68,60 +115,13 @@
 
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>Can't Move</v-expansion-panel-header
+										>STATIONARY</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
 									>
 										<v-treeview
 											:items="unmovable"
-											dense
-											open-on-click
-											selected-color="primary"
-											hoverable
-											activatable
-											item-key="name"
-											@update:active="onItemChanged"
-										>
-											<template v-slot:label="{ item }">
-												<span>
-													{{
-														customLocalization(
-															item.name
-														)
-													}}
-												</span>
-											</template>
-											<template
-												v-slot:prepend="{ item, leaf }"
-											>
-												<v-img
-													v-if="leaf"
-													:src="
-														getEntityIcon(item.name)
-													"
-													:width="24"
-													:height="24"
-													tile
-													contain
-												></v-img>
-												<v-icon v-else>{{
-													mdiParent
-												}}</v-icon>
-											</template>
-										</v-treeview>
-									</v-expansion-panel-content>
-								</v-expansion-panel>
-
-								<v-expansion-panel>
-									<v-expansion-panel-header
-										>All</v-expansion-panel-header
-									>
-									<v-expansion-panel-content
-										class="expansion-panel-content-inner-three"
-									>
-										<v-treeview
-											:items="allUnits"
 											dense
 											open-on-click
 											selected-color="primary"
