@@ -48,7 +48,7 @@
 		</v-sheet>
 
 		<ag-grid-vue
-			style="width: 100%; height: calc(50vh - 140px)"
+			:style="styleObject"
 			class="ag-theme-alpine"
 			:columnDefs="columns"
 			v-model="items"
@@ -61,7 +61,7 @@
 
 		<v-sheet
 			class="d-flex align-center justify-center expander"
-			v-if="getSelected"
+			v-if="getSelected && isVisible"
 		>
 			<v-btn
 				x-small
@@ -177,27 +177,6 @@ export default {
 							};
 						}
 
-						if (key === "vscripts") {
-							return {
-								component: "vscriptSelector",
-								params
-							};
-						}
-
-						if (key === "ScriptFile") {
-							return {
-								component: "scriptSelector",
-								params
-							};
-						}
-
-						if (key === "Creature") {
-							return {
-								component: "abilitySelector",
-								params
-							};
-						}
-
 						const options = getConstData(key);
 						if (options.length > 0) {
 							return {
@@ -272,7 +251,7 @@ export default {
 						[entityName, "Name"],
 						[`${entityName}_hype`, "Hype"],
 						[`${entityName}_bio`, "Bio"]
-					]
+					];
 				case "HERO":
 					return [
 						[entityName, "Name"],
@@ -311,6 +290,17 @@ export default {
 		},
 		localization() {
 			return this.getLocalizationData;
+		},
+		styleObject() {
+			return {
+				width: "100%",
+				height: this.getShowDefaultValues
+					? "calc(50vh - 140px)"
+					: "calc(100vh - 279px)"
+			};
+		},
+		isVisible() {
+			return this.originalItems.length > 0;
 		}
 	},
 	methods: {
@@ -323,7 +313,8 @@ export default {
 			"setHeros",
 			"setCurrentAvatar",
 			"setDetails",
-			"setSelected"
+			"setSelected",
+			"setOriginalItems"
 		]),
 		...mapActions(["addDebugLogs", "toggleShowDefaultValues"]),
 		getRowHeight(params) {
@@ -355,6 +346,7 @@ export default {
 			this.originalItems = this.originalItems.filter(
 				item => item.key !== data.key
 			);
+			this.setOriginalItems(this.originalItems);
 		},
 		onCellClicked(event) {
 			if (this.getDefaultAbilities[event.value]) {
@@ -445,6 +437,7 @@ export default {
 							.map(modified => modified.key)
 							.includes(item.key)
 				);
+				this.setOriginalItems(this.originalItems)
 		},
 		items(value) {
 			let newData = {};

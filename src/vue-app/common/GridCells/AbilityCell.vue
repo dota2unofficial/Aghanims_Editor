@@ -20,7 +20,15 @@
 						hide-details
 						dense
 						outlined
-						:type="isNumber(models[index]) ? 'number' : 'string'"
+						v-if="isNumber(models[index])"
+						@keypress="onKeyPress"
+						v-model="models[index][getFlattenArray(item)[1]]"
+					></v-text-field>
+					<v-text-field
+						hide-details
+						dense
+						outlined
+						v-else
 						v-model="models[index][getFlattenArray(item)[1]]"
 					></v-text-field>
 				</span>
@@ -98,11 +106,28 @@ export default Vue.extend({
 		},
 		isNumber(str) {
 			const value = str[Object.keys(str)[1]];
-			console.log(value);
+			if (isNaN(value)) {
+				let ret = false;
+				value.split(" ").forEach(item => (ret = isNaN(item)));
+				return !ret;
+			}
 			return (
 				typeof value === "number" ||
 				(typeof value === "string" && value.indexOf(".") > -1)
 			);
+		},
+		onKeyPress(evt) {
+			const event = evt ? evt : window.event;
+			const code = event.which ? event.which : event.keyCode;
+			if (
+				code > 31 &&
+				(code < 48 || code > 57) &&
+				code !== 46
+			) {
+				evt.preventDefault();
+			} else {
+				return true;
+			}
 		}
 	}
 });
