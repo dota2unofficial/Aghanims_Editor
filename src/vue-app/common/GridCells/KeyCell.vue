@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ default: isDefault }">
+	<div>
 		<div class="cell">
 			<img
 				:src="getIcon(params.value)"
@@ -13,7 +13,7 @@
 			dense
 			hide-details
 			class="pt-0 mt-0"
-			v-if="isAbilitySet && !isDefault"
+			v-if="isAbilitySet"
 			v-model="ability"
 			@change="toggleAbility"
 		></v-checkbox>
@@ -76,21 +76,31 @@ export default Vue.extend({
 		}
 	},
 	computed: {
-		...mapGetters(["getAbility", "getDetails", "getHideValueType"]),
+		...mapGetters([
+			"getAbility",
+			"getDetails",
+			"getHideValueType",
+			"getOriginalItems"
+		]),
 		isAbilitySet() {
 			if (!/Ability\d/.test(this.params.value)) return false;
 			const newArray = Object.keys(this.getDetails).filter(key =>
 				/Ability\d/.test(key)
 			);
-			if (newArray.length === 0) return false;
-			if (this.params.value === newArray[0]) return true;
+			let secondArray = this.getOriginalItems.filter(key =>
+				/Ability\d/.test(key.key)
+			);
+			if (newArray.length > 0) secondArray = [{key: "nofound"}];
+			if (newArray.length === 0 && secondArray === 0) return false;
+			if (
+				this.params.value === newArray[0] ||
+				this.params.value === secondArray[0].key
+			)
+				return true;
 			return false;
 		},
 		isObjectType() {
-			return this.params.value === "AbilitySpecial"
-		},
-		isDefault() {
-			return this.params.data.weight === 1;
+			return this.params.value === "AbilitySpecial";
 		}
 	}
 });

@@ -36,8 +36,9 @@ const store = new Vuex.Store({
 		defaultHeroes: {},
 		defaultAbilities: {},
 		defaultItems: {},
-		hideValueType: false,
-		showDefaultValues: false
+		hideValueType: true,
+		showDefaultValues: false,
+		originalItems: []
 	},
 	getters: {
 		getPath: state => state.path,
@@ -63,7 +64,8 @@ const store = new Vuex.Store({
 		getDefaultAbilities: state => state.defaultAbilities,
 		getDefaultItems: state => state.defaultItems,
 		getHideValueType: state => state.hideValueType,
-		getShowDefaultValues: state => state.showDefaultValues
+		getShowDefaultValues: state => state.showDefaultValues,
+		getOriginalItems: state => state.originalItems
 	},
 	mutations: {
 		setPath(state, path) {
@@ -137,6 +139,9 @@ const store = new Vuex.Store({
 		},
 		setShowDefaultValues(state, payload) {
 			state.showDefaultValues = payload;
+		},
+		setOriginalItems(state, payload) {
+			state.originalItems = payload;
 		}
 	},
 	actions: {
@@ -163,7 +168,7 @@ const store = new Vuex.Store({
 			commit("setDebugLogs", [...getters.getDebugLogs, log]);
 		},
 		toggleShowDefaultValues({ commit, state }) {
-			commit("setShowDefaultValues", !state.showDefaultValues)
+			commit("setShowDefaultValues", !state.showDefaultValues);
 		},
 		loadCustomLocalization({ commit, getters }, mod) {
 			const filePath = `${getters.getD2Path}\\dota_addons\\${mod}\\resource\\addon_english.txt`;
