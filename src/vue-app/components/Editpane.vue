@@ -57,6 +57,7 @@
 			stopEditingWhenGridLosesFocus
 			v-if="getSelected"
 			@column-resized="onColumnResized"
+			domLayout="autoHeight"
 		></ag-grid-vue>
 
 		<v-sheet
@@ -75,17 +76,18 @@
 		</v-sheet>
 
 		<ag-grid-vue
-			style="width: 100%; height: calc(50vh - 140px)"
+			style="width: 100%; height: auto"
 			class="ag-theme-alpine"
 			:columnDefs="columns"
 			v-model="originalItems"
 			:tooltipShowDelay="0"
 			:frameworkComponents="frameworkComponents"
 			stopEditingWhenGridLosesFocus
-			v-if="getSelected && getShowDefaultValues"
+			v-if="hasDefaultData"
 			@column-resized="onColumnResized"
 			@cellValueChanged="onCellValueChanged"
 			@cellClicked="onCellClicked"
+			domLayout="autoHeight"
 		></ag-grid-vue>
 
 		<v-sheet v-if="isOverride">
@@ -242,6 +244,11 @@ export default {
 			const list = this.getAbilities[this.getSelected];
 			return [];
 		},
+		hasDefaultData() {
+			return (
+				this.getSelected && this.getShowDefaultValues
+			);
+		},
 		localizationEditable() {
 			if (!this.getSelected) return [];
 			const entityName = this.getSelected;
@@ -295,7 +302,7 @@ export default {
 			return {
 				width: "100%",
 				height: this.getShowDefaultValues
-					? "calc(50vh - 140px)"
+					? "auto"
 					: "calc(100vh - 279px)"
 			};
 		},
@@ -437,7 +444,7 @@ export default {
 							.map(modified => modified.key)
 							.includes(item.key)
 				);
-				this.setOriginalItems(this.originalItems)
+			this.setOriginalItems(this.originalItems);
 		},
 		items(value) {
 			let newData = {};

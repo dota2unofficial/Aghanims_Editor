@@ -52,9 +52,15 @@ export default Vue.extend({
 			"getCustomLocalization",
 			"getHideValueType",
 			"getAbility",
+			"getHeros",
+			"getAbilities"
 		]),
 		isAbilitySpecial() {
-			if (this.params.data.key !== "AbilitySpecial") return false;
+			if (
+				this.params.data.key !== "AbilitySpecial" &&
+				this.params.data.key !== "Creature"
+			)
+				return false;
 			return true;
 		},
 		isAbility() {
@@ -64,38 +70,56 @@ export default Vue.extend({
 			return Object.keys(flatten(this.params.value));
 		},
 		getAbilityIcon() {
+			const entity = this.params.value;
 			const defaultPath = `file:\\${process.cwd()}\\${
 				process.env.NODE_ENV === "development" ? "" : "resources\\"
 			}assets`;
-			const texture = this.getLocalizationData[
-				`DOTA_Tooltip_ability_${this.params.value}`
-			];
 
-			const textureIcon = `${defaultPath}\\spells\\${texture
-				.split(" ")
-				.join("_")}_icon.png`;
+			const currentEntity = this.getAbilities[entity];
+			if (currentEntity && currentEntity["AbilityTextureName"]) {
+				const defaultD2Res = `${this.getD2Path}\\dota_addons\\${this.getPath}\\resource\\flash3\\images\\spellicons\\${currentEntity["AbilityTextureName"]}`;
+				const localizationData = this.getLocalizationData[
+					`DOTA_Tooltip_ability_${currentEntity["AbilityTextureName"]}`
+				];
+				if (fs.existsSync(`${defaultD2Res}_lua.png`))
+					return `${defaultD2Res}_lua.png`;
+				else if (fs.existsSync(`${defaultD2Res}.png`))
+					return `${defaultD2Res}.png`;
+				else if (localizationData) {
+					const localizedIcon = `${defaultPath}\\spells\\${localizationData
+						.split(" ")
+						.join("_")}_icon.png`;
 
-			let retUrl = null;
-
-			try {
-				fs.accessSync(textureIcon);
-				retUrl = textureIcon;
-			} catch (err) {
-				const normalPath = `${defaultPath}\\spells\\${this.params.value}.png`;
-				retUrl = normalPath;
+					let retUrl;
+					try {
+						fs.accessSync(localizedIcon);
+						return localizedIcon;
+					} catch {
+						retUrl = `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}.png`;
+					}
+					return retUrl;
+				} else
+					return `${defaultPath}\\spells\\${currentEntity["AbilityTextureName"]}.png`;
 			}
-
-			return retUrl;
+			return `${defaultPath}\\spells\\${entity}.png`;
 		},
 		hasIcon() {
 			const data = this.getLocalizationData[
 				`DOTA_Tooltip_ability_${this.params.value}`
-			];
+			]
+				? this.getLocalizationData[
+						`DOTA_Tooltip_ability_${this.params.value}`
+				  ]
+				: this.getCustomLocalization[
+						`DOTA_Tooltip_ability_${this.params.value}`
+				  ];
 			return data === undefined
 				? false
 				: data.indexOf("{s:value}") === -1;
 		},
 		getFormattedValue() {
+			if (this.params.data.key === "AbilityTextureName")
+				return this.params.value;
 			if (
 				this.getCustomLocalization[
 					`DOTA_Tooltip_ability_${this.params.value}`
