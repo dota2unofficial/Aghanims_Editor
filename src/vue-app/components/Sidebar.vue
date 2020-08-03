@@ -23,7 +23,7 @@
 							<v-expansion-panels accordion hover tile>
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>All</v-expansion-panel-header
+										>All ({{allUnits.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -70,7 +70,7 @@
 
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>Mobile</v-expansion-panel-header
+										>Mobile ({{movable.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -117,7 +117,7 @@
 
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>Stationary</v-expansion-panel-header
+										>Stationary ({{unmovable.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -218,7 +218,7 @@
 								<v-expansion-panel>
 									<v-expansion-panel-header
 										>Override
-										Abilities</v-expansion-panel-header
+										Abilities ({{overrideItemTree.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner"
@@ -266,7 +266,7 @@
 								<v-expansion-panel>
 									<v-expansion-panel-header
 										>Custom
-										Abilities</v-expansion-panel-header
+										Abilities ({{customAbilityTree.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner"
@@ -327,7 +327,7 @@
 								<v-expansion-panel>
 									<v-expansion-panel-header
 										>Override
-										Items</v-expansion-panel-header
+										Items ({{overrideItemTree.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner"
@@ -374,7 +374,7 @@
 
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>Custom Items</v-expansion-panel-header
+										>Custom Items ({{customItemTree.length}})</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner"
