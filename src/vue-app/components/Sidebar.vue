@@ -13,7 +13,9 @@
 				<v-expansion-panels accordion hover tile>
 					<v-expansion-panel>
 						<v-expansion-panel-header class="panel-header"
-							>Units</v-expansion-panel-header
+							>Units ({{
+								allUnits.length
+							}})</v-expansion-panel-header
 						>
 						<v-expansion-panel-content
 							class="expansion-panel-content"
@@ -21,7 +23,7 @@
 							<v-expansion-panels accordion hover tile>
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>ALL</v-expansion-panel-header
+										>All</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -65,10 +67,10 @@
 										</v-treeview>
 									</v-expansion-panel-content>
 								</v-expansion-panel>
-								
+
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>MOBILE</v-expansion-panel-header
+										>Mobile</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -115,7 +117,7 @@
 
 								<v-expansion-panel>
 									<v-expansion-panel-header
-										>STATIONARY</v-expansion-panel-header
+										>Stationary</v-expansion-panel-header
 									>
 									<v-expansion-panel-content
 										class="expansion-panel-content-inner-three"
@@ -165,7 +167,9 @@
 
 					<v-expansion-panel>
 						<v-expansion-panel-header class="panel-header"
-							>Heroes</v-expansion-panel-header
+							>Heroes ({{
+								heroTree.length
+							}})</v-expansion-panel-header
 						>
 						<v-expansion-panel-content
 							class="expansion-panel-content"
@@ -202,7 +206,10 @@
 
 					<v-expansion-panel>
 						<v-expansion-panel-header class="panel-header"
-							>Abilities</v-expansion-panel-header
+							>Abilities ({{
+								[...overrideItemTree, ...customAbilityTree]
+									.length
+							}})</v-expansion-panel-header
 						>
 						<v-expansion-panel-content
 							class="expansion-panel-content"
@@ -309,7 +316,9 @@
 
 					<v-expansion-panel>
 						<v-expansion-panel-header class="panel-header"
-							>Items</v-expansion-panel-header
+							>Items ({{
+								[...overrideItemTree, ...customItemTree].length
+							}})</v-expansion-panel-header
 						>
 						<v-expansion-panel-content
 							class="expansion-panel-content"
@@ -738,6 +747,14 @@ export default {
 					)
 						.join("\\")
 						.replace(".vmdl", ".png")}`;
+				if (this.getItems[entity].AbilityTextureName) {
+					const defaultD2Res = `${this.getD2Path}\\dota_addons\\${
+						this.getPath
+					}\\resource\\flash3\\images\\items\\${this.getItems[
+						entity
+					].AbilityTextureName.replace("item_", "")}.png`;
+					return defaultD2Res;
+				}
 				return `${defaultPath}\\items\\${entity.replace(
 					"item_",
 					""
